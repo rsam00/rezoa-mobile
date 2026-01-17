@@ -2,10 +2,9 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
-import { Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
-import { programs as allPrograms } from '../data/programs_updated';
-import { stations as allStations } from '../data/working_stations_2';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -31,15 +30,30 @@ function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
 
 export default function ProgramDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const program = allPrograms.find(p => p.id === id);
-  const station = program ? allStations.find(s => s.id === program.stationId) : null;
+  const { programs, stations, loading, recordProgramClick } = useData();
+  const program = programs.find(p => p.id === id);
+
+  React.useEffect(() => {
+    if (program) {
+      recordProgramClick(program.id);
+    }
+  }, [program]);
+  const station = program ? stations.find(s => s.id === program.stationId) : null;
   const router = useRouter();
   const { playStation } = usePlayer();
 
   const isProgramLive = useMemo(() => {
     if (!program) return false;
-    return !!isLive([program], program.stationId);
+    return !!isLive([program as any], program.stationId);
   }, [program]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#a78bfa" />
+      </SafeAreaView>
+    );
+  }
 
   if (!program) {
     return (
@@ -258,7 +272,7 @@ const styles = StyleSheet.create({
   liveBadgeWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ff3b30',
+    backgroundColor: '#7c3aed',
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,

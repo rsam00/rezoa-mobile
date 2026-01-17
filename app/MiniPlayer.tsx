@@ -1,13 +1,15 @@
+import { BlurView } from 'expo-blur';
 import { useSegments } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
-import { programs as allPrograms } from '../data/programs_updated';
 
 import { calculateProgramProgress, getCurrentProgram, Program } from '../utils/timeUtils';
 
 export default function MiniPlayer() {
   const { playerState, playStation, pause, stop } = usePlayer();
+  const { programs } = useData();
   const segments = useSegments();
   const isInTabs = segments[0] === '(tabs)';
   
@@ -20,7 +22,7 @@ export default function MiniPlayer() {
     if (!playerState.currentStation) return;
 
     const update = () => {
-      const program = getCurrentProgram(allPrograms as any[], playerState.currentStation!.id);
+      const program = getCurrentProgram(programs as any[], playerState.currentStation!.id);
       const progress = program ? calculateProgramProgress(program) : 0;
       setLiveInfo({ program: program || null, progress });
     };
@@ -100,56 +102,60 @@ export default function MiniPlayer() {
         styles.container, 
         { 
           transform: [{ translateY: slideAnim }],
-          bottom: isInTabs ? 90 : 0, // Docked exactly on top of TabBar or bottom of screen
+          bottom: isInTabs ? 70 : 0, // Docked exactly on top of TabBar or bottom of screen
         },
       ]}
     >
-      <View style={styles.mainRow}>
-        <View style={styles.infoSection}>
-          <View style={styles.scrollClip}>
-            <Animated.View style={{ transform: [{ translateY }] }}>
-              <View style={styles.textTrack}>
-                <Text style={styles.stationTitle} numberOfLines={1}>
-                  {playerState.currentStation.name}
-                </Text>
-              </View>
-              <View style={styles.textTrack}>
-                <Text style={styles.programTitle} numberOfLines={1}>
-                  {liveInfo.program ? liveInfo.program.name : 'Live Stream'}
-                </Text>
-              </View>
-            </Animated.View>
-          </View>
-          
-          {playerState.error && (
-            <Text style={styles.error} numberOfLines={1}>
-              {playerState.error}
-            </Text>
-          )}
-        </View>
-
-        <View style={styles.controls}>
-          {playerState.isLoading ? (
-            <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
-          ) : (
-            <TouchableOpacity onPress={handlePlayPause} style={styles.button}>
-              <Text style={styles.buttonText}>
-                {playerState.isPlaying ? '⏸' : '▶️'}
+      <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+      
+      <View style={styles.contentContainer}>
+        <View style={styles.mainRow}>
+          <View style={styles.infoSection}>
+            <View style={styles.scrollClip}>
+              <Animated.View style={{ transform: [{ translateY }] }}>
+                <View style={styles.textTrack}>
+                  <Text style={styles.stationTitle} numberOfLines={1}>
+                    {playerState.currentStation.name}
+                  </Text>
+                </View>
+                <View style={styles.textTrack}>
+                  <Text style={styles.programTitle} numberOfLines={1}>
+                    {liveInfo.program ? liveInfo.program.name : 'Live Stream'}
+                  </Text>
+                </View>
+              </Animated.View>
+            </View>
+            
+            {playerState.error && (
+              <Text style={styles.error} numberOfLines={1}>
+                {playerState.error}
               </Text>
-            </TouchableOpacity>
-          )}
-          <TouchableOpacity onPress={() => stop()} style={styles.button}>
-            <Text style={styles.buttonText}>⏹</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            )}
+          </View>
 
-      {/* Show Progress Bar */}
-      {liveInfo.program && (
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressBar, { width: `${liveInfo.progress * 100}%` }]} />
+          <View style={styles.controls}>
+            {playerState.isLoading ? (
+              <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
+            ) : (
+              <TouchableOpacity onPress={handlePlayPause} style={styles.button}>
+                <Text style={styles.buttonText}>
+                  {playerState.isPlaying ? '⏸' : '▶️'}
+                </Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity onPress={() => stop()} style={styles.button}>
+              <Text style={styles.buttonText}>⏹</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      )}
+
+        {/* Show Progress Bar */}
+        {liveInfo.program && (
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar, { width: `${liveInfo.progress * 100}%` }]} />
+          </View>
+        )}
+      </View>
     </Animated.View>
   );
 }
@@ -160,14 +166,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     // bottom is dynamic based on isInTabs
-    backgroundColor: '#18181b',
+    backgroundColor: 'rgba(0,0,0,0.95)',
     overflow: 'hidden',
-    zIndex: 9999,
+    zIndex: 100,
     borderTopWidth: 1,
-    borderTopColor: '#27272a',
+    borderTopColor: 'rgba(255,255,255,0.1)',
     height: 64,
     justifyContent: 'center',
-    // Removed margins and border radius for integrated docking look
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
   },
   mainRow: {
     flexDirection: 'row',
