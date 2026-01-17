@@ -16,49 +16,48 @@ export default function TabLayout() {
   const isHome = String(segments[segments.length - 1]) === 'index';
 
   return (
-    <>
-      <Tabs
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
-          headerShown: false,
-          tabBarButton: HapticTab,
-          tabBarBackground: TabBarBackground,
-          tabBarStyle: {
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 90,
-            paddingBottom: Platform.OS === 'ios' ? 25 : 15,
-            paddingTop: 8,
-            borderTopWidth: 1,
-            borderTopColor: '#222',
-            elevation: 0,
-          },
-        }}>
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: 'Explore',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass.circle" color={color} />,
-          }}
-        />
-                  <Tabs.Screen
-            name="programguide"
-            options={{
-              title: 'Guide',
-              tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
-            }}
-          />
-        </Tabs>
-    </>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+        headerShown: false,
+        tabBarButton: HapticTab,
+        tabBarBackground: TabBarBackground,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: 'rgba(0,0,0,0.95)',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 70,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+          paddingTop: 0,
+          borderTopWidth: 1,
+          borderTopColor: '#222',
+          elevation: 0,
+        },
+      }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="programguide"
+        options={{
+          title: 'Guide',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="magnifyingglass.circle" color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }

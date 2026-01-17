@@ -62,7 +62,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       setCurrentStation(station);
-      addToHistory(station.id);
+      await addToHistory(station.id);
       player.replace({ uri: station.streamUrl });
       player.play();
 

@@ -1,15 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
-import { ActivityIndicator, Animated, Dimensions, FlatList, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useContributions } from '../contexts/ContributionsContext';
+import { useData } from '../contexts/DataContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
-import { programs as allPrograms } from '../data/programs_updated';
-import { stations as allStations } from '../data/working_stations_2';
+import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const HERO_HEIGHT = 280;
+const HERO_HEIGHT = 400;
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any; [key: string]: any }>;
 function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
@@ -25,8 +27,6 @@ function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
     </Pressable>
   );
 }
-
-import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
 const ProgramCard = React.memo(function ProgramCard({ item, onPress }: { item: any, onPress: () => void }) {
   const live = useMemo(() => isLive([item], item.stationId), [item]);
@@ -46,6 +46,11 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress }: { item: a
               <Text style={styles.liveBadgeText}>LIVE</Text>
             </View>
           )}
+          {item.status === 'pending' && (
+            <View style={[styles.liveBadge, { backgroundColor: '#fbbf24' }]}>
+              <Text style={[styles.liveBadgeText, { color: '#000' }]}>PENDING</Text>
+            </View>
+          )}
         </View>
         
         {item.schedules && item.schedules[0] && (
@@ -61,25 +66,51 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress }: { item: a
         )}
       </View>
       
-      <Text style={styles.chevron}>›</Text>
+      <Ionicons name="chevron-forward" size={20} color="#52525b" />
     </AnimatedCard>
   );
 });
 
 export default function StationDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const station = allStations.find(s => s.id === id);
-  const stationPrograms = useMemo(() => allPrograms.filter(p => p.stationId === id), [id]);
+  const { stations, getProgramsForStation, loading, recordClick, recordProgramClick } = useData();
+  const station = stations.find(s => s.id === id);
+
+  React.useEffect(() => {
+    if (station) {
+      recordClick(station.id);
+    }
+  }, [station]);
+  const { getContributionsForStation } = useContributions();
+  const localContributions = useMemo(() => getContributionsForStation(id as string), [id, getContributionsForStation]);
+
+  const stationPrograms = useMemo(() => {
+    const staticProgs = getProgramsForStation(id as string);
+    return [...localContributions, ...staticProgs];
+  }, [id, localContributions, getProgramsForStation]);
+
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
   const isStationPlaying = playerState.isPlaying && playerState.currentStation?.id === station?.id;
-  const isLoading = playerState.isLoading && playerState.currentStation?.id === station?.id;
+  const isStationLoading = playerState.isLoading && playerState.currentStation?.id === station?.id;
   const router = useRouter();
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#a78bfa" />
+      </SafeAreaView>
+    );
+  }
 
   if (!station) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.stationName}>Station not found</Text>
+        <TouchableOpacity style={styles.backButtonInline} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+          <Text style={styles.backButtonText}>Back</Text>
+        </TouchableOpacity>
+        <Text style={[styles.stationName, { marginTop: 40, textAlign: 'center' }]}>Station not found</Text>
       </SafeAreaView>
     );
   }
@@ -88,132 +119,117 @@ export default function StationDetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[0]}>
-        {/* Header Layer */}
-        <View style={styles.heroRoot}>
-          <View style={styles.heroWrapper}>
-            <View style={styles.heroBackgroundContainer}>
-              <Image source={logoSource} style={styles.heroBlurBg} resizeMode="cover" />
-              <BlurView intensity={95} tint="dark" style={StyleSheet.absoluteFill} />
-              <LinearGradient
-                colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(0,0,0,1)']}
-                style={StyleSheet.absoluteFill}
-              />
-            </View>
-          </View>
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.heroSection}>
+          <Image source={logoSource} style={styles.heroBg} blurRadius={15} resizeMode="cover" />
+          <LinearGradient 
+            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)', 'black']} 
+            style={StyleSheet.absoluteFill} 
+          />
           
-          <TouchableOpacity onPress={() => router.back()} style={styles.floatBackButton}>
-            <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
-            <Text style={styles.backButtonText}>✕</Text>
-          </TouchableOpacity>
+          <View style={styles.heroContent}>
+            <View style={styles.topBar}>
+              <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <BlurView intensity={30} tint="light" style={styles.backButtonBlur}>
+                  <Ionicons name="chevron-back" size={24} color="white" />
+                </BlurView>
+              </TouchableOpacity>
+            </View>
 
-          <View style={styles.heroLogoWrapper}>
-            <View style={styles.heroLogoContainer}>
-              <Image source={logoSource} style={styles.heroLogo} resizeMode="contain" />
+            <View style={styles.stationHeader}>
+              <View style={styles.logoRing}>
+                <Image source={logoSource} style={styles.stationLogo} resizeMode="contain" />
+              </View>
+              <View style={styles.stationText}>
+                <Text style={styles.stationName}>{station.name}</Text>
+                <Text style={styles.stationMeta}>{station.city}, {station.country}</Text>
+                <Text style={styles.stationFrequency}>{station.frequency || 'Streaming Live'}</Text>
+              </View>
+            </View>
+
+            <View style={styles.heroActions}>
+              <TouchableOpacity
+                style={[styles.mainPlayButton, isStationPlaying && styles.playingButton]}
+                onPress={async () => {
+                  if (isStationPlaying) await pause();
+                  else await playStation(station as any);
+                }}
+              >
+                {!isStationPlaying && (
+                  <LinearGradient
+                    colors={['#fff', '#f4f4f5']}
+                    style={StyleSheet.absoluteFill}
+                  />
+                )}
+                {isStationLoading ? (
+                  <ActivityIndicator color={isStationPlaying ? "#fff" : "#000"} />
+                ) : (
+                  <View style={styles.buttonContent}>
+                    <Ionicons 
+                      name={isStationPlaying ? "pause" : "play"} 
+                      size={20} 
+                      color={isStationPlaying ? "#fff" : "#000"} 
+                      style={{ marginRight: 8 }}
+                    />
+                    <Text style={[styles.playButtonText, { color: isStationPlaying ? "#fff" : "#000" }]}>
+                      {isStationPlaying ? 'PAUSE' : 'LISTEN'}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.favButtonCircle}
+                onPress={() => toggleFavorite(station.id)}
+              >
+                <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
+                <Ionicons 
+                  name={favorites.includes(station.id) ? "star" : "star-outline"} 
+                  size={24} 
+                  color={favorites.includes(station.id) ? "#fbbf24" : "white"} 
+                />
+              </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        {/* Station Info Section */}
-        <View style={styles.contentPadding}>
-          <View style={styles.infoRow}>
-            <Text style={styles.stationName}>{station.name}</Text>
-          </View>
-          
-          <Text style={styles.stationMeta}>
-            {station.city}, {station.country}  •  <Text style={styles.frequencyText}>{station.frequency || 'Streaming Live'}</Text>
-          </Text>
-
-          <View style={styles.tagGrid}>
-            {(station.tag || []).map((tag: string) => (
-              <View key={tag} style={styles.tagBadge}>
-                <Text style={styles.tagText}>{tag.toUpperCase()}</Text>
+        <View style={styles.detailsBody}>
+          <View style={styles.tagStrip}>
+            {station.tag?.map(t => (
+              <View key={t} style={styles.tag}>
+                <Text style={styles.tagText}>{t}</Text>
               </View>
             ))}
           </View>
 
-          <Text style={styles.descriptionText}>{station.description}</Text>
+          <Text style={styles.description}>{station.description || 'Welcome to ' + station.name + '. Streaming live from ' + (station.city || 'Haiti') + '.'}</Text>
 
-          {/* Contact Information Section - Enriched Data */}
-          {((station as any).phone || (station as any).email || (station as any).facebook || (station as any).twitter || station.website) && (
-            <View style={styles.contactContainer}>
-               <BlurView intensity={10} tint="light" style={StyleSheet.absoluteFill} />
-               <View style={styles.contactGrid}>
-                  {(station as any).phone && (
-                    <View style={styles.contactItem}>
-                      <Text style={styles.contactLabel}>PHONE</Text>
-                      <Text style={styles.contactValue}>{(station as any).phone}</Text>
-                    </View>
-                  )}
-                  {(station as any).email && (
-                    <View style={styles.contactItem}>
-                      <Text style={styles.contactLabel}>EMAIL</Text>
-                      <Text style={styles.contactValue} numberOfLines={1}>{(station as any).email.toLowerCase()}</Text>
-                    </View>
-                  )}
-                  {station.website && (
-                    <TouchableOpacity style={styles.contactItem} onPress={() => {}}>
-                      <Text style={styles.contactLabel}>WEBSITE</Text>
-                      <Text style={styles.contactValue} numberOfLines={1}>Visit Site</Text>
-                    </TouchableOpacity>
-                  )}
-                  {((station as any).facebook || (station as any).twitter) && (
-                    <View style={styles.contactItem}>
-                      <Text style={styles.contactLabel}>SOCIAL</Text>
-                      <View style={{ flexDirection: 'row', gap: 10, marginTop: 2 }}>
-                        {(station as any).facebook && <Text style={styles.contactValue}>FB</Text>}
-                        {(station as any).twitter && <Text style={styles.contactValue}>TW</Text>}
-                      </View>
-                    </View>
-                  )}
-               </View>
+          <View style={styles.programSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Radio Schedule</Text>
+              <TouchableOpacity onPress={() => router.push({ pathname: '/contribute-program', params: { stationId: station.id } })}>
+                <Text style={styles.addLink}>+ Suggest Program</Text>
+              </TouchableOpacity>
             </View>
-          )}
 
-          {/* Action Row */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              onPress={async () => isStationPlaying ? await pause() : await playStation(station)}
-              style={[styles.playButtonMain, isStationPlaying && styles.playButtonActive]}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator size="small" color="#000" />
-              ) : (
-                <Text style={styles.playButtonText}>
-                  {isStationPlaying ? '⏸ PAUSE' : '▶️ LISTEN LIVE'}
-                </Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.favoriteButton} 
-              onPress={() => toggleFavorite(station.id)}
-            >
-              <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
-              <Text style={styles.favoriteIcon}>
-                {favorites.includes(station.id) ? '★' : '☆'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Programs Section */}
-          <Text style={styles.sectionHeader}>PROGRAMS & SCHEDULE</Text>
-          <FlatList
-            key="program-list-v2"
-            data={stationPrograms}
-            keyExtractor={item => item.id}
-            scrollEnabled={false}
-            renderItem={({ item }) => (
-              <ProgramCard
-                item={item}
-                onPress={() => router.push({ pathname: '/program-details', params: { id: item.id } })}
-              />
+            {stationPrograms.length > 0 ? (
+              stationPrograms.map(prog => (
+                <ProgramCard
+                  key={prog.id}
+                  item={prog}
+                  onPress={() => {
+                    recordProgramClick(prog.id);
+                    router.push({ pathname: '/program-details', params: { id: prog.id } });
+                  }}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyText}>No programs listed for this station yet.</Text>
+              </View>
             )}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>Full schedule coming soon.</Text>
-            }
-          />
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -221,256 +237,123 @@ export default function StationDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'black',
+  container: { flex: 1, backgroundColor: 'black' },
+  scrollContent: { paddingBottom: 150 },
+  heroSection: { height: HERO_HEIGHT, width: '100%' },
+  heroBg: { ...StyleSheet.absoluteFillObject, width: '100%', height: HERO_HEIGHT },
+  heroContent: { 
+    flex: 1, 
+    paddingHorizontal: 20, 
+    paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 50,
+    paddingBottom: 30,
+    justifyContent: 'space-between'
   },
-  heroRoot: {
-    height: HERO_HEIGHT,
-    width: SCREEN_WIDTH,
-    zIndex: 10,
-  },
-  heroWrapper: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-    backgroundColor: '#000',
-  },
-  heroBackgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  heroBlurBg: {
-    width: SCREEN_WIDTH,
-    height: HERO_HEIGHT,
-  },
-  floatBackButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  heroLogoWrapper: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    zIndex: 20,
-  },
-  heroLogoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 12,
-    backgroundColor: '#fff',
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 20,
-    marginBottom: -40, 
-  },
-  heroLogo: {
-    width: '100%',
-    height: '100%',
-  },
-  contentPadding: {
-    paddingHorizontal: 20,
-    paddingTop: 50, // Higher padding to accommodate the overlapping logo
-    paddingBottom: 100,
-  },
-  infoRow: {
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  stationName: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#fff',
-    textAlign: 'center',
-  },
-  stationMeta: {
-    fontSize: 16,
-    color: '#a1a1aa',
-    textAlign: 'center',
-    marginTop: 5,
-    fontWeight: '500',
-  },
-  frequencyText: {
-    color: '#fbbf24',
-    fontWeight: 'bold',
-  },
-  tagGrid: {
+  topBar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginTop: 15,
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  tagBadge: {
-    backgroundColor: 'rgba(167, 139, 250, 0.15)',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(167, 139, 250, 0.2)',
-  },
-  tagText: {
-    color: '#a78bfa',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  descriptionText: {
-    color: '#d4d4d8',
-    fontSize: 15,
-    lineHeight: 22,
-    marginTop: 20,
-    textAlign: 'center',
-  },
-  actionRow: {
-    flexDirection: 'row',
-    marginTop: 25,
-    marginBottom: 30,
-    gap: 12,
-  },
-  playButtonMain: {
-    flex: 1,
-    backgroundColor: '#fff',
-    height: 50,
-    borderRadius: 6,
+  backButton: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: 22, 
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  playButtonActive: {
-    backgroundColor: '#a78bfa',
-  },
-  playButtonText: {
-    color: '#000',
-    fontWeight: '900',
-    fontSize: 16,
-  },
-  favoriteButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  favoriteIcon: {
-    color: '#fff',
-    fontSize: 24,
+  backButtonBlur: { 
+    width: '100%', 
+    height: '100%', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
   },
-  sectionHeader: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginBottom: 15,
-    marginTop: 10,
-  },
-  programCard: {
+  backButtonInline: { 
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 12,
-    marginBottom: 10,
-    padding: 10,
     alignItems: 'center',
+    padding: 15, 
+    marginTop: 40,
+    gap: 10
+  },
+  backButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+  stationHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 20,
+    marginBottom: 20,
+  },
+  logoRing: { 
+    width: 100, 
+    height: 100, 
+    borderRadius: 20, 
+    backgroundColor: 'rgba(255,255,255,0.08)', 
+    padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  programPoster: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    backgroundColor: '#27272a',
+  stationLogo: { width: '100%', height: '100%' },
+  stationText: { flex: 1 },
+  stationName: { color: 'white', fontSize: 32, fontWeight: '900', letterSpacing: -0.5 },
+  stationMeta: { color: 'rgba(255,255,255,0.7)', fontSize: 16, fontWeight: '600', marginTop: 4 },
+  stationFrequency: { color: '#a78bfa', fontSize: 14, fontWeight: '700', marginTop: 2 },
+  heroActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  mainPlayButton: { 
+    flex: 1, 
+    backgroundColor: '#fff', 
+    height: 56, 
+    borderRadius: 16, 
+    overflow: 'hidden', 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  programInfo: {
-    flex: 1,
-    marginLeft: 15,
-    justifyContent: 'center',
-  },
-  programNameRow: {
+  playingButton: { backgroundColor: '#7c3aed' },
+  buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    justifyContent: 'center',
+    width: '100%',
   },
-  programName: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-    flexShrink: 1,
-  },
-  liveBadge: {
-    backgroundColor: '#ff3b30',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginLeft: 8,
-  },
-  liveBadgeText: {
-    color: '#fff',
-    fontSize: 9,
-    fontWeight: '900',
-  },
-  programTime: {
-    color: '#a78bfa',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  programHost: {
-    color: '#a1a1aa',
-    fontSize: 12,
-    marginTop: 1,
-  },
-  chevron: {
-    color: 'rgba(255,255,255,0.2)',
-    fontSize: 24,
-    marginLeft: 10,
-  },
-  emptyText: {
-    color: '#52525b',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 20,
-    fontStyle: 'italic',
-  },
-  contactContainer: {
-    marginTop: 30,
-    borderRadius: 16,
+  playButtonText: { fontWeight: '900', fontSize: 16, letterSpacing: 1 },
+  favButtonCircle: { 
+    width: 56, 
+    height: 56, 
+    borderRadius: 28, 
+    backgroundColor: 'rgba(255,255,255,0.1)', 
+    justifyContent: 'center', 
+    alignItems: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
-  contactGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 20,
-    gap: 20,
+  detailsBody: { 
+    padding: 20, 
+    backgroundColor: 'black', 
+    borderTopLeftRadius: 30, 
+    borderTopRightRadius: 30,
+    marginTop: -30,
   },
-  contactItem: {
-    width: '45%',
-  },
-  contactLabel: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  contactValue: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
+  tagStrip: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
+  tag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: '#1c1c1e', borderWidth: 1, borderColor: '#27272a' },
+  tagText: { color: '#a1a1aa', fontSize: 13, fontWeight: '600' },
+  description: { color: '#d4d4d8', fontSize: 16, lineHeight: 26, marginBottom: 30 },
+  programSection: { marginTop: 10 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  sectionTitle: { color: 'white', fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
+  addLink: { color: '#a78bfa', fontSize: 14, fontWeight: '700' },
+  programCard: { flexDirection: 'row', backgroundColor: '#1c1c1e', borderRadius: 20, padding: 12, marginBottom: 12, alignItems: 'center', gap: 15, borderWidth: 1, borderColor: '#27272a' },
+  programPoster: { width: 64, height: 64, borderRadius: 12 },
+  programInfo: { flex: 1 },
+  programNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  programName: { color: 'white', fontSize: 17, fontWeight: 'bold' },
+  liveBadge: { backgroundColor: '#7c3aed', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  liveBadgeText: { color: 'white', fontSize: 10, fontWeight: '900' },
+  programTime: { color: '#a1a1aa', fontSize: 13, marginTop: 4 },
+  programHost: { color: '#71717a', fontSize: 13, marginTop: 2 },
+  emptyState: { padding: 40, alignItems: 'center', backgroundColor: '#1c1c1e', borderRadius: 24, borderStyle: 'dashed', borderWidth: 1, borderColor: '#27272a' },
+  emptyText: { color: '#52525b', fontSize: 14, textAlign: 'center' },
 });

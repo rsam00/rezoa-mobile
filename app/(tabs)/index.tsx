@@ -1,31 +1,21 @@
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, InteractionManager, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useData } from '../../contexts/DataContext';
+import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useHistory } from '../../contexts/HistoryContext';
 import { usePlayer } from '../../contexts/PlayerContext';
-import { programs as allPrograms } from '../../data/programs_updated';
-import { stations as allStations } from '../../data/working_stations_2';
+import { getCurrentProgram } from '../../utils/timeUtils';
 
 const HERO_HEIGHT = 450;
 const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 100;
-const POSTER_WIDTH = 130;
-const POSTER_HEIGHT = 190;
-const HERO_ROTATION_INTERVAL = 10000; // 10 seconds
-const HERO_MANUAL_TIMEOUT = 30000; // 30 seconds
-
-interface CarouselCardProps {
-  item: any;
-  onPress: () => void;
-  isFavorite: boolean;
-  onToggleFavorite: () => void;
-  isStationPlaying: boolean;
-  isLoading: boolean;
-  onPlayPause: () => void;
-}
+const HERO_ROTATION_INTERVAL = 10000;
+const HERO_MANUAL_TIMEOUT = 30000;
 
 const CarouselCard = React.memo(function CarouselCard({ item, onPress }: { item: any; onPress: () => void }) {
   return (
@@ -58,7 +48,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
   }
   return (
     <TouchableOpacity
-      style={[styles.thumbCard, rank !== undefined && { marginLeft: 35 }]}
+      style={styles.thumbCard}
       onPress={onPress}
       activeOpacity={0.85}
     >
@@ -75,19 +65,37 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
   );
 });
 
-import { getCurrentProgram } from '../../utils/timeUtils';
-
 export default function HomeScreen() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setIsReady(true);
+    });
+    return () => task.cancel();
+  }, []);
+
+  if (!isReady) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#a78bfa" />
+      </SafeAreaView>
+    );
+  }
+
+  return <HomeScreenContent />;
+}
+
+function HomeScreenContent() {
+  const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
   const { history } = useHistory();
+  const { openDrawer } = useDrawer();
   const router = useRouter();
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [selectedHero, setSelectedHero] = useState<any>(null);
   
-  const stations = useMemo(() => allStations.filter(s => s.name && s.streamUrl), []);
-  const programs = useMemo(() => allPrograms.filter(p => p.name && p.stationId), []);
-
   const liveNow = useMemo(() => {
     return programs
       .map(p => ({
@@ -107,14 +115,11 @@ export default function HomeScreen() {
     return () => clearInterval(timer);
   }, [liveNow.length, playerState.isPlaying, selectedHero]);
 
-  // Handle manual selection timeout (revert to auto-rotation after 30s)
   useEffect(() => {
     if (!selectedHero) return;
-    
     const timer = setTimeout(() => {
       setSelectedHero(null);
     }, HERO_MANUAL_TIMEOUT);
-    
     return () => clearTimeout(timer);
   }, [selectedHero]);
 
@@ -138,7 +143,7 @@ export default function HomeScreen() {
 
   const newsStations = useMemo(() => {
     return stations.filter(s => 
-      s.tag?.some((t: string) => ['News', 'Talk'].includes(t)) || 
+      s.tag?.some((t: string) => ['News', 'Talk', 'news'].includes(t.toLowerCase())) || 
       s.description?.toLowerCase().includes('news')
     ).slice(0, 15);
   }, [stations]);
@@ -154,13 +159,17 @@ export default function HomeScreen() {
 
   const musicStations = useMemo(() => {
     return stations.filter(s => 
-      s.tag?.some((t: string) => ['pop', 'Pop', 'Music'].includes(t)) || 
+      s.tag?.some((t: string) => ['pop', 'Music', 'music'].includes(t.toLowerCase())) || 
       s.description?.toLowerCase().includes('music') ||
       s.description?.toLowerCase().includes('kompa')
     ).slice(0, 15);
   }, [stations]);
 
-  const justAdded = useMemo(() => stations.slice(-15).reverse(), [stations]);
+  const justAdded = useMemo(() => {
+    return [...stations].sort((a, b) => 
+      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    ).slice(0, 15);
+  }, [stations]);
 
   const temporalCategory = useMemo(() => {
     const hours = new Date().getHours();
@@ -169,28 +178,40 @@ export default function HomeScreen() {
 
     if (hours >= 11 && hours < 17) {
       title = "Mid-Day Mix";
-      filtered = stations.filter(s => s.tag?.includes('pop')).slice(0, 10);
+      filtered = stations.filter(s => s.tag?.some(t => t.toLowerCase().includes('pop'))).slice(0, 10);
     } else if (hours >= 17 && hours < 23) {
       title = "Evening Vibes";
       filtered = stations.filter(s => s.description?.toLowerCase().includes('entertainment')).slice(0, 10);
     } else if (hours >= 23 || hours < 6) {
       title = "Late Night Radio";
-      filtered = stations.filter(s => s.description?.toLowerCase().includes('smooth') || s.tag?.includes('chill')).slice(0, 10);
+      filtered = stations.filter(s => s.description?.toLowerCase().includes('smooth') || s.tag?.some(t => t.toLowerCase().includes('chill'))).slice(0, 10);
     }
     return { title, data: filtered };
   }, [stations]);
 
-  const popular = useMemo(() => stations.slice(10, 25), [stations]);
-  const trendingShows = useMemo(() => programs.slice(0, 10), [programs]);
+  const popular = useMemo(() => {
+    return [...stations].sort((a, b) => 
+      (b.favoriteCount || 0) - (a.favoriteCount || 0)
+    ).slice(0, 15);
+  }, [stations]);
+
+  const trendingShows = useMemo(() => {
+    return [...programs].sort((a, b) => 
+      (b.clickCount || 0) - (a.clickCount || 0)
+    ).slice(0, 15);
+  }, [programs]);
 
   const renderCarouselItem = useCallback(({ item }: { item: any }) => {
     return (
       <CarouselCard
         item={item}
-        onPress={() => setSelectedHero({ station: item, program: getCurrentProgram(programs, item.id) })}
+        onPress={() => {
+          recordClick(item.id);
+          setSelectedHero({ station: item, program: getCurrentProgram(programs, item.id) });
+        }}
       />
     );
-  }, [programs]);
+  }, [programs, recordClick]);
 
   const renderProgramItem = useCallback(({ item, index }: { item: any, index: number }) => {
     const station = stations.find(s => s.id === item.stationId);
@@ -198,11 +219,14 @@ export default function HomeScreen() {
       <ProgramCard
         item={item}
         rank={index}
-        onPress={() => setSelectedHero({ station, program: item })}
+        onPress={() => {
+          recordProgramClick(item.id);
+          setSelectedHero({ station, program: item });
+        }}
         station={station}
       />
     );
-  }, [stations]);
+  }, [stations, recordProgramClick]);
 
   const navigateToDetails = useCallback(() => {
     const { station, program } = featuredItem;
@@ -225,9 +249,26 @@ export default function HomeScreen() {
     index,
   }), []);
 
+  if (dataLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#a78bfa" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header} accessibilityRole="header">Rezoa</Text>
+      <View style={styles.headerRow}>
+        <TouchableOpacity 
+          style={styles.profileButton} 
+          onPress={openDrawer}
+        >
+          <Text style={styles.profileButtonText}>☰</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Rezoa</Text>
+        <View style={{ width: 44 }} />
+      </View>
       
       {featuredItem.station && (
         <TouchableOpacity 
@@ -235,7 +276,6 @@ export default function HomeScreen() {
           onPress={navigateToDetails}
           activeOpacity={0.9}
         >
-          {/* Background Blurred Layer */}
           <Image
             source={
               featuredItem.program?.poster 
@@ -247,7 +287,6 @@ export default function HomeScreen() {
           />
           <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
 
-          {/* Foreground Contained Layer */}
           <View style={styles.heroForegroundContainer}>
             <Image
               source={
@@ -307,9 +346,11 @@ export default function HomeScreen() {
                 onPress={() => toggleFavorite(featuredItem.station!.id)}
               >
                 <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
-                <Text style={styles.favoriteButtonTextHero}>
-                  {favorites.includes(featuredItem.station!.id) ? '★' : '☆'}
-                </Text>
+                <Ionicons 
+                  name={favorites.includes(featuredItem.station!.id) ? 'heart' : 'heart-outline'} 
+                  size={24} 
+                  color={favorites.includes(featuredItem.station!.id) ? '#a78bfa' : '#fff'} 
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -372,7 +413,7 @@ export default function HomeScreen() {
           renderItem={renderProgramItem}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20 }}
+          contentContainerStyle={{ paddingHorizontal: 15 }}
           getItemLayout={getTrendingLayout}
           nestedScrollEnabled={true}
         />
@@ -446,17 +487,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
-  header: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
+  headerRow: {
+    paddingTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    zIndex: 100,
+    backgroundColor: 'black',
+  },
+  headerTitle: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#E50914',
-    zIndex: 100,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    color: '#a78bfa',
+  },
+  profileButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  profileButtonText: {
+    color: '#a78bfa',
+    fontSize: 28,
+    fontWeight: '700',
   },
   scrollView: {
     flex: 1,
@@ -486,12 +538,9 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     color: '#fff',
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: '900',
     marginBottom: 10,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
   },
   heroForegroundContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -510,7 +559,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   badge: {
-    backgroundColor: '#E50914',
+    backgroundColor: '#a78bfa',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -525,9 +574,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
   },
   heroActions: {
     flexDirection: 'row',
@@ -538,8 +584,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   playButtonText: {
     color: '#000',
@@ -593,29 +637,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  posterOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 4,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  posterAction: {
-    padding: 2,
-  },
   rankNumberThumb: {
     position: 'absolute',
-    left: -40,
-    bottom: -10,
+    left: 4,
+    bottom: -14,
     fontSize: 70,
     fontWeight: '900',
-    color: '#000',
+    color: 'rgba(255,255,255,0.15)',
     zIndex: -1,
-    textShadowColor: 'rgba(255,255,255,0.7)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
   },
 });

@@ -1,30 +1,30 @@
-import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  FlatList,
-  Image,
-  Platform,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    InteractionManager,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    useWindowDimensions
 } from 'react-native';
 import Animated, {
-  scrollTo,
-  useAnimatedRef,
-  useAnimatedScrollHandler,
-  useSharedValue
+    scrollTo,
+    useAnimatedRef,
+    useAnimatedScrollHandler,
+    useSharedValue
 } from 'react-native-reanimated';
+import { useData } from '../../contexts/DataContext';
+import { useDrawer } from '../../contexts/DrawerContext';
 import { usePlayer } from '../../contexts/PlayerContext';
-import { programs as allPrograms } from '../../data/programs_updated';
-import { stations as allStations } from '../../data/working_stations_2';
 import { getHaitiTime } from '../../utils/timeUtils';
 
 const ReanimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -35,7 +35,6 @@ const STATION_ROW_HEIGHT = 90;
 const TIME_ROW_HEIGHT = 45;
 const LEFT_COLUMN_WIDTH = 100;
 
-// Types
 interface Station {
   id: string;
   name: string;
@@ -61,7 +60,6 @@ interface ProgramBlock {
   isCurrent: boolean;
 }
 
-// Helper for overnight split
 function getBlocksForDay(programs: Program[], dayName: string) {
   const normDay = dayName.toLowerCase().slice(0, 3);
   const blocks: ProgramBlock[] = [];
@@ -90,7 +88,6 @@ function getBlocksForDay(programs: Program[], dayName: string) {
           isCurrent: isTargetDayHaitiToday && currentTotalMinutes >= start && currentTotalMinutes < end
         });
       } else if (end < start) {
-        // Spill over to next day - handle part on this day
         blocks.push({
           program,
           startMinute: start,
@@ -100,91 +97,81 @@ function getBlocksForDay(programs: Program[], dayName: string) {
         });
       }
     });
-
-    // Handle spillover from PREVIOUS day
-    program.schedules?.forEach(sch => {
-      const schDays = sch.days.map(d => d.toLowerCase().slice(0, 3));
-      const daysArr = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-      const currentDayIdx = daysArr.indexOf(normDay);
-      if (currentDayIdx === -1) return;
-      const prevDayIdx = (currentDayIdx + 6) % 7;
-      const prevDayName = daysArr[prevDayIdx];
-
-      if (!schDays.includes(prevDayName)) return;
-
-      const [startH, startM = '0'] = sch.startTime.split(':');
-      const [endH, endM = '0'] = sch.endTime.split(':');
-      const start = parseInt(startH, 10) * 60 + parseInt(startM, 10);
-      const end = parseInt(endH, 10) * 60 + parseInt(endM, 10);
-
-      if (end < start) {
-        blocks.push({
-          program,
-          startMinute: 0,
-          endMinute: end,
-          duration: end,
-          isCurrent: isTargetDayHaitiToday && currentTotalMinutes < end
-        });
-      }
-    });
   });
-
-  return blocks.sort((a, b) => a.startMinute - b.startMinute);
+  return blocks;
 }
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-// Pre-setup notifications
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
-
-const SkeletonRow = () => (
-  <View style={styles.skeletonRow}>
-    <View style={styles.skeletonLogo} />
-    <View style={[styles.skeletonCard, { width: CELL_WIDTH * 2 }]} />
-    <View style={[styles.skeletonCard, { width: CELL_WIDTH * 3 }]} />
-    <View style={[styles.skeletonCard, { width: CELL_WIDTH * 1.5 }]} />
-  </View>
-);
 
 const GENRES = ['All', 'News', 'Music', 'Gospel', 'Sports', 'Talk', 'Culture'];
 
-export default function ProgramGuide() {
+export default function ProgramGuideScreen() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const task = InteractionManager.runAfterInteractions(() => {
+      setIsReady(true);
+    });
+    return () => task.cancel();
+  }, []);
+
+  if (!isReady) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
+      </SafeAreaView>
+    );
+  }
+
+  return <ProgramGuideContent />;
+}
+
+function ProgramGuideContent() {
   const router = useRouter();
-  const { playStation } = usePlayer();
-  const [loading, setLoading] = useState(true);
-  const [stations, setStations] = useState<Station[]>([]);
-  const [filteredStations, setFilteredStations] = useState<Station[]>([]);
-  const [programsByStation, setProgramsByStation] = useState<Record<string, Program[]>>({});
+  const { playStation, playerState, pause } = usePlayer();
+  const { openDrawer } = useDrawer();
+  const { stations, programs, loading: dataLoading } = useData();
+  
   const [selectedDay, setSelectedDay] = useState<number>(getHaitiTime().day ? ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day) : new Date().getDay());
   const [haitiNow, setHaitiNow] = useState(getHaitiTime());
-
-  // Keep Haiti time in sync - Reduced frequency to 30s
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHaitiNow(getHaitiTime());
-    }, 30000); 
-    return () => clearInterval(interval);
-  }, []);
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
 
-  const { width, height } = useWindowDimensions();
-  const isLandscape = width > height;
+  const { width } = useWindowDimensions();
 
-  const scrollY = useSharedValue(0);
-  const isScrollingLeft = useSharedValue(false);
-  const isScrollingRight = useSharedValue(false);
   const leftRef = useAnimatedRef<FlatList>();
   const rightRef = useAnimatedRef<FlatList>();
   const horizontalScrollRef = useRef<ScrollView>(null);
   const dayScrollRef = useRef<ScrollView>(null);
+
+  const isScrollingLeft = useSharedValue(false);
+  const isScrollingRight = useSharedValue(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setHaitiNow(getHaitiTime());
+    }, 30000); 
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    Notifications.requestPermissionsAsync();
+  }, []);
+
+  const filteredStations = useMemo(() => {
+    const active = stations.filter(s => s.name && s.streamUrl);
+    if (selectedGenre === 'All') return active;
+    return active.filter(s => 
+      s.tag?.includes(selectedGenre) || 
+      s.name.toLowerCase().includes(selectedGenre.toLowerCase())
+    );
+  }, [stations, selectedGenre]);
+
+  const programsByStation = useMemo(() => {
+    const grouped: Record<string, Program[]> = {};
+    programs.forEach(p => {
+      if (!grouped[p.stationId]) grouped[p.stationId] = [];
+      grouped[p.stationId].push(p);
+    });
+    return grouped;
+  }, [programs]);
 
   const onLeftScroll = useAnimatedScrollHandler({
     onBeginDrag: () => { isScrollingLeft.value = true; isScrollingRight.value = false; },
@@ -210,85 +197,29 @@ export default function ProgramGuide() {
     },
   });
 
-  // No animated reaction needed if we sync in handlers
-
-  useEffect(() => {
-    // Simulate data loading for skeleton demo
-    setTimeout(() => {
-      const grouped: Record<string, Program[]> = {};
-      allPrograms.forEach(p => {
-        if (!grouped[p.stationId]) grouped[p.stationId] = [];
-        grouped[p.stationId].push(p);
-      });
-      setProgramsByStation(grouped);
-      const activeStations = allStations.filter(s => s.name && s.streamUrl);
-      setStations(activeStations);
-      setFilteredStations(activeStations);
-      setLoading(false);
-    }, 1500);
-
-    Notifications.requestPermissionsAsync();
-  }, []);
-
-  // Update filtered list when genre changes
-  useEffect(() => {
-    if (selectedGenre === 'All') {
-      setFilteredStations(stations);
-    } else {
-      setFilteredStations(stations.filter(s => 
-        s.tag?.includes(selectedGenre) || 
-        s.name.toLowerCase().includes(selectedGenre.toLowerCase())
-      ));
+  const scrollToNow = () => {
+    // 1. Set to today
+    const todayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day);
+    if (todayIndex !== -1) {
+      setSelectedDay(todayIndex);
+      // Scroll day strip to today (tab width approx 60-80 + gap 15)
+      dayScrollRef.current?.scrollTo({ x: todayIndex * 70, animated: true });
     }
-  }, [selectedGenre, stations]);
 
-  const handleReminder = async (program: Program, startHour: number) => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const trigger = new Date();
-    trigger.setHours(startHour, 0, 0, 0);
-    if (trigger < new Date()) trigger.setDate(trigger.getDate() + 7);
-
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: `Reminder: ${program.name}`,
-        body: `Starting now on ${program.stationId}.`,
-        data: { stationId: program.stationId },
-      },
-      trigger: {
-        hour: startHour,
-        minute: 0,
-        repeats: false,
-      } as any, // Use any if type is being stubborn or I'll try to find the exact type
-    });
-    alert(`Reminder set for ${program.name}!`);
-  };
-
-  const jumpToLive = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
-    // 1. Automatically select current day if not already selected
+    // 2. Scroll horizontal guide to current time
     const haiti = getHaitiTime();
-    const dayIdx = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(haiti.day);
-    if (dayIdx !== -1) {
-      setSelectedDay(dayIdx);
-      // Ensure day strip scrolls even if day was already selected but off-screen
-      // Approx 75px per day tab (padding + margins)
-      dayScrollRef.current?.scrollTo({ x: dayIdx * 75, animated: true });
-    }
-
-    // 2. Scroll to current time
-    const pixPerMin = CELL_WIDTH / 60;
-    const timelinePos = (haiti.totalSeconds / 60) * pixPerMin;
-    const viewportWidth = width - LEFT_COLUMN_WIDTH;
-    const scrollPos = Math.max(0, timelinePos - viewportWidth / 2);
-    
-    horizontalScrollRef.current?.scrollTo({ x: scrollPos, animated: true });
+    const currentMinutes = haiti.hours * 60 + haiti.minutes;
+    const scrollX = (currentMinutes / 60) * CELL_WIDTH - (width - LEFT_COLUMN_WIDTH) / 2;
+    horizontalScrollRef.current?.scrollTo({ 
+      x: Math.max(0, scrollX), 
+      animated: true 
+    });
   };
 
-  const LogoColumnItem = React.memo(({ item, onPress }: { item: Station, onPress: (id: string) => void }) => (
+  const LogoColumnItem = React.memo(({ item }: { item: Station }) => (
     <View style={styles.logoCell}>
       <Pressable 
-        onPress={() => onPress(item.id)}
+        onPress={() => router.push({ pathname: '/station-details', params: { id: item.id } })}
         style={({pressed}) => [styles.logoContainer, pressed && { opacity: 0.7 }]}
       >
         <Image 
@@ -301,451 +232,207 @@ export default function ProgramGuide() {
     </View>
   ));
 
-  const ProgramRowItem = React.memo(({ 
-    station, 
-    programs, 
-    selectedDay, 
-    haitiNow,
-    onPressProgram,
-    onPlayStation 
-  }: { 
-    station: Station, 
-    programs: Program[], 
-    selectedDay: number,
-    haitiNow: any,
-    onPressProgram: (id: string) => void,
-    onPlayStation: (s: any) => void
-  }) => {
-    const blocks = getBlocksForDay(programs || [], DAYS[selectedDay]);
-    const pixPerMin = CELL_WIDTH / 60;
-    let currentPos = 0;
-    const rowCells: React.ReactNode[] = [];
+  const ProgramRow = React.memo(({ station }: { station: Station }) => {
+    const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][selectedDay];
+    const stationPrograms = programsByStation[station.id] || [];
+    const blocks = getBlocksForDay(stationPrograms, dayName);
 
-    const formatMins = (mins: number) => {
-      const h = Math.floor(mins / 60);
-      const m = mins % 60;
-      return `${h}:${m.toString().padStart(2, '0')}`;
-    };
+    const isPlayingCurrentStation = playerState.isPlaying && playerState.currentStation?.id === station.id;
 
-    blocks.forEach((block, bIdx) => {
-      const gap = block.startMinute - currentPos;
-      if (gap > 0) {
-        rowCells.push(<View key={`gap-${bIdx}`} style={{ width: gap * pixPerMin }} />);
-      }
-      
-      const cardWidth = Math.max(0, block.duration * pixPerMin);
-      
-      rowCells.push(
-        <TouchableOpacity 
-          key={block.program.id + bIdx}
-          onPress={() => onPressProgram(block.program.id)}
-          onLongPress={() => onPlayStation({ id: station.id, name: station.name, streamUrl: station.streamUrl })}
-          style={[
-            styles.programCard, 
-            { width: cardWidth - 2 },
-            block.isCurrent && styles.currentProgramCard
-          ]}
-        >
-          <BlurView intensity={block.isCurrent ? 40 : 10} tint="dark" style={StyleSheet.absoluteFill} />
-          <View style={styles.cardContent}>
-            <Text style={[styles.cardTitle, block.isCurrent && styles.currentText]} numberOfLines={1}>{block.program.name}</Text>
-            {block.program.host && <Text style={[styles.cardHost, block.isCurrent && styles.currentTextSecondary]} numberOfLines={1}>{block.program.host}</Text>}
-            <Text style={[styles.cardTime, block.isCurrent && styles.currentTextSecondary]}>{formatMins(block.startMinute)} - {formatMins(block.endMinute)}</Text>
-          </View>
-          {block.isCurrent && (
-            <TouchableOpacity 
-              style={styles.cardPlayBtn}
-              onPress={(e) => {
-                e.stopPropagation();
-                onPlayStation({ id: station.id, name: station.name, streamUrl: station.streamUrl });
-              }}
-            >
-              <Text style={styles.cardPlayIcon}>▶</Text>
-            </TouchableOpacity>
-          )}
-          {block.isCurrent && <View style={styles.liveIndicator} />}
-        </TouchableOpacity>
-      );
-      currentPos = Math.max(currentPos, block.endMinute);
-    });
-
-    if (currentPos < 1440) {
-      rowCells.push(<View key="end-gap" style={{ width: (1440 - currentPos) * pixPerMin }} />);
-    }
-
-    return <View style={styles.programRow}>{rowCells}</View>;
+    return (
+      <View style={styles.programRow}>
+        {blocks.map((block, i) => (
+          <TouchableOpacity
+            key={i}
+            style={[
+              styles.programBlock,
+              {
+                left: (block.startMinute / 60) * CELL_WIDTH,
+                width: (block.duration / 60) * CELL_WIDTH,
+                backgroundColor: block.isCurrent ? '#4c1d95' : '#1c1c1e'
+              },
+              block.isCurrent && styles.currentProgramBlock
+            ]}
+            onPress={() => router.push({ pathname: '/program-details', params: { id: block.program.id } })}
+          >
+            <Text style={styles.programName} numberOfLines={1}>{block.program.name}</Text>
+            <Text style={styles.programTime} numberOfLines={1}>
+                {Math.floor(block.startMinute/60)}:{(block.startMinute%60).toString().padStart(2,'0')} 
+                - {Math.floor(block.endMinute/60)}:{(block.endMinute%60).toString().padStart(2,'0')}
+            </Text>
+            {block.isCurrent && (
+              <TouchableOpacity 
+                style={styles.livePlayButton}
+                onPress={() => {
+                  if (isPlayingCurrentStation) {
+                    pause();
+                  } else {
+                    playStation(station);
+                  }
+                }}
+              >
+                <Ionicons 
+                  name={isPlayingCurrentStation ? "pause" : "play"} 
+                  size={16} 
+                  color="#fff" 
+                  style={{ marginLeft: isPlayingCurrentStation ? 0 : 2 }} 
+                />
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
   });
 
-  if (loading) return (
-    <SafeAreaView style={styles.safeContainer}>
-      <View style={styles.topHeader}>
-        <View style={[styles.skeletonLogo, { width: 120, height: 40, marginBottom: 20 }]} />
-        <SkeletonRow />
-        <SkeletonRow />
-        <SkeletonRow />
-        <SkeletonRow />
-        <SkeletonRow />
-      </View>
-    </SafeAreaView>
-  );
-
-  const now = new Date();
-  const timelineLeft = (now.getHours() + now.getMinutes() / 60) * CELL_WIDTH;
+  if (dataLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
-      <View style={[styles.topHeader, isLandscape && { paddingBottom: 0 }]}>
-        {!isLandscape && <Text style={styles.headerText}>Guide</Text>}
-        
-        {/* Genre Filter */}
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={[styles.dayStrip, isLandscape && { paddingRight: 10 }]}
-        >
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
+          <Text style={styles.profileButtonText}>☰</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Haitian Radio Guide</Text>
+        <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
+            <Text style={styles.liveNowText}>LIVE</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.genreStripContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
           {GENRES.map(genre => (
             <TouchableOpacity 
               key={genre} 
-              onPress={() => {
-                setSelectedGenre(genre);
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              }}
-              style={[styles.genreTab, selectedGenre === genre && styles.dayTabActive, isLandscape && { paddingVertical: 4 }]}
+              onPress={() => setSelectedGenre(genre)}
+              style={[styles.genreTab, selectedGenre === genre && styles.activeGenreTab]}
             >
-              <Text style={[styles.dayTabText, selectedGenre === genre && styles.dayTabTextActive, isLandscape && { fontSize: 12 }]}>
-                {genre}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* Day Strip */}
-        <ScrollView 
-          ref={dayScrollRef}
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          contentContainerStyle={[styles.dayStrip, { marginTop: 8 }, isLandscape && { marginTop: 4 }]}
-        >
-          {DAYS.map((day, idx) => (
-            <TouchableOpacity 
-              key={day} 
-              onPress={() => {
-                setSelectedDay(idx);
-                Haptics.selectionAsync();
-              }}
-              style={[styles.dayTab, selectedDay === idx && styles.dayTabActive, isLandscape && { paddingVertical: 4 }]}
-            >
-              <Text style={[styles.dayTabText, selectedDay === idx && styles.dayTabTextActive, isLandscape && { fontSize: 12 }]}>
-                {day}
-              </Text>
+              <Text style={[styles.genreText, selectedGenre === genre && styles.activeGenreText]}>{genre}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-      <View style={styles.mainGrid}>
-        <View style={styles.leftColumn}>
-          <View style={styles.cornerCell}>
-            <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
-          </View>
+      <View style={styles.dayStripContainer}>
+        <ScrollView ref={dayScrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dayStrip}>
+          {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, i) => (
+            <TouchableOpacity 
+              key={day} 
+              onPress={() => setSelectedDay(i)}
+              style={[styles.dayTab, selectedDay === i && styles.activeDayTab]}
+            >
+              <Text style={[styles.dayText, selectedDay === i && styles.activeDayText]}>{day}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View style={{ width: LEFT_COLUMN_WIDTH }}>
+          <View style={[styles.timeHeader, { height: TIME_ROW_HEIGHT }]} />
           <ReanimatedFlatList
             ref={leftRef}
             data={filteredStations}
-            renderItem={({ item }: { item: Station }) => (
-              <LogoColumnItem 
-                item={item} 
-                onPress={(id) => router.push({ pathname: '/station-details', params: { id } })} 
-              />
-            )}
-            keyExtractor={(s: any) => s.id}
+            keyExtractor={(item: any) => item.id}
+            renderItem={({ item }: any) => <LogoColumnItem item={item} />}
             showsVerticalScrollIndicator={false}
             scrollEventThrottle={16}
             onScroll={onLeftScroll}
-            getItemLayout={(_: any, i: number) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * i, index: i })}
-            windowSize={5}
-            removeClippedSubviews={Platform.OS === 'android'}
+            getItemLayout={(data, index) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * index, index })}
           />
         </View>
 
-        <ScrollView ref={horizontalScrollRef} horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView 
+          ref={horizontalScrollRef} 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+        >
           <View>
-            <View style={styles.timeHeader}>
-              <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
-              {HOURS.map(h => {
-                let color = '#1c1c1e';
-                if (h >= 6 && h < 12) color = '#2c2c2e';
-                if (h >= 12 && h < 18) color = '#3a3a3c';
-                return (
-                  <View key={h} style={[styles.timeCell, { backgroundColor: color }]}>
-                    <Text style={styles.timeLabel}>{h}:00</Text>
-                  </View>
-                );
-              })}
+            <View style={[styles.timeRow, { height: TIME_ROW_HEIGHT }]}>
+              {HOURS.map(hour => (
+                <View key={hour} style={[styles.timeCell, { width: CELL_WIDTH }]}>
+                  <Text style={styles.timeText}>{hour}:00</Text>
+                </View>
+              ))}
+              <View style={[styles.currentTimeIndicator, { left: (haitiNow.hours * 60 + haitiNow.minutes) * (CELL_WIDTH / 60) }]} />
             </View>
 
             <ReanimatedFlatList
               ref={rightRef}
               data={filteredStations}
-              renderItem={({ item: station }: { item: Station }) => (
-                <ProgramRowItem 
-                  station={station}
-                  programs={programsByStation[station.id]}
-                  selectedDay={selectedDay}
-                  haitiNow={haitiNow}
-                  onPressProgram={(id) => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    router.push({ pathname: '/program-details', params: { id } });
-                  }}
-                  onPlayStation={(s) => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    playStation(s);
-                  }}
-                />
-              )}
-              keyExtractor={(s: any) => s.id}
-              showsVerticalScrollIndicator={true}
+              keyExtractor={(item: any) => item.id}
+              renderItem={({ item }: any) => <ProgramRow station={item} />}
+              showsVerticalScrollIndicator={false}
               scrollEventThrottle={16}
               onScroll={onRightScroll}
-              contentContainerStyle={{ paddingBottom: 160 }} // Safe padding for player
-              getItemLayout={(_: any, i: number) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * i, index: i })}
-              windowSize={5}
-              maxToRenderPerBatch={10}
-              updateCellsBatchingPeriod={50}
-              removeClippedSubviews={Platform.OS === 'android'}
+              getItemLayout={(data, index) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * index, index })}
             />
-
-            {selectedDay === ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(haitiNow.day) && (
-              <View style={[styles.timeline, { left: (haitiNow.totalSeconds / 60) * (CELL_WIDTH / 60) }]} pointerEvents="none" />
-            )}
           </View>
         </ScrollView>
       </View>
-
-      <TouchableOpacity style={styles.jumpBtn} onPress={jumpToLive}>
-        <Text style={styles.jumpBtnText}>JUMP TO LIVE</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-    paddingTop: Platform.OS === 'android' ? 40 : 0,
+  container: { flex: 1, backgroundColor: 'black' },
+  headerRow: {
+    paddingTop: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    zIndex: 100,
+    backgroundColor: 'black',
+    marginBottom: 5,
   },
-  topHeader: {
-    paddingHorizontal: 16,
-    paddingBottom: 10,
-  },
-  headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#a78bfa',
-    marginBottom: 12,
-  },
-  dayStrip: {
-    paddingRight: 20,
-  },
-  dayTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#1c1c1e',
-    marginRight: 8,
-  },
-  dayTabActive: {
+  headerTitle: { color: '#a78bfa', fontSize: 22, fontWeight: '900' },
+  profileButton: { padding: 4 },
+  profileButtonText: { color: '#a78bfa', fontSize: 28, fontWeight: '700' },
+  liveNowButton: { backgroundColor: '#a78bfa', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4 },
+  liveNowText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
+  genreStripContainer: { backgroundColor: 'black', paddingBottom: 5 },
+  genreStrip: { paddingHorizontal: 15, gap: 10 },
+  genreTab: { paddingHorizontal: 15, paddingVertical: 6, borderRadius: 20, backgroundColor: '#1c1c1e' },
+  activeGenreTab: { backgroundColor: '#a78bfa' },
+  genreText: { color: '#a1a1aa', fontWeight: '600' },
+  activeGenreText: { color: '#fff' },
+  dayStripContainer: { borderBottomWidth: 1, borderBottomColor: '#27272a', backgroundColor: 'black' },
+  dayStrip: { paddingHorizontal: 15, paddingVertical: 10, gap: 15 },
+  dayTab: { paddingBottom: 5 },
+  activeDayTab: { borderBottomWidth: 2, borderBottomColor: '#a78bfa' },
+  dayText: { color: '#a1a1aa', fontWeight: 'bold' },
+  activeDayText: { color: '#fff' },
+  timeHeader: { backgroundColor: 'black', borderRightWidth: 1, borderRightColor: '#27272a' },
+  logoCell: { height: STATION_ROW_HEIGHT, width: LEFT_COLUMN_WIDTH, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#27272a', backgroundColor: 'black' },
+  logoContainer: { alignItems: 'center', gap: 4 },
+  logo: { width: 50, height: 50, borderRadius: 25 },
+  stationNameMini: { color: '#a1a1aa', fontSize: 10, fontWeight: '600' },
+  timeRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#27272a', backgroundColor: 'black' },
+  timeCell: { justifyContent: 'center', paddingLeft: 5 },
+  timeText: { color: '#a1a1aa', fontSize: 12, fontWeight: '600' },
+  programRow: { height: STATION_ROW_HEIGHT, width: 24 * CELL_WIDTH, borderBottomWidth: 1, borderBottomColor: '#27272a' },
+  programBlock: { position: 'absolute', top: 5, bottom: 5, borderRadius: 8, padding: 8, justifyContent: 'center' },
+  currentProgramBlock: { borderColor: '#a78bfa', borderWidth: 1 },
+  programName: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+  programTime: { color: '#a1a1aa', fontSize: 10, marginTop: 2 },
+  livePlayButton: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
     backgroundColor: '#a78bfa',
-  },
-  genreTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: '#1c1c1e',
-    marginRight: 8,
-  },
-  dayTabText: {
-    color: '#8e8e93',
-    fontWeight: '600',
-  },
-  dayTabTextActive: {
-    color: '#fff',
-  },
-  mainGrid: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  leftColumn: {
-    width: LEFT_COLUMN_WIDTH,
-    zIndex: 10,
-    backgroundColor: '#000',
-    borderRightWidth: 1,
-    borderRightColor: '#1c1c1e',
-  },
-  cornerCell: {
-    height: TIME_ROW_HEIGHT,
-  },
-  logoCell: {
-    height: STATION_ROW_HEIGHT,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  logoContainer: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#1c1c1e',
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 5,
-  },
-  logo: {
-    width: '80%',
-    height: '60%',
-  },
-  stationNameMini: {
-    fontSize: 10,
-    color: '#8e8e93',
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  timeHeader: {
-    flexDirection: 'row',
-    height: TIME_ROW_HEIGHT,
-    backgroundColor: '#000',
-  },
-  timeCell: {
-    width: CELL_WIDTH,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderLeftWidth: 1,
-    borderLeftColor: '#1c1c1e',
-  },
-  timeLabel: {
-    color: '#8e8e93',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  programRow: {
-    flexDirection: 'row',
-    height: STATION_ROW_HEIGHT,
-  },
-  programCard: {
-    height: STATION_ROW_HEIGHT - 10,
-    marginTop: 5,
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#2c2c2e',
-    marginHorizontal: 1,
-  },
-  currentProgramCard: {
-    borderColor: '#a78bfa',
-    borderWidth: 2,
-  },
-  cardContent: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'center',
-  },
-  cardTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  cardHost: {
-    color: '#8e8e93',
-    fontSize: 11,
-    marginTop: 2,
-  },
-  cardTime: {
-    color: '#636366',
-    fontSize: 10,
-    marginTop: 2,
-  },
-  currentText: {
-    color: '#fff',
-  },
-  currentTextSecondary: {
-    color: '#e5e5ea',
-  },
-  liveIndicator: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#ff3b30',
-  },
-  cardPlayBtn: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#a78bfa',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
-  cardPlayIcon: {
-    color: '#fff',
-    fontSize: 14,
-    marginLeft: 2,
-  },
-  timeline: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 2,
-    backgroundColor: '#ff3b30',
-    zIndex: 100,
-  },
-  jumpBtn: {
-    position: 'absolute',
-    bottom: 180, // Moved up to clear Docked Player (90) + Player Height (64)
-    right: 20,
-    backgroundColor: '#ff3b30',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 25,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  jumpBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  skeletonRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: STATION_ROW_HEIGHT,
-    paddingHorizontal: 10,
-    marginBottom: 5,
-  },
-  skeletonLogo: {
-    width: 80,
-    height: 60,
-    backgroundColor: '#1c1c1e',
-    borderRadius: 12,
-    marginRight: 10,
-  },
-  skeletonCard: {
-    height: STATION_ROW_HEIGHT - 20,
-    backgroundColor: '#1c1c1e',
-    borderRadius: 12,
-    marginRight: 5,
-  },
+  currentTimeIndicator: { position: 'absolute', top: 0, bottom: -10000, width: 2, backgroundColor: '#ef4444', zIndex: 100 },
 });
- 
