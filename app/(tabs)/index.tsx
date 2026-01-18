@@ -3,7 +3,8 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, InteractionManager, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
@@ -66,16 +67,9 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
 });
 
 export default function HomeScreen() {
-  const [isReady, setIsReady] = useState(false);
+  const { loading: dataLoading } = useData();
 
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => {
-      setIsReady(true);
-    });
-    return () => task.cancel();
-  }, []);
-
-  if (!isReady) {
+  if (dataLoading) {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#a78bfa" />
@@ -266,7 +260,7 @@ function HomeScreenContent() {
         >
           <Text style={styles.profileButtonText}>☰</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rezoa</Text>
+        <Text style={styles.headerTitle}>Home</Text>
         <View style={{ width: 44 }} />
       </View>
       
@@ -362,6 +356,10 @@ function HomeScreenContent() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+        <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
+          <AdBanner />
+        </View>
+
         {recentlyPlayed.length > 0 && (
           <>
             <Text style={styles.sectionTitle}>Jump Back In</Text>
@@ -430,6 +428,10 @@ function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
 
+        <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
+          <AdBanner />
+        </View>
+
         <Text style={styles.sectionTitle}>News & Talk</Text>
         <FlatList
           data={newsStations}
@@ -466,6 +468,10 @@ function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
 
+        <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
+          <AdBanner />
+        </View>
+
         <Text style={styles.sectionTitle}>Just Added</Text>
         <FlatList
           data={justAdded}
@@ -497,7 +503,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '900',
     color: '#a78bfa',
   },

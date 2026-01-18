@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.anonymous.rezoamobile'
+    namespace 'com.richardsam76.rezoamobile'
     defaultConfig {
-        applicationId 'com.anonymous.rezoamobile'
+        applicationId 'com.richardsam76.rezoamobile'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

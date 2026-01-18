@@ -114,12 +114,6 @@ export default function ProgramDetailsScreen() {
               </View>
             )}
             
-            {isProgramLive && (
-              <View style={styles.liveBadgeWrapper}>
-                <View style={styles.liveIndicator} />
-                <Text style={styles.liveNowText}>LIVE NOW</Text>
-              </View>
-            )}
           </View>
         </View>
 
@@ -151,7 +145,7 @@ export default function ProgramDetailsScreen() {
                 end={{ x: 1, y: 0 }}
                 style={StyleSheet.absoluteFill}
               />
-              <Text style={styles.listenLiveText}>▶   LISTEN LIVE NOW</Text>
+              <Text style={styles.listenLiveText}>▶   LISTEN LIVE</Text>
             </TouchableOpacity>
           )}
 

@@ -1,4 +1,4 @@
-package com.anonymous.rezoamobile
+package com.richardsam76.rezoamobile
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

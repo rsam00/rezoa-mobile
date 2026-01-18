@@ -28,15 +28,17 @@ function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
   );
 }
 
-const ProgramCard = React.memo(function ProgramCard({ item, onPress }: { item: any, onPress: () => void }) {
+const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLogo }: { item: any, onPress: () => void, fallbackLogo: any }) {
   const live = useMemo(() => isLive([item], item.stationId), [item]);
   return (
     <AnimatedCard style={styles.programCard} onPress={onPress}>
-      <Image
-        source={item.poster ? { uri: item.poster } : require('../assets/images/favicon.png')}
-        style={styles.programPoster}
-        resizeMode="cover"
-      />
+      <View style={[styles.programPoster, { backgroundColor: 'rgba(255,255,255,0.05)', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }]}>
+        <Image
+          source={item.poster ? { uri: item.poster } : fallbackLogo}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="contain"
+        />
+      </View>
       
       <View style={styles.programInfo}>
         <View style={styles.programNameRow}>
@@ -185,9 +187,9 @@ export default function StationDetailsScreen() {
               >
                 <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
                 <Ionicons 
-                  name={favorites.includes(station.id) ? "star" : "star-outline"} 
+                  name={favorites.includes(station.id) ? "heart" : "heart-outline"} 
                   size={24} 
-                  color={favorites.includes(station.id) ? "#fbbf24" : "white"} 
+                  color={favorites.includes(station.id) ? "#a78bfa" : "white"} 
                 />
               </TouchableOpacity>
             </View>
@@ -209,7 +211,7 @@ export default function StationDetailsScreen() {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Radio Schedule</Text>
               <TouchableOpacity onPress={() => router.push({ pathname: '/contribute-program', params: { stationId: station.id } })}>
-                <Text style={styles.addLink}>+ Suggest Program</Text>
+                <Text style={styles.addLink}>+ Add Program</Text>
               </TouchableOpacity>
             </View>
 
@@ -218,6 +220,7 @@ export default function StationDetailsScreen() {
                 <ProgramCard
                   key={prog.id}
                   item={prog}
+                  fallbackLogo={logoSource}
                   onPress={() => {
                     recordProgramClick(prog.id);
                     router.push({ pathname: '/program-details', params: { id: prog.id } });

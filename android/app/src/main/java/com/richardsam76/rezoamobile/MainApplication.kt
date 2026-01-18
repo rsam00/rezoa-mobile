@@ -1,4 +1,4 @@
-package com.anonymous.rezoamobile
+package com.richardsam76.rezoamobile
 
 import android.app.Application
 import android.content.res.Configuration

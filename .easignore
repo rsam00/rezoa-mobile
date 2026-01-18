@@ -1,0 +1,30 @@
+# EAS Ignore - To reduce upload size (Current: 621MB)
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build artifacts and caches
+.expo/
+dist/
+web-build/
+android/app/build/
+android/.gradle/
+ios/build/
+ios/Pods/
+
+# Version control
+.git/
+.gitignore
+
+# Environment and logs
+.env*.local
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Development files
+.vscode/
+app-example/
+README.md
+scripts/

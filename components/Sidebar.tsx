@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
     Dimensions,
+    Image,
     Pressable,
     StyleSheet,
     Text,
@@ -65,12 +66,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Backdrop */}
       <Animated.View style={[styles.backdrop, backdropStyle]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={closeDrawer} />
       </Animated.View>
 
-      {/* Sidebar Panel */}
       <Animated.View style={[styles.container, animatedStyle]}>
         <LinearGradient
           colors={['#1e1b4b', '#000']}
@@ -79,7 +78,11 @@ export default function Sidebar() {
         
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.logoText}>Rezoa</Text>
+            <Image 
+              source={require('../assets/images/rezoa_logo_clear.png')} 
+              style={styles.logoImage} 
+              resizeMode="contain"
+            />
             {user && (
               <View style={styles.userProfile}>
                 <View style={styles.avatar}>
@@ -89,8 +92,6 @@ export default function Sidebar() {
               </View>
             )}
           </View>
-
-          <View style={styles.divider} />
 
           <View style={styles.menuItems}>
             <View style={[styles.divider, { marginVertical: 20 }]} />
@@ -121,15 +122,6 @@ export default function Sidebar() {
   );
 }
 
-function MenuButton({ label, icon, onPress }: { label: string; icon: string; onPress: () => void }) {
-  return (
-    <TouchableOpacity style={styles.menuButton} onPress={onPress}>
-      <Text style={styles.menuIcon}>{icon}</Text>
-      <Text style={styles.menuLabel}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -156,19 +148,20 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 30,
+    alignItems: 'center',
   },
-  logoText: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: '#a78bfa',
+  logoImage: {
+    width: 140,
+    height: 50,
     marginBottom: 20,
   },
   userProfile: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    padding: 12,
+    padding: 20,
     borderRadius: 12,
+    gap: 12,
   },
   avatar: {
     width: 40,
@@ -177,7 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#a78bfa',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   avatarText: {
     color: '#fff',
@@ -188,7 +180,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
-    flex: 1,
+    textAlign: 'center',
   },
   divider: {
     height: 1,
@@ -198,21 +190,6 @@ const styles = StyleSheet.create({
   menuItems: {
     marginTop: 20,
     flex: 1,
-  },
-  menuButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 5,
-  },
-  menuIcon: {
-    fontSize: 20,
-    marginRight: 15,
-  },
-  menuLabel: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   authButton: {
     height: 50,

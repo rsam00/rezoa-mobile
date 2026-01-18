@@ -1,7 +1,8 @@
 ﻿import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, InteractionManager, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Dimensions, FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
@@ -61,23 +62,6 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
 });
 
 export default function ExploreScreen() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => {
-      setIsReady(true);
-    });
-    return () => task.cancel();
-  },[]);
-
-  if (!isReady) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
-      </SafeAreaView>
-    );
-  }
-
   return <ExploreScreenContent />;
 }
 
@@ -100,30 +84,66 @@ function ExploreScreenContent() {
     );
   }, [search, stations]);
 
+  const exploreData = useMemo(() => {
+    const data: any[] = [];
+    const rows: any[] = [];
+    
+    // Group into pairs
+    for (let i = 0; i < filteredStations.length; i += 2) {
+      rows.push(filteredStations.slice(i, i + 2));
+    }
+
+    // Insert ad every 3 rows
+    rows.forEach((row, index) => {
+      if (index > 0 && index % 3 === 0) {
+        data.push({ id: `ad-${index}`, isAd: true });
+      }
+      data.push({ id: `row-${index}`, items: row });
+    });
+
+    return data;
+  }, [filteredStations]);
+
   const handleToggleFavorite = useCallback((id: string) => {
     toggleFavorite(id);
   }, [toggleFavorite]);
 
-  const renderItem = useCallback(({ item }: any) => {
-    const isFavorite = favorites.includes(item.id);
-    const isStationPlaying = playerState.isPlaying && playerState.currentStation?.id === item.id;
-    const isLoading = playerState.isLoading && playerState.currentStation?.id === item.id;
-    
-    const handlePlayPause = async () => {
-      if (isStationPlaying) await pause();
-      else await playStation(item as any);
-    };
+  const renderExploreItem = useCallback(({ item }: any) => {
+    if (item.isAd) {
+      return (
+        <View style={{ paddingHorizontal: 15, marginVertical: 10, marginBottom: 16 }}>
+          <AdBanner />
+        </View>
+      );
+    }
 
     return (
-      <StationCard
-        item={item}
-        isFavorite={isFavorite}
-        isStationPlaying={isStationPlaying}
-        isLoading={isLoading}
-        onPress={() => router.push({ pathname: '/station-details', params: { id: item.id } })}
-        onToggleFavorite={() => handleToggleFavorite(item.id)}
-        onPlayPause={handlePlayPause}
-      />
+      <View style={{ flexDirection: 'row', paddingHorizontal: 15, gap: CARD_GAP, marginBottom: 16 }}>
+        {item.items.map((station: any) => {
+          const isFavorite = favorites.includes(station.id);
+          const isStationPlaying = playerState.isPlaying && playerState.currentStation?.id === station.id;
+          const isLoading = playerState.isLoading && playerState.currentStation?.id === station.id;
+          
+          const handlePlayPause = async () => {
+            if (isStationPlaying) await pause();
+            else await playStation(station as any);
+          };
+
+          return (
+            <StationCard
+              key={station.id}
+              item={station}
+              isFavorite={isFavorite}
+              isStationPlaying={isStationPlaying}
+              isLoading={isLoading}
+              onPress={() => router.push({ pathname: '/station-details', params: { id: station.id } })}
+              onToggleFavorite={() => handleToggleFavorite(station.id)}
+              onPlayPause={handlePlayPause}
+            />
+          );
+        })}
+        {item.items.length === 1 && <View style={{ width: CARD_WIDTH }} />}
+      </View>
     );
   }, [favorites, playerState, router, handleToggleFavorite, pause, playStation]);
 
@@ -169,16 +189,12 @@ function ExploreScreenContent() {
         <Ionicons name="search" size={20} color="#a78bfa" style={styles.searchIcon} />
       </View>
       <FlatList
-        key={'grid-revamp'}
-        data={filteredStations}
+        data={exploreData}
         keyExtractor={(item) => item.id}
-        numColumns={NUM_COLUMNS}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 170 }}
-        columnWrapperStyle={{ gap: CARD_GAP, paddingHorizontal: 15 }}
-        renderItem={renderItem}
-        getItemLayout={getItemLayout}
-        initialNumToRender={8}
+        renderItem={renderExploreItem}
+        initialNumToRender={6}
       />
     </SafeAreaView>
   );
@@ -200,8 +216,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   header: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '900',
     color: '#a78bfa',
   },
   profileButton: {

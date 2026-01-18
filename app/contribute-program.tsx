@@ -2,15 +2,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
@@ -91,9 +91,7 @@ export default function ContributeProgramScreen() {
           <Text style={styles.closeButtonText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add Program</Text>
-        <TouchableOpacity onPress={handleSubmit} style={styles.submitButtonHeader}>
-          <Text style={styles.submitButtonTextHeader}>SAVE</Text>
-        </TouchableOpacity>
+        <View style={{ width: 32 }} />
       </View>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -166,8 +164,6 @@ const styles = StyleSheet.create({
   closeButton: { width: 32, height: 32, justifyContent: 'center' },
   closeButtonText: { color: '#fff', fontSize: 20, fontWeight: '300' },
   headerTitle: { color: '#fff', fontSize: 17, fontWeight: '700' },
-  submitButtonHeader: { backgroundColor: 'rgba(167, 139, 250, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(167, 139, 250, 0.3)' },
-  submitButtonTextHeader: { color: '#a78bfa', fontSize: 12, fontWeight: '900' },
   scrollContent: { padding: 20, paddingBottom: 60 },
   stationBanner: { marginBottom: 30, alignItems: 'center' },
   contributingTo: { color: '#a1a1aa', fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 4 },
