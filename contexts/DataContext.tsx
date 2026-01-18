@@ -52,42 +52,54 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const fetchData = async () => {
     setLoading(true);
-    try {
-      // 1. Fetch Stations
-      const { data: sData, error: sError } = await supabase
-        .from('stations')
-        .select('*');
-      
-      // 2. Fetch Programs
-      const { data: pData, error: pError } = await supabase
-        .from('programs')
-        .select('*');
+    
+    // Create a timeout promise to prevent hanging on slow networks
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Fetch timeout')), 5000)
+    );
 
-      if (sError || pError) {
-        console.log('⚠️ Supabase fetch error:', sError || pError);
-        fallbackToLocal();
-      } else if (!sData || sData.length === 0) {
-        console.log('ℹ️ Supabase is empty, using local fallback.');
-        fallbackToLocal();
-      } else {
-        // Map Supabase snake_case to CamelCase expected by frontend
-        setStations(sData.map(s => ({
-          ...s,
-          streamUrl: s.stream_url,
-          tag: s.tags,
-          favoriteCount: s.favorite_count,
-          clickCount: s.click_count,
-          createdAt: s.created_at
-        })));
-        setPrograms(pData.map(p => ({
-          ...p,
-          stationId: p.station_id,
-          clickCount: p.click_count,
-          createdAt: p.created_at
-        })));
-      }
+    try {
+      const fetchPromise = (async () => {
+        // 1. Fetch Stations
+        const { data: sData, error: sError } = await supabase
+          .from('stations')
+          .select('*');
+        
+        // 2. Fetch Programs
+        const { data: pData, error: pError } = await supabase
+          .from('programs')
+          .select('*');
+
+        if (sError || pError) {
+          console.log('⚠️ Supabase fetch error:', sError || pError);
+          fallbackToLocal();
+        } else if (!sData || sData.length === 0) {
+          console.log('ℹ️ Supabase is empty, using local fallback.');
+          fallbackToLocal();
+        } else {
+          // Map Supabase snake_case to CamelCase expected by frontend
+          setStations(sData.map(s => ({
+            ...s,
+            streamUrl: s.stream_url,
+            tag: s.tags,
+            favoriteCount: s.favorite_count,
+            clickCount: s.click_count,
+            createdAt: s.created_at
+          })));
+          setPrograms(pData.map(p => ({
+            ...p,
+            stationId: p.station_id,
+            clickCount: p.click_count,
+            createdAt: p.created_at
+          })));
+        }
+      })();
+
+      // Race the fetch against the timeout
+      await Promise.race([fetchPromise, timeoutPromise]);
+
     } catch (e) {
-      console.error('❌ Critical error fetching from Supabase:', e);
+      console.error('❌ Data fetch error or timeout:', e);
       fallbackToLocal();
     } finally {
       setLoading(false);

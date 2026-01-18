@@ -1,27 +1,28 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    InteractionManager,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    useWindowDimensions
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions
 } from 'react-native';
 import Animated, {
-    scrollTo,
-    useAnimatedRef,
-    useAnimatedScrollHandler,
-    useSharedValue
+  scrollTo,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useSharedValue
 } from 'react-native-reanimated';
+import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { usePlayer } from '../../contexts/PlayerContext';
@@ -104,23 +105,6 @@ function getBlocksForDay(programs: Program[], dayName: string) {
 const GENRES = ['All', 'News', 'Music', 'Gospel', 'Sports', 'Talk', 'Culture'];
 
 export default function ProgramGuideScreen() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    const task = InteractionManager.runAfterInteractions(() => {
-      setIsReady(true);
-    });
-    return () => task.cancel();
-  }, []);
-
-  if (!isReady) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
-      </SafeAreaView>
-    );
-  }
-
   return <ProgramGuideContent />;
 }
 
@@ -151,6 +135,16 @@ function ProgramGuideContent() {
     return () => clearInterval(interval);
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!dataLoading) {
+        // Small delay to ensure refs are attached and layout is calculated
+        const timer = setTimeout(scrollToNow, 300);
+        return () => clearTimeout(timer);
+      }
+    }, [dataLoading])
+  );
+
   useEffect(() => {
     Notifications.requestPermissionsAsync();
   }, []);
@@ -172,6 +166,18 @@ function ProgramGuideContent() {
     });
     return grouped;
   }, [programs]);
+
+  const guideData = useMemo(() => {
+    const result: any[] = [];
+    filteredStations.forEach((station, index) => {
+      // Reduced ad density from index % 8 to index % 12 to improve performance
+      if (index > 0 && index % 12 === 0) {
+        result.push({ id: `ad-${index}`, isAd: true });
+      }
+      result.push(station);
+    });
+    return result;
+  }, [filteredStations]);
 
   const onLeftScroll = useAnimatedScrollHandler({
     onBeginDrag: () => { isScrollingLeft.value = true; isScrollingRight.value = false; },
@@ -299,7 +305,7 @@ function ProgramGuideContent() {
         <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
           <Text style={styles.profileButtonText}>☰</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Haitian Radio Guide</Text>
+        <Text style={styles.headerTitle}>Guide</Text>
         <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
             <Text style={styles.liveNowText}>LIVE</Text>
         </TouchableOpacity>
@@ -338,13 +344,22 @@ function ProgramGuideContent() {
           <View style={[styles.timeHeader, { height: TIME_ROW_HEIGHT }]} />
           <ReanimatedFlatList
             ref={leftRef}
-            data={filteredStations}
+            data={guideData}
             keyExtractor={(item: any) => item.id}
-            renderItem={({ item }: any) => <LogoColumnItem item={item} />}
+            renderItem={({ item }: any) => item.isAd ? (
+              <View style={{ height: STATION_ROW_HEIGHT, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: '#555', fontSize: 8, fontWeight: '900' }}>SPONSORED</Text>
+              </View>
+            ) : <LogoColumnItem item={item} />}
             showsVerticalScrollIndicator={false}
             scrollEventThrottle={16}
             onScroll={onLeftScroll}
             getItemLayout={(data, index) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * index, index })}
+            initialNumToRender={8}
+            windowSize={5}
+            maxToRenderPerBatch={5}
+            updateCellsBatchingPeriod={50}
+            removeClippedSubviews={true}
           />
         </View>
 
@@ -366,13 +381,26 @@ function ProgramGuideContent() {
 
             <ReanimatedFlatList
               ref={rightRef}
-              data={filteredStations}
+              data={guideData}
               keyExtractor={(item: any) => item.id}
-              renderItem={({ item }: any) => <ProgramRow station={item} />}
+              renderItem={({ item }: any) => item.isAd ? (
+                <View style={{ width: 24 * CELL_WIDTH, height: STATION_ROW_HEIGHT, backgroundColor: '#000', flexDirection: 'row', alignItems: 'center' }}>
+                   {[0, 6, 12, 18].map((h) => (
+                     <View key={h} style={{ width: 6 * CELL_WIDTH, height: STATION_ROW_HEIGHT, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10 }}>
+                        <AdBanner height={STATION_ROW_HEIGHT - 20} type="banner" />
+                     </View>
+                   ))}
+                </View>
+              ) : <ProgramRow station={item} />}
               showsVerticalScrollIndicator={false}
               scrollEventThrottle={16}
               onScroll={onRightScroll}
               getItemLayout={(data, index) => ({ length: STATION_ROW_HEIGHT, offset: STATION_ROW_HEIGHT * index, index })}
+              initialNumToRender={8}
+              windowSize={5}
+              maxToRenderPerBatch={5}
+              updateCellsBatchingPeriod={50}
+              removeClippedSubviews={true}
             />
           </View>
         </ScrollView>
