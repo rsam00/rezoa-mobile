@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import * as Notifications from 'expo-notifications';
+
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -145,9 +145,7 @@ function ProgramGuideContent() {
     }, [dataLoading])
   );
 
-  useEffect(() => {
-    Notifications.requestPermissionsAsync();
-  }, []);
+
 
   const filteredStations = useMemo(() => {
     const active = stations.filter(s => s.name && s.streamUrl);
