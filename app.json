@@ -4,10 +4,10 @@
     "slug": "rezoa-mobile",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/rezoa_logo_3.png",
+    "icon": "./assets/images/app-icon-primary.png",
     "scheme": "rezoa",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -21,14 +21,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/rezoa_logo_3.png",
+        "foregroundImage": "./assets/images/app-icon-primary.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "usesCleartextTraffic": true,
       "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
@@ -44,7 +41,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/rezoa_logo_3.png",
+          "image": "./assets/images/app-icon-primary.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#000000"
@@ -56,6 +53,14 @@
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.1.0"
+          }
         }
       ]
     ],

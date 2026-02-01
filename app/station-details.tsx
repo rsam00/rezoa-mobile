@@ -97,13 +97,7 @@ export default function StationDetailsScreen() {
   const isStationLoading = playerState.isLoading && playerState.currentStation?.id === station?.id;
   const router = useRouter();
 
-  if (loading) {
-    return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center' }]}>
-        <ActivityIndicator size="large" color="#a78bfa" />
-      </SafeAreaView>
-    );
-  }
+
 
   if (!station) {
     return (

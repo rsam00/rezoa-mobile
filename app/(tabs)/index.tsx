@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import AdBanner from '../../components/AdBanner';
@@ -67,13 +68,19 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
 });
 
 export default function HomeScreen() {
-  const { loading: dataLoading } = useData();
+  const { isReady } = useData();
 
-  if (dataLoading) {
+  useEffect(() => {
+    // Hide native splash screen once the JS Home Screen mounts/renders
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  if (!isReady) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#a78bfa" />
-      </SafeAreaView>
+      <View style={{ flex: 1, backgroundColor: '#2e1065', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={{ color: '#fff', marginTop: 20, fontWeight: 'bold' }}>SYNCHRONIZING REZOA...</Text>
+      </View>
     );
   }
 
@@ -82,14 +89,32 @@ export default function HomeScreen() {
 
 function HomeScreenContent() {
   const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
+  console.log('--- HOMESCREEN CONTENT DRAWING ---');
+
+
+
+  useEffect(() => {
+    console.log('--- HOMESCREEN CONTENT MOUNTED ---');
+  }, []);
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
   const { history } = useHistory();
   const { openDrawer } = useDrawer();
   const router = useRouter();
+
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [selectedHero, setSelectedHero] = useState<any>(null);
   
+  const [categoriesReady, setCategoriesReady] = useState(false);
+  const [extraCategoriesReady, setExtraCategoriesReady] = useState(false);
+
+  // Tiered computation: Stage 1 for the first few rows, Stage 2 for everything else
+  useEffect(() => {
+    const t1 = setTimeout(() => setCategoriesReady(true), 100);
+    const t2 = setTimeout(() => setExtraCategoriesReady(true), 1500);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
   const liveNow = useMemo(() => {
     return programs
       .map(p => ({
@@ -124,46 +149,61 @@ function HomeScreenContent() {
       const program = station ? getCurrentProgram(programs, station.id) : undefined;
       return { station, program };
     }
-    return liveNow.length > 0 ? liveNow[currentHeroIndex] : { station: stations[0], program: null };
+    
+    // Safety check: ensure the index is still valid for the current liveNow array
+    const safeIndex = currentHeroIndex >= liveNow.length ? 0 : currentHeroIndex;
+    if (liveNow.length > 0) return liveNow[safeIndex];
+    
+    // Final fallback: If no live now and no stations fetched yet, return null
+    if (stations.length === 0) return { station: null, program: null };
+    
+    return { station: stations[0], program: null };
   }, [selectedHero, liveNow, currentHeroIndex, playerState.currentStation, stations, programs]);
 
+  // Only calculate these once the screen has finished its first "Hero" render
   const recentlyPlayed = useMemo(() => {
+    if (!categoriesReady) return [];
     return history.map(id => stations.find(s => s.id === id)).filter(Boolean) as any[];
-  }, [history, stations]);
+  }, [history, stations, categoriesReady]);
 
   const favoriteStations = useMemo(() => {
+    if (!categoriesReady) return [];
     return favorites.map(id => stations.find(s => s.id === id)).filter(Boolean) as any[];
-  }, [favorites, stations]);
+  }, [favorites, stations, categoriesReady]);
 
   const newsStations = useMemo(() => {
+    if (!categoriesReady) return [];
     return stations.filter(s => 
       s.tag?.some((t: string) => ['News', 'Talk', 'news'].includes(t.toLowerCase())) || 
       s.description?.toLowerCase().includes('news')
     ).slice(0, 15);
-  }, [stations]);
+  }, [stations, categoriesReady]);
 
   const faithStations = useMemo(() => {
+    if (!extraCategoriesReady) return [];
     return stations.filter(s => 
       s.description?.toLowerCase().includes('christian') || 
       s.description?.toLowerCase().includes('evangelique') ||
       s.name.toLowerCase().includes('radio 4veh') ||
       s.name.toLowerCase().includes('lumiere')
     ).slice(0, 15);
-  }, [stations]);
+  }, [stations, extraCategoriesReady]);
 
   const musicStations = useMemo(() => {
+    if (!extraCategoriesReady) return [];
     return stations.filter(s => 
       s.tag?.some((t: string) => ['pop', 'Music', 'music'].includes(t.toLowerCase())) || 
       s.description?.toLowerCase().includes('music') ||
       s.description?.toLowerCase().includes('kompa')
     ).slice(0, 15);
-  }, [stations]);
+  }, [stations, extraCategoriesReady]);
 
   const justAdded = useMemo(() => {
+    if (!extraCategoriesReady) return [];
     return [...stations].sort((a, b) => 
       new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     ).slice(0, 15);
-  }, [stations]);
+  }, [stations, extraCategoriesReady]);
 
   const temporalCategory = useMemo(() => {
     const hours = new Date().getHours();
@@ -181,19 +221,21 @@ function HomeScreenContent() {
       filtered = stations.filter(s => s.description?.toLowerCase().includes('smooth') || s.tag?.some(t => t.toLowerCase().includes('chill'))).slice(0, 10);
     }
     return { title, data: filtered };
-  }, [stations]);
+  }, [stations, categoriesReady]);
 
   const popular = useMemo(() => {
+    if (!extraCategoriesReady) return [];
     return [...stations].sort((a, b) => 
       (b.favoriteCount || 0) - (a.favoriteCount || 0)
     ).slice(0, 15);
-  }, [stations]);
+  }, [stations, extraCategoriesReady]);
 
   const trendingShows = useMemo(() => {
+    if (!extraCategoriesReady) return [];
     return [...programs].sort((a, b) => 
       (b.clickCount || 0) - (a.clickCount || 0)
     ).slice(0, 15);
-  }, [programs]);
+  }, [programs, extraCategoriesReady]);
 
   const renderCarouselItem = useCallback(({ item }: { item: any }) => {
     return (
@@ -243,13 +285,7 @@ function HomeScreenContent() {
     index,
   }), []);
 
-  if (dataLoading) {
-    return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#a78bfa" />
-      </SafeAreaView>
-    );
-  }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -264,7 +300,7 @@ function HomeScreenContent() {
         <View style={{ width: 44 }} />
       </View>
       
-      {featuredItem.station && (
+      {featuredItem?.station && (
         <TouchableOpacity 
           style={styles.heroContainer} 
           onPress={navigateToDetails}
@@ -491,7 +527,7 @@ function HomeScreenContent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#111',
   },
   headerRow: {
     paddingTop: 50,

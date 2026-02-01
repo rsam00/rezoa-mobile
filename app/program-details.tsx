@@ -47,13 +47,7 @@ export default function ProgramDetailsScreen() {
     return !!isLive([program as any], program.stationId);
   }, [program]);
 
-  if (loading) {
-    return (
-      <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color="#a78bfa" />
-      </SafeAreaView>
-    );
-  }
+
 
   if (!program) {
     return (

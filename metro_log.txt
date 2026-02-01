@@ -1,0 +1,11 @@
+Starting project at C:\Users\U4652G6\Documents\rezoa\project_v1\rezoa-mobile
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+The following packages should be updated for best compatibility with the installed expo version:
+  expo@53.0.25 - expected version: ~53.0.26
+  expo-router@5.1.10 - expected version: ~5.1.11
+  react-native-svg@15.15.1 - expected version: 15.11.2
+Your project may not work correctly until you install the expected versions of the packages.
+› Opening exp://192.168.1.69:8081 on MyEmulator
+Waiting on http://localhost:8081
+Logs for your project will appear below.

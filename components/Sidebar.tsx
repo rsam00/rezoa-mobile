@@ -79,7 +79,7 @@ export default function Sidebar() {
         <View style={styles.content}>
           <View style={styles.header}>
             <Image 
-              source={require('../assets/images/rezoa_logo_clear.png')} 
+              source={require('../assets/images/logo-sidebar.png')} 
               style={styles.logoImage} 
               resizeMode="contain"
             />
