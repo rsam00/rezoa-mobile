@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -12,8 +13,7 @@ import { useSegments } from 'expo-router';
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const segments = useSegments();
-  // segments[segments.length - 1] gives the current tab name (e.g., 'index', 'explore', 'programguide')
-  const isHome = String(segments[segments.length - 1]) === 'index';
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -29,8 +29,8 @@ export default function TabLayout() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 70,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom,
           paddingTop: 0,
           borderTopWidth: 1,
           borderTopColor: '#222',

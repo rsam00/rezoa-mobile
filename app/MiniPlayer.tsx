@@ -1,17 +1,20 @@
 import { BlurView } from 'expo-blur';
 import { useSegments } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 
 import { calculateProgramProgress, getCurrentProgram, Program } from '../utils/timeUtils';
 
 export default function MiniPlayer() {
+  const insets = useSafeAreaInsets();
   const { playerState, playStation, pause, stop } = usePlayer();
   const { programs } = useData();
   const segments = useSegments();
-  const isInTabs = segments[0] === '(tabs)';
+  // Robust check for tabs: check if any segment is (tabs)
+  const isInTabs = (segments as string[]).includes('(tabs)');
   
   const slideAnim = useRef(new Animated.Value(200)).current; 
   const scrollAnim = useRef(new Animated.Value(0)).current;
@@ -96,13 +99,15 @@ export default function MiniPlayer() {
     outputRange: [-24, 0], // Heights for the vertical shift
   });
 
+  const bottomOffset = isInTabs ? 60 + insets.bottom : insets.bottom;
+
   return (
     <Animated.View
       style={[
         styles.container, 
         { 
           transform: [{ translateY: slideAnim }],
-          bottom: isInTabs ? 70 : 0, // Docked exactly on top of TabBar or bottom of screen
+          bottom: bottomOffset, // Docked exactly on top of TabBar or bottom of screen
         },
       ]}
     >
@@ -168,7 +173,8 @@ const styles = StyleSheet.create({
     // bottom is dynamic based on isInTabs
     backgroundColor: 'rgba(0,0,0,0.95)',
     overflow: 'hidden',
-    zIndex: 100,
+    zIndex: 9999,
+    elevation: 20,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
     height: 64,

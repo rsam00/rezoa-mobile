@@ -52,8 +52,9 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError(null);
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
 
+      // If it's already the current station, toggle play/pause
       if (currentStation?.id === station.id) {
-        if (player.playing) {
+        if (status.playing) {
           player.pause();
         } else {
           player.play();
@@ -61,14 +62,18 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
+      // New station logic
       setCurrentStation(station);
       await addToHistory(station.id);
+      
+      // Stop current before replacing source
+      player.pause();
       player.replace({ uri: station.streamUrl });
       player.play();
 
       // Start a 15-second timeout for loading
       loadingTimeoutRef.current = setTimeout(() => {
-        if (!player.playing) {
+        if (!player.playing && !player.isBuffering) {
           setError('Station is currently unreachable. Please try another.');
           player.pause();
           setCurrentStation(null);
@@ -100,7 +105,8 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const playerState: PlayerState = {
     isPlaying: status.playing,
-    isLoading: status.isBuffering || (currentStation !== null && !status.isLoaded),
+    // Avoid showing loading forever if it's already playing
+    isLoading: status.isBuffering && !status.playing,
     currentStation,
     error: error,
   };

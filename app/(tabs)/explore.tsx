@@ -1,7 +1,8 @@
 ﻿import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
@@ -66,6 +67,7 @@ export default function ExploreScreen() {
 }
 
 function ExploreScreenContent() {
+  const insets = useSafeAreaInsets();
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { openDrawer } = useDrawer();
@@ -157,14 +159,14 @@ function ExploreScreenContent() {
 
   if (dataLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <TouchableOpacity 
           style={styles.profileButton} 
@@ -196,7 +198,7 @@ function ExploreScreenContent() {
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   headerRow: {
-    paddingTop: 50,
+    paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

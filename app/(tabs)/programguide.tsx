@@ -8,14 +8,15 @@ import {
   FlatList,
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions
+  useWindowDimensions,
+  Platform
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   scrollTo,
   useAnimatedRef,
@@ -109,6 +110,7 @@ export default function ProgramGuideScreen() {
 }
 
 function ProgramGuideContent() {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { playStation, playerState, pause } = usePlayer();
   const { openDrawer } = useDrawer();
@@ -134,6 +136,25 @@ function ProgramGuideContent() {
     }, 30000); 
     return () => clearInterval(interval);
   }, []);
+
+  const scrollToNow = () => {
+    // 1. Set to today
+    const todayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day);
+    if (todayIndex !== -1) {
+      setSelectedDay(todayIndex);
+      // Scroll day strip to today (tab width approx 60-80 + gap 15)
+      dayScrollRef.current?.scrollTo({ x: todayIndex * 70, animated: true });
+    }
+
+    // 2. Scroll horizontal guide to current time
+    const haiti = getHaitiTime();
+    const currentMinutes = haiti.hours * 60 + haiti.minutes;
+    const scrollX = (currentMinutes / 60) * CELL_WIDTH - (width - LEFT_COLUMN_WIDTH) / 2;
+    horizontalScrollRef.current?.scrollTo({ 
+      x: Math.max(0, scrollX), 
+      animated: true 
+    });
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -200,25 +221,6 @@ function ProgramGuideContent() {
       }
     },
   });
-
-  const scrollToNow = () => {
-    // 1. Set to today
-    const todayIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day);
-    if (todayIndex !== -1) {
-      setSelectedDay(todayIndex);
-      // Scroll day strip to today (tab width approx 60-80 + gap 15)
-      dayScrollRef.current?.scrollTo({ x: todayIndex * 70, animated: true });
-    }
-
-    // 2. Scroll horizontal guide to current time
-    const haiti = getHaitiTime();
-    const currentMinutes = haiti.hours * 60 + haiti.minutes;
-    const scrollX = (currentMinutes / 60) * CELL_WIDTH - (width - LEFT_COLUMN_WIDTH) / 2;
-    horizontalScrollRef.current?.scrollTo({ 
-      x: Math.max(0, scrollX), 
-      animated: true 
-    });
-  };
 
   const LogoColumnItem = React.memo(({ item }: { item: Station }) => (
     <View style={styles.logoCell}>
@@ -291,14 +293,14 @@ function ProgramGuideContent() {
 
   if (dataLoading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
         <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
           <Text style={styles.profileButtonText}>☰</Text>
@@ -403,14 +405,14 @@ function ProgramGuideContent() {
           </View>
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   headerRow: {
-    paddingTop: 50,
+    paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
