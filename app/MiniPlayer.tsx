@@ -185,8 +185,8 @@ const styles = StyleSheet.create({
     // bottom is dynamic based on isInTabs
     backgroundColor: 'rgba(0,0,0,0.7)',
     overflow: 'hidden',
-    zIndex: 9999,
-    elevation: 20,
+    zIndex: 100,
+    elevation: 8,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
     height: 64,

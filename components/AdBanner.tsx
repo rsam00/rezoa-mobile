@@ -1,16 +1,8 @@
 import React from 'react';
-import { DimensionValue, StyleSheet, View } from 'react-native';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+import { DimensionValue, StyleSheet, Text, View } from 'react-native';
 
-const adUnitId = TestIds.BANNER;
-
-interface AdBannerProps {
-  type?: 'inline' | 'banner';
-  height?: DimensionValue;
-  width?: DimensionValue;
-}
-
-export default function AdBanner({ type = 'inline', height, width }: AdBannerProps) {
+export default function AdBanner({ type = 'inline', height, width }: { type?: 'inline' | 'banner', height?: DimensionValue, width?: DimensionValue }) {
+  // Temporarily disabled BannerAd to troubleshoot UI freezing
   return (
     <View style={[
       styles.container, 
@@ -18,14 +10,7 @@ export default function AdBanner({ type = 'inline', height, width }: AdBannerPro
       height ? { height } : {},
       width ? { width } : {},
     ]}>
-      <BannerAd
-        unitId={adUnitId}
-        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-        requestOptions={{
-          requestNonPersonalizedAdsOnly: true,
-        }}
-        onAdFailedToLoad={(error) => console.log('Ad failed to load: ', error)}
-      />
+      <Text style={{ color: '#444', fontSize: 10 }}>Ad Placeholder</Text>
     </View>
   );
 }

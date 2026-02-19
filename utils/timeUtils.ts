@@ -8,6 +8,18 @@ export interface Program {
 /**
  * Gets the current time and day in Haiti (America/Port-au-Prince)
  */
+const haitiFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Port-au-Prince',
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  hour12: false,
+  weekday: 'long',
+});
+
 /**
  * Gets the current time and day in Haiti (America/Port-au-Prince)
  */
@@ -15,22 +27,7 @@ export function getHaitiTime() {
   const now = new Date();
   
   try {
-    // We want to get the hour, minute, second and weekday in Haiti's timezone
-    // The safest way is to use a locale that we know returns full weekday names
-    const options: Intl.DateTimeFormatOptions = {
-        timeZone: 'America/Port-au-Prince',
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        hour12: false,
-        weekday: 'long',
-    };
-    
-    const formatter = new Intl.DateTimeFormat('en-US', options);
-    const parts = formatter.formatToParts(now);
+    const parts = haitiFormatter.formatToParts(now);
     const dateMap: Record<string, string> = {};
     parts.forEach(p => { dateMap[p.type] = p.value; });
 

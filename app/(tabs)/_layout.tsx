@@ -34,7 +34,8 @@ export default function TabLayout() {
           paddingBottom: insets.bottom,
           paddingTop: 0,
           borderTopWidth: 0,
-          elevation: 0,
+          elevation: 5,
+          zIndex: 10,
         },
       }}>
       <Tabs.Screen
