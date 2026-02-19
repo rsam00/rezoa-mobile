@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import mobileAds from 'react-native-google-mobile-ads';
@@ -16,6 +16,10 @@ import { DrawerProvider } from '../contexts/DrawerContext';
 import { FavoritesProvider } from '../contexts/FavoritesContext';
 import { HistoryProvider } from '../contexts/HistoryContext';
 import { PlayerProvider } from '../contexts/PlayerContext';
+
+import * as NavigationBar from 'expo-navigation-bar';
+import Sidebar from '../components/Sidebar';
+import MiniPlayer from './MiniPlayer';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -33,6 +37,14 @@ export default function RootLayout() {
       .then(adapterStatuses => {
         console.log('Mobile Ads Initialized', adapterStatuses);
       });
+      
+    if (Platform.OS === 'android') {
+      // In edge-to-edge mode, background color is controlled by the screen content (transparent).
+      // We only need to set the button/icon style.
+      NavigationBar.setButtonStyleAsync("light");
+      // Optional: ensures the bar remains hidden/subtle in certain interaction modes
+      NavigationBar.setBehaviorAsync('inset-touch');
+    }
   }, []);
   
   if (!loaded) {
@@ -49,10 +61,14 @@ export default function RootLayout() {
                 <ContributionsProvider>
                   <DrawerProvider>
                     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                      <Stack>
-                        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                        <Stack.Screen name="+not-found" />
-                      </Stack>
+                      <View style={{ flex: 1 }}>
+                        <Stack>
+                          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                          <Stack.Screen name="+not-found" />
+                        </Stack>
+                        <MiniPlayer />
+                        <Sidebar />
+                      </View>
                     </ThemeProvider>
                   </DrawerProvider>
                 </ContributionsProvider>

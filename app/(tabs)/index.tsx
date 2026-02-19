@@ -4,7 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
@@ -89,13 +90,13 @@ export default function HomeScreen() {
 }
 
 function HomeScreenContent() {
+  const insets = useSafeAreaInsets();
   const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
-  console.log('--- HOMESCREEN CONTENT DRAWING ---');
 
 
 
   useEffect(() => {
-    console.log('--- HOMESCREEN CONTENT MOUNTED ---');
+    // No-op
   }, []);
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
@@ -289,7 +290,7 @@ function HomeScreenContent() {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.headerRow}>
         <TouchableOpacity 
           style={styles.profileButton} 
@@ -521,7 +522,7 @@ function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -531,7 +532,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#111',
   },
   headerRow: {
-    paddingTop: 50,
+    paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
