@@ -19,12 +19,13 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+        tabBarInactiveTintColor: '#fff',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: 'rgba(0,0,0,0.95)',
+          backgroundColor: 'rgba(0,0,0,0.7)',
           position: 'absolute',
           bottom: 0,
           left: 0,
@@ -32,8 +33,7 @@ export default function TabLayout() {
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
           paddingTop: 0,
-          borderTopWidth: 1,
-          borderTopColor: '#222',
+          borderTopWidth: 0,
           elevation: 0,
         },
       }}>

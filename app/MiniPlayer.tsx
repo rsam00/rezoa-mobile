@@ -1,4 +1,3 @@
-import { BlurView } from 'expo-blur';
 import { useSegments } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -111,8 +110,6 @@ export default function MiniPlayer() {
         },
       ]}
     >
-      <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-      
       <View style={styles.contentContainer}>
         <View style={styles.mainRow}>
           <View style={styles.infoSection}>
@@ -171,7 +168,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     // bottom is dynamic based on isInTabs
-    backgroundColor: 'rgba(0,0,0,0.95)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     overflow: 'hidden',
     zIndex: 9999,
     elevation: 20,
@@ -206,7 +203,7 @@ const styles = StyleSheet.create({
   },
   stationTitle: {
     color: '#a78bfa',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
@@ -235,6 +232,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     textAlign: 'center',
     includeFontPadding: false,
+    color: '#fff',
   },
   loadingIndicator: {
     padding: 8,

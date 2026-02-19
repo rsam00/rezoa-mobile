@@ -7,6 +7,7 @@ import { Platform, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import mobileAds from 'react-native-google-mobile-ads';
+import { StatusBar } from 'expo-status-bar';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -42,8 +43,6 @@ export default function RootLayout() {
       // In edge-to-edge mode, background color is controlled by the screen content (transparent).
       // We only need to set the button/icon style.
       NavigationBar.setButtonStyleAsync("light");
-      // Optional: ensures the bar remains hidden/subtle in certain interaction modes
-      NavigationBar.setBehaviorAsync('inset-touch');
     }
   }, []);
   
@@ -61,7 +60,8 @@ export default function RootLayout() {
                 <ContributionsProvider>
                   <DrawerProvider>
                     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-                      <View style={{ flex: 1 }}>
+                      <View style={{ flex: 1, backgroundColor: 'black' }}>
+                        <StatusBar style="light" />
                         <Stack>
                           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                           <Stack.Screen name="+not-found" />

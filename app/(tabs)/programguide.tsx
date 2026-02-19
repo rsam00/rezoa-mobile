@@ -412,14 +412,14 @@ function ProgramGuideContent() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   headerRow: {
-    paddingTop: 10,
+    paddingTop: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     zIndex: 100,
     backgroundColor: 'black',
-    marginBottom: 5,
+    marginBottom: 0,
   },
   headerTitle: { color: '#a78bfa', fontSize: 22, fontWeight: '900' },
   profileButton: { padding: 4 },
