@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
@@ -13,7 +13,8 @@ import { useHistory } from '../../contexts/HistoryContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import { getCurrentProgram } from '../../utils/timeUtils';
 
-const HERO_HEIGHT = 450;
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.3;
 const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 100;
 const HERO_ROTATION_INTERVAL = 10000;
@@ -573,16 +574,16 @@ const styles = StyleSheet.create({
   },
   heroContent: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 20,
     left: 20,
     right: 20,
     zIndex: 10,
   },
   heroTitle: {
     color: '#fff',
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: '900',
-    marginBottom: 10,
+    marginBottom: 6,
   },
   heroForegroundContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -598,7 +599,7 @@ const styles = StyleSheet.create({
   heroBadges: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   badge: {
     backgroundColor: '#a78bfa',
@@ -623,18 +624,18 @@ const styles = StyleSheet.create({
   },
   playButtonMain: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 4,
   },
   playButtonText: {
     color: '#000',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   infoButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 4,
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.2)',
@@ -642,11 +643,11 @@ const styles = StyleSheet.create({
   infoButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 14,
   },
   favoriteButtonHero: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     borderRadius: 4,
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.2)',

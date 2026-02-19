@@ -10,8 +10,8 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const HERO_HEIGHT = 400;
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.5;
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any; [key: string]: any }>;
 function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
