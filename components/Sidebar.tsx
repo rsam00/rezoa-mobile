@@ -65,10 +65,12 @@ export default function Sidebar() {
   };
 
   return (
-    <>
-      <Animated.View style={[styles.backdrop, backdropStyle]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={closeDrawer} />
-      </Animated.View>
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      {isOpen && (
+        <Animated.View style={[styles.backdrop, backdropStyle]}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={closeDrawer} />
+        </Animated.View>
+      )}
 
       <Animated.View style={[styles.container, animatedStyle]}>
         <LinearGradient
@@ -118,7 +120,7 @@ export default function Sidebar() {
           </View>
         </View>
       </Animated.View>
-    </>
+    </View>
   );
 }
 
