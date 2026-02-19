@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -54,11 +55,20 @@ export default function MiniPlayer() {
   }, [playerState.currentStation]);
 
   // Vertical scrolling between Station and Show Name
+  const lastProgramId = useRef<string | null>(null);
   useEffect(() => {
     if (!playerState.currentStation) {
       scrollAnim.setValue(0);
+      lastProgramId.current = null;
       return;
     }
+
+    const currentProgId = liveInfo.program?.id || 'live';
+    if (currentProgId === lastProgramId.current) return;
+    lastProgramId.current = currentProgId;
+
+    console.log('[MiniPlayer] Starting scroll animation for:', currentProgId);
+    scrollAnim.setValue(0);
 
     const startAnimation = () => {
       Animated.sequence([
@@ -76,14 +86,17 @@ export default function MiniPlayer() {
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-      ]).start(() => {
-        if (playerState.currentStation) startAnimation();
+      ]).start((result) => {
+        if (playerState.currentStation && result.finished) startAnimation();
       });
     };
 
     startAnimation();
-    return () => scrollAnim.stopAnimation();
-  }, [liveInfo.program, playerState.currentStation]);
+    return () => {
+      console.log('[MiniPlayer] Stopping animation');
+      scrollAnim.stopAnimation();
+    };
+  }, [liveInfo.program?.id, playerState.currentStation?.id]);
 
   if (!playerState.currentStation) return null;
 
@@ -139,14 +152,16 @@ export default function MiniPlayer() {
             {playerState.isLoading ? (
               <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
             ) : (
-              <TouchableOpacity onPress={handlePlayPause} style={styles.button}>
-                <Text style={styles.buttonText}>
-                  {playerState.isPlaying ? '⏸' : '▶️'}
-                </Text>
+              <TouchableOpacity onPress={handlePlayPause} style={styles.button} activeOpacity={0.7}>
+                <Ionicons 
+                  name={playerState.isPlaying ? "pause" : "play"} 
+                  size={24} 
+                  color="#fff" 
+                />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => stop()} style={styles.button}>
-              <Text style={styles.buttonText}>⏹</Text>
+            <TouchableOpacity onPress={() => stop()} style={styles.button} activeOpacity={0.7}>
+              <Ionicons name="square" size={20} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -223,10 +238,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    padding: 2,
-    marginLeft: 10,
+    padding: 8,
+    marginLeft: 4,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   buttonText: {
     fontSize: 28,

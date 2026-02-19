@@ -48,25 +48,31 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const playStation = async (station: { id: string; name: string; streamUrl: string }) => {
+    console.log('[Player] Playing station:', station.name);
     try {
       setError(null);
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
 
-      // If it's already the current station, toggle play/pause
+      // 1. Non-blocking history update
+      addToHistory(station.id).catch(err => console.error('[Player] History error:', err));
+
+      // 2. If it's already the current station, toggle play/pause
       if (currentStation?.id === station.id) {
         if (status.playing) {
+          console.log('[Player] Pausing current station');
           player.pause();
         } else {
+          console.log('[Player] Resuming current station');
           player.play();
         }
         return;
       }
 
-      // New station logic
+      // 3. New station logic
+      console.log('[Player] Switching to new station:', station.streamUrl);
       setCurrentStation(station);
-      await addToHistory(station.id);
       
-      // Stop current before replacing source
+      // Stop and replace
       player.pause();
       player.replace({ uri: station.streamUrl });
       player.play();
@@ -75,24 +81,37 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       loadingTimeoutRef.current = setTimeout(() => {
         if (!player.playing && !player.isBuffering) {
           setError('Station is currently unreachable. Please try another.');
-          player.pause();
-          setCurrentStation(null);
+          console.warn('[Player] Loading timeout reached');
+          stop();
         }
       }, 15000);
     } catch (err) {
       setError('Failed to play station. Please try again.');
-      console.error('Playback error:', err);
+      console.error('[Player] Playback error:', err);
     }
   };
 
   const pause = async () => {
-    player.pause();
+    console.log('[Player] Pause called');
+    try {
+      player.pause();
+    } catch (err) {
+      console.error('[Player] Pause error:', err);
+    }
   };
 
   const stop = async () => {
-    if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
-    player.pause();
-    setCurrentStation(null);
+    console.log('[Player] Stop called');
+    try {
+      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
+      player.pause();
+    } catch (err) {
+      console.error('[Player] Stop error:', err);
+    } finally {
+      // Always clear state even if player.pause() fails
+      setCurrentStation(null);
+      setError(null);
+    }
   };
 
   // Clear timeout when playback starts
@@ -100,13 +119,13 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (status.playing && loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
       loadingTimeoutRef.current = null;
+      console.log('[Player] Playback started, cleared timeout');
     }
   }, [status.playing]);
 
   const playerState: PlayerState = {
     isPlaying: status.playing,
-    // Avoid showing loading forever if it's already playing
-    isLoading: status.isBuffering && !status.playing,
+    isLoading: (status.isBuffering && !status.playing) || (currentStation !== null && !status.isLoaded && !status.playing),
     currentStation,
     error: error,
   };
