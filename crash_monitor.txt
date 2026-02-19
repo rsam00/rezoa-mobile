@@ -5200,3 +5200,145 @@
 02-01 16:16:22.337 14745 14849 E bluetooth: system/gd/os/linux_generic/files.cc:223 FileCreatedTime: unable to read '/data/misc/bluetooth/logs/btsnooz_hci.log' file metadata, error: No such file or directory
 02-01 16:16:38.648 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
 02-01 16:16:38.648 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:17:50.412 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:17:50.412 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:18:38.736   616  1923 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:18:39.765   616  1923 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:18:59.916   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:00.329   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:00.430   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:20.681   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:20.988   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:21.029   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:19:22.452   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:20:11.755   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:20:12.829   616   886 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:20:13.152 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:20:13.152 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:20:14.774   616 18836 E GnssPsdsDownloader: No Long-Term PSDS servers were specified in the GnssConfiguration
+02-01 16:20:40.141   616   885 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:20:40.214   616   886 E ClipboardService: Denying clipboard access to com.google.android.gms, application is not in focus nor is it a system service for user 0
+02-01 16:21:25.360 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:21:25.360 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:21:31.505 18900 18900 E oid.apps.photos: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:21:31.505 18899 18899 E .apps.safetyhub: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:21:38.046   166   177 E lowmemorykiller: process_mrelease 17985 failed: No such process
+02-01 16:22:05.920 18978 18978 E id.gms.unstable: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:22:35.932 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:22:35.932 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:23:44.368   413   413 E IPCThreadState: binder thread pool (1 threads) starved for 155 ms
+02-01 16:23:45.323   616  1921 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:23:45.382   616   662 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:24:57.118 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:24:57.118 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:24:57.614 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:24:57.614 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:24:58.487 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:24:58.488 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:26:06.214   616   662 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:26:06.851 19285 19285 E gs.intelligence: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:26:07.527   616   662 E WifiService: Attempt to retrieve passpoint with invalid scanResult List
+02-01 16:26:09.449 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:26:09.453 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:27:19.303 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:27:19.303 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:27:20.446 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:27:20.449 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:28:30.022 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:28:30.022 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:28:30.628 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:28:30.632 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:29:41.064 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:29:41.065 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:30:52.525 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:30:52.526 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:32:02.384 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:32:02.384 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:32:03.828 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:32:03.831 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:33:13.106 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:33:13.110 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:23.760 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:23.760 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:24.908 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:24.914 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:25.453 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:34:25.453 15716 15790 E chromium: [ERROR:cc/tiles/tile_manager.cc:998] WARNING: tile memory limits exceeded, some content may not draw
+02-01 16:35:20.681 15402 15704 E ExoPlayerImplInternal: Playback error
+02-01 16:35:20.681 15402 15704 E ExoPlayerImplInternal:   UnknownHostException (no network)
+02-01 16:36:03.960 19878 19878 E chbox:googleapp: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:36:06.165   616  1524 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+02-01 16:36:09.110   616   683 E libprocessgroup: Unable to remove cgroup /sys/fs/cgroup/uid_10214/pid_15402: Device or resource busy
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: Retrieving snapshot for hub_android.device#com.google.android.gm failed
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: java.util.concurrent.TimeoutException: Timed out waiting for Task
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at yik.aM(PG:48)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at zgy.d(PG:13)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at zgy.g(PG:38)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at zgy.c(PG:2)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at iue.run(PG:377)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+02-01 16:36:11.447 19863 19931 E PhenotypeFlagCommitter: 	at java.lang.Thread.run(Thread.java:1012)
+02-01 16:36:16.635   463   463 E BpTransactionCompletedListener: Failed to transact (-32)
+02-01 16:36:18.767   616  1524 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: No service published for: persistent_data_block
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: android.os.ServiceManager$ServiceNotFoundException: No service published for: persistent_data_block
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.ServiceManager.getServiceOrThrow(ServiceManager.java:203)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$81.createService(SystemServiceRegistry.java:1071)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$81.createService(SystemServiceRegistry.java:1068)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry$StaticServiceFetcher.getService(SystemServiceRegistry.java:2293)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.app.SystemServiceRegistry.getSystemService(SystemServiceRegistry.java:1812)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.app.ContextImpl.getSystemService(ContextImpl.java:2241)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.content.Context.getSystemService(Context.java:4503)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageInstallerSession.markAsSealed(PackageInstallerSession.java:2394)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageInstallerSession.commit(PackageInstallerSession.java:2143)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.content.pm.PackageInstaller$Session.commit(PackageInstaller.java:1977)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerShellCommand.doCommitSession(PackageManagerShellCommand.java:4298)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerShellCommand.doRunInstall(PackageManagerShellCommand.java:1634)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerShellCommand.runInstall(PackageManagerShellCommand.java:1561)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerShellCommand.onCommand(PackageManagerShellCommand.java:245)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.modules.utils.BasicShellCommandHandler.exec(BasicShellCommandHandler.java:97)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.ShellCommand.exec(ShellCommand.java:38)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.onShellCommand(PackageManagerService.java:6561)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.Binder.shellCommand(Binder.java:1230)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.Binder.onTransact(Binder.java:1043)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.content.pm.IPackageManager$Stub.onTransact(IPackageManager.java:4620)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at com.android.server.pm.PackageManagerService$IPackageManagerImpl.onTransact(PackageManagerService.java:6545)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.Binder.execTransactInternal(Binder.java:1505)
+02-01 16:38:22.021   616  2029 E SystemServiceRegistry: 	at android.os.Binder.execTransact(Binder.java:1444)
+02-01 16:38:22.036   616  2029 E SystemServiceRegistry: Manager wrapper not available: persistent_data_block
+02-01 16:38:27.261   616   824 E AppOps  : attributionTag VCN not declared in manifest of android
+02-01 16:38:27.411   616   824 E AppOps  : attributionTag VCN not declared in manifest of android
+02-01 16:38:27.699  1067  1067 E SmsApplication: com.google.android.apps.messaging lost android:read_cell_broadcasts:  (fixing)
+02-01 16:38:28.695  1067  1067 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+02-01 16:38:28.745 20004 20004 E ndroid.keychain: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:38:28.869   616   824 E AppOps  : attributionTag VCN not declared in manifest of android
+02-01 16:38:29.011 20007 20007 E android.vending: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:38:29.535  1067  1067 E SmsApplication: com.google.android.apps.messaging lost android:read_cell_broadcasts:  (fixing)
+02-01 16:38:29.617  1067  1067 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+02-01 16:38:29.805  1067  1067 E SmsApplication: com.google.android.apps.messaging lost android:read_cell_broadcasts:  (fixing)
+02-01 16:38:29.812  1067  1067 E CellBroadcastUtils: getDefaultCellBroadcastReceiverPackageName: no package found
+02-01 16:38:38.605 20081 20081 E ding:background: Not starting debugger since process cannot load the jdwp agent.
+02-01 16:38:50.411   616  1524 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+02-01 16:38:58.323 20169 20269 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[PopupWindow:1d77206]#0) as ready
+02-01 16:38:58.356 20169 20269 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[PopupWindow:1d77206]#1) as ready
+02-01 16:39:15.527   413   890 E IPCThreadState: binder thread pool (1 threads) starved for 506 ms
+02-01 16:39:15.899   413   413 E IPCThreadState: binder thread pool (1 threads) starved for 255 ms
+02-01 16:39:16.353   413   890 E IPCThreadState: binder thread pool (1 threads) starved for 148 ms
+02-01 16:39:16.606   413   890 E IPCThreadState: binder thread pool (1 threads) starved for 230 ms
+02-01 16:39:17.043   413   890 E IPCThreadState: binder thread pool (1 threads) starved for 114 ms
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: Error occurred, shutting down websocket connection: Websocket exception
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: java.io.EOFException
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okio.RealBufferedSource.require(RealBufferedSource.kt:202)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okio.RealBufferedSource.readByte(RealBufferedSource.kt:212)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okhttp3.internal.ws.WebSocketReader.readHeader(WebSocketReader.kt:119)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okhttp3.internal.ws.WebSocketReader.processNextFrame(WebSocketReader.kt:102)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okhttp3.internal.ws.RealWebSocket.loopReader(RealWebSocket.kt:293)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okhttp3.internal.ws.RealWebSocket$connect$1.onResponse(RealWebSocket.kt:195)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at okhttp3.internal.connection.RealCall$AsyncCall.run(RealCall.kt:519)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:644)
+02-01 16:41:52.385 20169 20258 E unknown:ReconnectingWebSocket: 	at java.lang.Thread.run(Thread.java:1012)
+02-01 16:46:57.297   616  1524 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
+02-01 16:46:58.021   463   463 E BpTransactionCompletedListener: Failed to transact (-32)
+02-01 16:47:00.988   616  1524 E TaskPersister: File error accessing recents directory (directory doesn't exist?).
