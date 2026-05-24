@@ -33,17 +33,16 @@ export default function RootLayout() {
 
   // We will hide the splash screen in the Home Screen component once it mounts.
   useEffect(() => {
-    mobileAds()
-      .initialize()
-      .then(adapterStatuses => {
-        console.log('Mobile Ads Initialized', adapterStatuses);
-      });
+    // Delay Mobile Ads initialization by 3 seconds to prevent concurrent network spikes
+    // that crash certain emulators during the initial Supabase data sync.
+    setTimeout(() => {
+      mobileAds()
+        .initialize()
+        .then(adapterStatuses => {
+          console.log('Mobile Ads Initialized', adapterStatuses);
+        });
+    }, 3000);
       
-    if (Platform.OS === 'android') {
-      // In edge-to-edge mode, background color is controlled by the screen content (transparent).
-      // We only need to set the button/icon style.
-      NavigationBar.setButtonStyleAsync("light");
-    }
   }, []);
   
   if (!loaded) {

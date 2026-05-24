@@ -1,5 +1,5 @@
-import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { setAudioModeAsync, useAudioPlayerStatus } from 'expo-audio';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { useHistory } from './HistoryContext';
 
 interface PlayerState {
@@ -23,47 +23,78 @@ const PlayerContext = createContext<PlayerContextType>({
   stop: async () => {},
 });
 
+const PlayerStatusListener = React.memo(({ player, onStatusChange }: { player: any, onStatusChange: (status: any) => void }) => {
+  const status = useAudioPlayerStatus(player);
+  useEffect(() => {
+    onStatusChange(status);
+  }, [status, onStatusChange]);
+  return null;
+});
+
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToHistory } = useHistory();
   const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const loadingTimeoutRef = useRef<any>(null);
+  const [player, setPlayerState] = useState<AudioPlayer | null>(null);
+  const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  const [status, setStatus] = useState({
+    isLoaded: false,
+    playing: false,
+    currentTime: 0,
+    duration: 0,
+    playbackState: 'stopped',
+    timeControlStatus: 'paused',
+    reasonForWaitingToPlay: '',
+    mute: false,
+    loop: false,
+    didJustFinish: false,
+    isBuffering: false,
+    playbackRate: 1,
+    shouldCorrectPitch: false
+  });
 
-  // Initialize player with null source
-  const player = useAudioPlayer(null);
-  const status = useAudioPlayerStatus(player);
+  const handleStatusChange = useCallback((newStatus: any) => {
+    setStatus(newStatus);
+  }, []);
 
   useEffect(() => {
-    player.volume = 1.0;
+    if (player) {
+      player.volume = 1.0;
+    }
   }, [player]);
 
-  useEffect(() => {
-    // Configure background audio
-    setAudioModeAsync({
-      playsInSilentMode: true,
-      shouldPlayInBackground: true,
-      interruptionMode: 'doNotMix',
-      interruptionModeAndroid: 'doNotMix',
-    }).catch(err => console.log('Error setting audio mode:', err));
-  }, []);
+  let audioModeConfigured = false;
 
   const playStation = async (station: { id: string; name: string; streamUrl: string }) => {
     console.log('[Player] Playing station:', station.name);
     try {
+      if (!audioModeConfigured) {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionMode: 'doNotMix',
+          interruptionModeAndroid: 'doNotMix',
+        }).catch(err => console.log('Error setting audio mode:', err));
+        audioModeConfigured = true;
+      }
+
       setError(null);
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
 
       // 1. Non-blocking history update
       addToHistory(station.id).catch(err => console.error('[Player] History error:', err));
 
+      let currentPlayer = player;
+
       // 2. If it's already the current station, toggle play/pause
-      if (currentStation?.id === station.id) {
+      if (currentStation?.id === station.id && currentPlayer) {
         if (status.playing) {
           console.log('[Player] Pausing current station');
-          player.pause();
+          currentPlayer.pause();
         } else {
           console.log('[Player] Resuming current station');
-          player.play();
+          currentPlayer.play();
         }
         return;
       }
@@ -72,14 +103,21 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       console.log('[Player] Switching to new station:', station.streamUrl);
       setCurrentStation(station);
       
-      // Stop and replace
-      player.pause();
-      player.replace({ uri: station.streamUrl });
-      player.play();
+      if (!currentPlayer) {
+        import('expo-audio').then(({ createAudioPlayer }) => {
+          const newPlayer = createAudioPlayer(station.streamUrl);
+          setPlayerState(newPlayer);
+          newPlayer.play();
+        });
+      } else {
+        currentPlayer.pause();
+        currentPlayer.replace({ uri: station.streamUrl });
+        currentPlayer.play();
+      }
 
       // Start a 15-second timeout for loading
       loadingTimeoutRef.current = setTimeout(() => {
-        if (!player.playing && !player.isBuffering) {
+        if (player && !player.playing && !player.isBuffering) {
           setError('Station is currently unreachable. Please try another.');
           console.warn('[Player] Loading timeout reached');
           stop();
@@ -94,7 +132,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const pause = async () => {
     console.log('[Player] Pause called');
     try {
-      player.pause();
+      if (player) player.pause();
     } catch (err) {
       console.error('[Player] Pause error:', err);
     }
@@ -104,11 +142,10 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     console.log('[Player] Stop called');
     try {
       if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
-      player.pause();
+      if (player) player.pause();
     } catch (err) {
       console.error('[Player] Stop error:', err);
     } finally {
-      // Always clear state even if player.pause() fails
       setCurrentStation(null);
       setError(null);
     }
@@ -132,6 +169,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   return (
     <PlayerContext.Provider value={{ playerState, playStation, pause, stop }}>
+      {player && <PlayerStatusListener player={player} onStatusChange={handleStatusChange} />}
       {children}
     </PlayerContext.Provider>
   );

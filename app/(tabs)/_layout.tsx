@@ -25,17 +25,7 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 60 + insets.bottom,
-          paddingBottom: insets.bottom,
-          paddingTop: 0,
-          borderTopWidth: 0,
-          elevation: 5,
-          zIndex: 10,
+          display: 'none',
         },
       }}>
       <Tabs.Screen

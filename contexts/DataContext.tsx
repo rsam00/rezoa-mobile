@@ -123,13 +123,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           createdAt: p.created_at
         }));
 
+        console.log('--- DATA SYNC COMPLETE - SETTING UI READY ---');
         setStations(mappedS);
         setPrograms(mappedP);
         setIsReady(true);
 
-        AsyncStorage.setItem(CACHE_KEYS.STATIONS, JSON.stringify(mappedS)).catch(() => {});
-        AsyncStorage.setItem(CACHE_KEYS.PROGRAMS, JSON.stringify(mappedP)).catch(() => {});
-        console.log('--- DATA SYNC COMPLETE ---');
+        // Sequence: Wait 2 seconds before stringifying and saving STATIONS
+        setTimeout(() => {
+          console.log('--- [SEQUENCE 1] SAVING STATIONS TO CACHE ---');
+          const strS = JSON.stringify(mappedS);
+          console.log(`--- STATIONS STRING LENGTH: ${strS.length} ---`);
+          AsyncStorage.setItem(CACHE_KEYS.STATIONS, strS)
+            .then(() => console.log('--- STATIONS SAVE OK ---'))
+            .catch(e => console.log('--- STATIONS SAVE ERROR ---', e));
+        }, 2000);
+
+        // Sequence: Wait 4 seconds before stringifying and saving PROGRAMS
+        setTimeout(() => {
+          console.log('--- [SEQUENCE 2] SAVING PROGRAMS TO CACHE ---');
+          const strP = JSON.stringify(mappedP);
+          console.log(`--- PROGRAMS STRING LENGTH: ${strP.length} ---`);
+          AsyncStorage.setItem(CACHE_KEYS.PROGRAMS, strP)
+            .then(() => console.log('--- PROGRAMS SAVE OK ---'))
+            .catch(e => console.log('--- PROGRAMS SAVE ERROR ---', e));
+        }, 4000);
+
       }
     } catch (e) {
       console.error('--- NETWORK CRASHED ---');

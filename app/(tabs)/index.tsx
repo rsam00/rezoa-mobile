@@ -12,16 +12,24 @@ import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { useHistory } from '../../contexts/HistoryContext';
 import { usePlayer } from '../../contexts/PlayerContext';
-import { getCurrentProgram } from '../../utils/timeUtils';
+import TopNavigation from '../../components/TopNavigation';
+import { getCurrentProgram, getHaitiTime } from '../../utils/timeUtils';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const HERO_HEIGHT = SCREEN_HEIGHT * 0.3;
+const HERO_HEIGHT = SCREEN_HEIGHT * 0.45;
 const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 100;
 const HERO_ROTATION_INTERVAL = 10000;
 const HERO_MANUAL_TIMEOUT = 30000;
 
 const CarouselCard = React.memo(function CarouselCard({ item, onPress }: { item: any; onPress: () => void }) {
+  const getSafeUri = (uri: any) => {
+    if (typeof uri !== 'string' || uri.trim() === '' || uri === 'null' || uri === 'undefined') return null;
+    return uri.startsWith('http') ? uri : `https:${uri}`;
+  };
+  
+  const safeLogo = getSafeUri(item.logo);
+
   return (
     <TouchableOpacity
       style={styles.thumbCard}
@@ -29,7 +37,7 @@ const CarouselCard = React.memo(function CarouselCard({ item, onPress }: { item:
       activeOpacity={0.85}
     >
       <Image
-        source={item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/favicon.png')}
+        source={safeLogo ? { uri: safeLogo } : require('../../assets/images/favicon.png')}
         style={styles.thumbImage}
         resizeMode="contain"
       />
@@ -46,10 +54,17 @@ interface ProgramCardProps {
 
 const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, rank }: ProgramCardProps) {
   const [imgError, setImgError] = React.useState(false);
-  let fallbackSource = require('../../assets/images/favicon.png');
-  if (station && station.logo) {
-    fallbackSource = { uri: station.logo.startsWith('http') ? station.logo : `https:${station.logo}` };
-  }
+  
+  const getSafeUri = (uri: any) => {
+    if (typeof uri !== 'string' || uri.trim() === '' || uri === 'null' || uri === 'undefined') return null;
+    return uri.startsWith('http') ? uri : `https:${uri}`;
+  };
+
+  const safeStationLogo = getSafeUri(station?.logo);
+  const safePoster = getSafeUri(item.poster);
+  
+  const fallbackSource = safeStationLogo ? { uri: safeStationLogo } : require('../../assets/images/favicon.png');
+
   return (
     <TouchableOpacity
       style={styles.thumbCard}
@@ -60,7 +75,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
         <Text style={styles.rankNumberThumb}>{rank + 1}</Text>
       )}
       <Image
-        source={item.poster && !imgError ? { uri: item.poster } : fallbackSource}
+        source={(safePoster && !imgError) ? { uri: safePoster } : fallbackSource}
         style={styles.thumbImage}
         resizeMode="contain"
         onError={() => setImgError(true)}
@@ -90,18 +105,16 @@ export default function HomeScreen() {
 }
 
 function HomeScreenContent() {
+  console.log('--- RENDERING HOME SCREEN CONTENT ---');
   const insets = useSafeAreaInsets();
   const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
 
-
-
   useEffect(() => {
-    // No-op
+    console.log('--- HOME SCREEN CONTENT MOUNTED ---');
   }, []);
   const { favorites, toggleFavorite } = useFavorites();
-  const { playerState, playStation, pause } = usePlayer();
+  const { playStation, playerState, pause } = usePlayer();
   const { history } = useHistory();
-  const { openDrawer } = useDrawer();
   const router = useRouter();
 
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
@@ -113,19 +126,26 @@ function HomeScreenContent() {
   // Tiered computation: Stage 1 for the first few rows, Stage 2 for everything else
   useEffect(() => {
     const t1 = setTimeout(() => setCategoriesReady(true), 100);
-    const t2 = setTimeout(() => setExtraCategoriesReady(true), 1500);
+    const t2 = setTimeout(() => setExtraCategoriesReady(true), 1500); 
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   const liveNow = useMemo(() => {
-    return programs
+    console.log('--- COMPUTING LIVE NOW ---');
+    const nowHaiti = getHaitiTime();
+    const stationMap = new Map();
+    stations.forEach(s => stationMap.set(s.id, s));
+
+    const result = programs
       .map(p => ({
         program: p,
-        station: stations.find(s => s.id === p.stationId),
-        isLive: !!getCurrentProgram([p], p.stationId)
+        station: stationMap.get(p.stationId),
+        isLive: !!getCurrentProgram([p], p.stationId, nowHaiti)
       }))
       .filter(item => item.isLive && item.station)
-      .slice(0, 10); 
+      .slice(0, 10);
+    console.log('--- COMPUTING LIVE NOW DONE ---');
+    return result;
   }, [programs, stations]);
 
   useEffect(() => {
@@ -145,6 +165,7 @@ function HomeScreenContent() {
   }, [selectedHero]);
 
   const featuredItem = useMemo(() => {
+    console.log('--- COMPUTING FEATURED ITEM ---');
     if (selectedHero) return selectedHero;
     if (playerState.currentStation) {
       const station = stations.find(s => s.id === playerState.currentStation!.id);
@@ -159,6 +180,7 @@ function HomeScreenContent() {
     // Final fallback: If no live now and no stations fetched yet, return null
     if (stations.length === 0) return { station: null, program: null };
     
+    console.log('--- COMPUTING FEATURED ITEM DONE ---');
     return { station: stations[0], program: null };
   }, [selectedHero, liveNow, currentHeroIndex, playerState.currentStation, stations, programs]);
 
@@ -175,29 +197,32 @@ function HomeScreenContent() {
 
   const newsStations = useMemo(() => {
     if (!categoriesReady) return [];
-    return stations.filter(s => 
-      s.tag?.some((t: string) => ['News', 'Talk', 'news'].includes(t.toLowerCase())) || 
-      s.description?.toLowerCase().includes('news')
-    ).slice(0, 15);
+    return stations.filter(s => {
+      const hasTag = Array.isArray(s.tag) && s.tag.some((t: string) => t && typeof t === 'string' && ['news', 'talk'].includes(t.toLowerCase()));
+      const hasDesc = typeof s.description === 'string' && s.description.toLowerCase().includes('news');
+      return hasTag || hasDesc;
+    }).slice(0, 15);
   }, [stations, categoriesReady]);
 
   const faithStations = useMemo(() => {
     if (!extraCategoriesReady) return [];
-    return stations.filter(s => 
-      s.description?.toLowerCase().includes('christian') || 
-      s.description?.toLowerCase().includes('evangelique') ||
-      s.name.toLowerCase().includes('radio 4veh') ||
-      s.name.toLowerCase().includes('lumiere')
-    ).slice(0, 15);
+    return stations.filter(s => {
+      const desc = typeof s.description === 'string' ? s.description.toLowerCase() : '';
+      const name = typeof s.name === 'string' ? s.name.toLowerCase() : '';
+      return desc.includes('christian') || 
+             desc.includes('evangelique') ||
+             name.includes('radio 4veh') ||
+             name.includes('lumiere');
+    }).slice(0, 15);
   }, [stations, extraCategoriesReady]);
 
   const musicStations = useMemo(() => {
     if (!extraCategoriesReady) return [];
-    return stations.filter(s => 
-      s.tag?.some((t: string) => ['pop', 'Music', 'music'].includes(t.toLowerCase())) || 
-      s.description?.toLowerCase().includes('music') ||
-      s.description?.toLowerCase().includes('kompa')
-    ).slice(0, 15);
+    return stations.filter(s => {
+      const hasTag = Array.isArray(s.tag) && s.tag.some((t: string) => t && typeof t === 'string' && ['pop', 'music'].includes(t.toLowerCase()));
+      const desc = typeof s.description === 'string' ? s.description.toLowerCase() : '';
+      return hasTag || desc.includes('music') || desc.includes('kompa');
+    }).slice(0, 15);
   }, [stations, extraCategoriesReady]);
 
   const justAdded = useMemo(() => {
@@ -210,17 +235,20 @@ function HomeScreenContent() {
   const temporalCategory = useMemo(() => {
     const hours = new Date().getHours();
     let title = "Morning Boost";
-    let filtered = stations.filter(s => s.description?.toLowerCase().includes('news')).slice(0, 10);
+    let filtered = stations.filter(s => typeof s.description === 'string' && s.description.toLowerCase().includes('news')).slice(0, 10);
 
     if (hours >= 11 && hours < 17) {
       title = "Mid-Day Mix";
-      filtered = stations.filter(s => s.tag?.some(t => t.toLowerCase().includes('pop'))).slice(0, 10);
+      filtered = stations.filter(s => Array.isArray(s.tag) && s.tag.some(t => typeof t === 'string' && t.toLowerCase().includes('pop'))).slice(0, 10);
     } else if (hours >= 17 && hours < 23) {
       title = "Evening Vibes";
-      filtered = stations.filter(s => s.description?.toLowerCase().includes('entertainment')).slice(0, 10);
+      filtered = stations.filter(s => typeof s.description === 'string' && s.description.toLowerCase().includes('entertainment')).slice(0, 10);
     } else if (hours >= 23 || hours < 6) {
       title = "Late Night Radio";
-      filtered = stations.filter(s => s.description?.toLowerCase().includes('smooth') || s.tag?.some(t => t.toLowerCase().includes('chill'))).slice(0, 10);
+      filtered = stations.filter(s => 
+        (typeof s.description === 'string' && s.description.toLowerCase().includes('smooth')) || 
+        (Array.isArray(s.tag) && s.tag.some(t => typeof t === 'string' && t.toLowerCase().includes('chill')))
+      ).slice(0, 10);
     }
     return { title, data: filtered };
   }, [stations, categoriesReady]);
@@ -291,109 +319,104 @@ function HomeScreenContent() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
-        <TouchableOpacity 
-          style={styles.profileButton} 
-          onPress={openDrawer}
-        >
-          <Text style={styles.profileButtonText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Home</Text>
-        <View style={{ width: 44 }} />
-      </View>
+      <TopNavigation />
       
-      {featuredItem?.station && (
-        <TouchableOpacity 
-          style={styles.heroContainer} 
-          onPress={navigateToDetails}
-          activeOpacity={0.9}
-        >
-          <Image
-            source={
-              featuredItem.program?.poster 
-                ? { uri: featuredItem.program.poster } 
-                : (featuredItem.station.logo ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } : require('../../assets/images/favicon.png'))
-            }
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
-          <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
-
-          <View style={styles.heroForegroundContainer}>
-            <Image
-              source={
-                featuredItem.program?.poster 
-                  ? { uri: featuredItem.program.poster } 
-                  : (featuredItem.station.logo ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } : require('../../assets/images/favicon.png'))
-              }
-              style={styles.heroImageForeground}
-              resizeMode="contain"
-            />
-          </View>
-
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)', 'black']}
-            style={styles.heroGradient}
-          />
-          
-          <View style={styles.heroContent}>
-            <Text style={styles.heroTitle} numberOfLines={2}>
-              {featuredItem.program ? featuredItem.program.name : featuredItem.station.name}
-            </Text>
-            <View style={styles.heroBadges}>
-              <View style={[styles.badge, !featuredItem.program && { backgroundColor: '#555' }]}>
-                <Text style={styles.badgeText}>
-                  {featuredItem.program ? 'LIVE NOW' : 'LIVE RADIO'}
-                </Text>
-              </View>
-              <Text style={styles.heroMeta}>
-                {featuredItem.program ? `on ${featuredItem.station.name}` : featuredItem.station.city}
-              </Text>
-            </View>
-            
-            <View style={styles.heroActions}>
-              <TouchableOpacity
-                style={styles.playButtonMain}
-                onPress={async () => {
-                  const isPlaying = Boolean(playerState.isPlaying && playerState.currentStation && playerState.currentStation.id === featuredItem.station!.id);
-                  if (isPlaying) await pause();
-                  else await playStation(featuredItem.station!);
-                }}
-              >
-                <Text style={styles.playButtonText}>
-                  {Boolean(playerState.isPlaying && playerState.currentStation && playerState.currentStation.id === featuredItem.station!.id) ? '⏸ PAUSE' : '▶️ LISTEN LIVE'}
-                </Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={styles.infoButton} 
-                onPress={navigateToDetails}
-              >
-                <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
-                <Text style={styles.infoButtonText}>ⓘ MORE INFO</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.favoriteButtonHero} 
-                onPress={() => toggleFavorite(featuredItem.station!.id)}
-              >
-                <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
-                <Ionicons 
-                  name={favorites.includes(featuredItem.station!.id) ? 'heart' : 'heart-outline'} 
-                  size={24} 
-                  color={favorites.includes(featuredItem.station!.id) ? '#a78bfa' : '#fff'} 
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableOpacity>
-      )}
-
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
+        {featuredItem?.station && (
+          <TouchableOpacity 
+            style={styles.heroContainer} 
+            onPress={navigateToDetails}
+            activeOpacity={0.9}
+          >
+            <Image
+              source={
+                (featuredItem.program?.poster && featuredItem.program.poster.trim() !== '')
+                  ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` } 
+                  : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== '' 
+                      ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } 
+                      : require('../../assets/images/favicon.png'))
+              }
+              style={styles.heroImage}
+              resizeMode="cover"
+            />
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
+
+            <View style={styles.heroForegroundContainer}>
+              <Image
+                source={
+                  (featuredItem.program?.poster && featuredItem.program.poster.trim() !== '')
+                    ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` } 
+                    : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== '' 
+                        ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } 
+                        : require('../../assets/images/favicon.png'))
+                }
+                style={styles.heroImageForeground}
+                resizeMode="contain"
+              />
+            </View>
+
+            <View style={[styles.heroGradient, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
+            
+            <View style={styles.heroContent}>
+              <Text style={styles.heroTitle} numberOfLines={2}>
+                {featuredItem.program ? featuredItem.program.name : (featuredItem.station?.name || 'Unknown')}
+              </Text>
+              <View style={styles.heroBadges}>
+                <View style={[styles.badge, !featuredItem.program && { backgroundColor: '#555' }]}>
+                  <Text style={styles.badgeText}>
+                    {featuredItem.program ? 'LIVE NOW' : 'LIVE RADIO'}
+                  </Text>
+                </View>
+                <Text style={styles.heroMeta}>
+                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : (featuredItem.station?.city || 'Haiti')}
+                </Text>
+              </View>
+              
+              <View style={styles.heroActions}>
+                <TouchableOpacity
+                  style={styles.playButtonMain}
+                  onPress={async () => {
+                    if (!featuredItem.station) return;
+                    const isPlaying = Boolean(playerState.isPlaying && playerState.currentStation && playerState.currentStation.id === featuredItem.station.id);
+                    if (isPlaying) await pause();
+                    else await playStation(featuredItem.station);
+                  }}
+                >
+                  <Text style={styles.playButtonText}>
+                    {Boolean(playerState.isPlaying && playerState.currentStation && featuredItem.station && playerState.currentStation.id === featuredItem.station.id) ? '⏸ PAUSE' : '▶️ LISTEN LIVE'}
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.infoButton} 
+                  onPress={navigateToDetails}
+                >
+                  <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
+                  <Text style={styles.infoButtonText}>ⓘ MORE INFO</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  style={styles.favoriteButtonHero} 
+                  onPress={() => {
+                    if (featuredItem.station) toggleFavorite(featuredItem.station.id);
+                  }}
+                >
+                  <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
+                  <Ionicons 
+                    name={featuredItem.station && favorites.includes(featuredItem.station.id) ? 'heart' : 'heart-outline'} 
+                    size={24} 
+                    color={featuredItem.station && favorites.includes(featuredItem.station.id) ? '#a78bfa' : '#fff'} 
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+
         <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
           <AdBanner />
         </View>
@@ -531,34 +554,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
-  headerRow: {
-    paddingTop: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 100,
-    backgroundColor: 'black',
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#a78bfa',
-  },
-  profileButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  profileButtonText: {
-    color: '#a78bfa',
-    fontSize: 28,
-    fontWeight: '700',
-  },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 170,
+    paddingBottom: 100,
   },
   heroContainer: {
     height: HERO_HEIGHT,

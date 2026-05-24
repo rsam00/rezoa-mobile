@@ -8,25 +8,21 @@ export interface Program {
 /**
  * Gets the current time and day in Haiti (America/Port-au-Prince)
  */
-const haitiFormatter = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/Port-au-Prince',
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  hour12: false,
-  weekday: 'long',
-});
-
-/**
- * Gets the current time and day in Haiti (America/Port-au-Prince)
- */
 export function getHaitiTime() {
   const now = new Date();
   
   try {
+    const haitiFormatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Port-au-Prince',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+      weekday: 'long',
+    });
     const parts = haitiFormatter.formatToParts(now);
     const dateMap: Record<string, string> = {};
     parts.forEach(p => { dateMap[p.type] = p.value; });
@@ -65,8 +61,8 @@ export function getHaitiTime() {
 /**
  * Finds the currently playing program for a station based on Haiti time
  */
-export function getCurrentProgram(programs: Program[], stationId: string) {
-  const haiti = getHaitiTime();
+export function getCurrentProgram(programs: Program[], stationId: string, precomputedTime?: any) {
+  const haiti = precomputedTime || getHaitiTime();
   const { day, totalSeconds } = haiti;
   const currentMinutes = Math.floor(totalSeconds / 60);
 

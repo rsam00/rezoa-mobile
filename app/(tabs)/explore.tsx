@@ -1,4 +1,4 @@
-﻿import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -8,6 +8,7 @@ import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { usePlayer } from '../../contexts/PlayerContext';
+import TopNavigation from '../../components/TopNavigation';
 
 const CARD_GAP = 12;
 const NUM_COLUMNS = 2;
@@ -70,7 +71,6 @@ function ExploreScreenContent() {
   const insets = useSafeAreaInsets();
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
-  const { openDrawer } = useDrawer();
   const { playerState, playStation, pause } = usePlayer();
   const router = useRouter();
   const [search, setSearch] = useState('');
@@ -167,16 +167,7 @@ function ExploreScreenContent() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
-        <TouchableOpacity 
-          style={styles.profileButton} 
-          onPress={openDrawer}
-        >
-          <Text style={styles.profileButtonText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.header}>Explore</Text>
-        <View style={{ width: 44 }} />
-      </View>
+      <TopNavigation />
       <View style={styles.searchBarContainer}>
         <TextInput
           style={styles.searchBar}
@@ -194,7 +185,7 @@ function ExploreScreenContent() {
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 170 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />
@@ -206,30 +197,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
-  },
-  headerRow: {
-    paddingTop: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 100,
-    backgroundColor: 'black',
-    marginBottom: 0,
-  },
-  header: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#a78bfa',
-  },
-  profileButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  profileButtonText: {
-    color: '#a78bfa',
-    fontSize: 28,
-    fontWeight: '700',
   },
   searchBarContainer: {
     flexDirection: 'row',

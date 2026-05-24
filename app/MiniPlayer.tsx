@@ -13,8 +13,6 @@ export default function MiniPlayer() {
   const { playerState, playStation, pause, stop } = usePlayer();
   const { programs } = useData();
   const segments = useSegments();
-  // Robust check for tabs: check if any segment is (tabs)
-  const isInTabs = (segments as string[]).includes('(tabs)');
   
   const slideAnim = useRef(new Animated.Value(200)).current; 
   const scrollAnim = useRef(new Animated.Value(0)).current;
@@ -111,7 +109,7 @@ export default function MiniPlayer() {
     outputRange: [-24, 0], // Heights for the vertical shift
   });
 
-  const bottomOffset = isInTabs ? 60 + insets.bottom : insets.bottom;
+  const bottomOffset = insets.bottom;
 
   return (
     <Animated.View

@@ -21,7 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDrawer } from '../contexts/DrawerContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const SIDEBAR_WIDTH = SCREEN_WIDTH * 0.375;
+const SIDEBAR_WIDTH = SCREEN_WIDTH * 0.8;
 
 export default function Sidebar() {
   const { isOpen, closeDrawer } = useDrawer();
@@ -73,10 +73,7 @@ export default function Sidebar() {
       )}
 
       <Animated.View style={[styles.container, animatedStyle]}>
-        <LinearGradient
-          colors={['#1e1b4b', '#000']}
-          style={StyleSheet.absoluteFill}
-        />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: '#1e1b4b' }]} />
         
         <View style={styles.content}>
           <View style={styles.header}>
@@ -99,7 +96,7 @@ export default function Sidebar() {
             <View style={[styles.divider, { marginVertical: 20 }]} />
             
             <TouchableOpacity style={styles.authButton} onPress={handleAuth}>
-              <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
               <Text style={styles.authButtonText}>
                 {user ? 'Sign Out' : 'Sign in'}
               </Text>

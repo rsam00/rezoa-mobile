@@ -28,6 +28,7 @@ import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import { getHaitiTime } from '../../utils/timeUtils';
+import TopNavigation from '../../components/TopNavigation';
 
 const ReanimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -113,7 +114,6 @@ function ProgramGuideContent() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { playStation, playerState, pause } = usePlayer();
-  const { openDrawer } = useDrawer();
   const { stations, programs, loading: dataLoading } = useData();
   
   const [selectedDay, setSelectedDay] = useState<number>(getHaitiTime().day ? ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day) : new Date().getDay());
@@ -301,15 +301,13 @@ function ProgramGuideContent() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
-          <Text style={styles.profileButtonText}>☰</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Guide</Text>
-        <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
+      <TopNavigation 
+        rightComponent={
+          <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
             <Text style={styles.liveNowText}>LIVE</Text>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        }
+      />
 
       <View style={styles.genreStripContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
@@ -351,6 +349,7 @@ function ProgramGuideContent() {
                 <Text style={{ color: '#555', fontSize: 8, fontWeight: '900' }}>SPONSORED</Text>
               </View>
             ) : <LogoColumnItem item={item} />}
+            contentContainerStyle={{ paddingBottom: 100 }}
             showsVerticalScrollIndicator={false}
             scrollEventThrottle={16}
             onScroll={onLeftScroll}
@@ -392,6 +391,7 @@ function ProgramGuideContent() {
                    ))}
                 </View>
               ) : <ProgramRow station={item} />}
+              contentContainerStyle={{ paddingBottom: 100 }}
               showsVerticalScrollIndicator={false}
               scrollEventThrottle={16}
               onScroll={onRightScroll}
@@ -411,19 +411,6 @@ function ProgramGuideContent() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
-  headerRow: {
-    paddingTop: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    zIndex: 100,
-    backgroundColor: 'black',
-    marginBottom: 0,
-  },
-  headerTitle: { color: '#a78bfa', fontSize: 22, fontWeight: '900' },
-  profileButton: { padding: 4 },
-  profileButtonText: { color: '#a78bfa', fontSize: 28, fontWeight: '700' },
   liveNowButton: { backgroundColor: '#a78bfa', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4 },
   liveNowText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
   genreStripContainer: { backgroundColor: 'black', paddingBottom: 5 },
@@ -441,7 +428,7 @@ const styles = StyleSheet.create({
   timeHeader: { backgroundColor: 'black', borderRightWidth: 1, borderRightColor: '#27272a' },
   logoCell: { height: STATION_ROW_HEIGHT, width: LEFT_COLUMN_WIDTH, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#27272a', backgroundColor: 'black' },
   logoContainer: { alignItems: 'center', gap: 4 },
-  logo: { width: 50, height: 50, borderRadius: 25 },
+  logo: { width: 80, height: 50 },
   stationNameMini: { color: '#a1a1aa', fontSize: 10, fontWeight: '600' },
   timeRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#27272a', backgroundColor: 'black' },
   timeCell: { justifyContent: 'center', paddingLeft: 5 },

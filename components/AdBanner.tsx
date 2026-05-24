@@ -1,8 +1,11 @@
 import React from 'react';
 import { DimensionValue, StyleSheet, Text, View } from 'react-native';
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 
 export default function AdBanner({ type = 'inline', height, width }: { type?: 'inline' | 'banner', height?: DimensionValue, width?: DimensionValue }) {
-  // Temporarily disabled BannerAd to troubleshoot UI freezing
+  // Use Test ID for development to prevent account suspension
+  const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-3940256099942544/6300978111';
+
   return (
     <View style={[
       styles.container, 
@@ -10,7 +13,16 @@ export default function AdBanner({ type = 'inline', height, width }: { type?: 'i
       height ? { height } : {},
       width ? { width } : {},
     ]}>
-      <Text style={{ color: '#444', fontSize: 10 }}>Ad Placeholder</Text>
+      <BannerAd
+        unitId={adUnitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+        }}
+        onAdFailedToLoad={(error) => {
+          console.error('[AdBanner] Failed to load ad:', error);
+        }}
+      />
     </View>
   );
 }
