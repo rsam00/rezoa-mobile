@@ -11,6 +11,7 @@ export interface Station {
   website?: string;
   city?: string;
   country?: string;
+  department?: string;
   language?: string;
   description?: string;
   frequency?: string;
@@ -100,7 +101,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const performNetworkFetch = useCallback(async () => {
     try {
       console.log('--- NETWORK FETCH STARTING ---');
-      const fieldsS = 'id, name, logo, stream_url, city, country, tags, favorite_count, click_count, created_at, description';
+      const fieldsS = 'id, name, logo, stream_url, city, country, department, tags, favorite_count, click_count, created_at, description';
       const fieldsP = 'id, name, station_id, poster, schedules, click_count, created_at';
 
       const [{ data: sData, error: sErr }, { data: pData, error: pErr }] = await Promise.all([
@@ -118,6 +119,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const mappedS = sData.map(s => ({
           ...s,
           streamUrl: s.stream_url,
+          department: s.department,
           tag: s.tags || [],
           favoriteCount: s.favorite_count || 0,
           clickCount: s.click_count || 0,

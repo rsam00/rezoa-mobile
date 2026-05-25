@@ -1,27 +1,31 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TermsOfUseScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <LinearGradient
         colors={['#1e1b4b', '#000']}
         style={StyleSheet.absoluteFill}
       />
       
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top, height: 60 + insets.top }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Use</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 70 }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.lastUpdated}>Last Updated: January 17, 2026</Text>
 
         <Section title="1. Agreement to Terms">
@@ -70,7 +74,7 @@ export default function TermsOfUseScreen() {
           <Text style={styles.footerText}>© 2026 Rezoa. All rights reserved.</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -89,19 +93,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    zIndex: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.1)',
+    borderBottomColor: 'rgba(255,255,255,0.05)',
   },
   backButton: {
     marginRight: 15,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#a78bfa',
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#fff',
   },
   content: {
     padding: 20,

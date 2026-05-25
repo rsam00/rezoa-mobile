@@ -9,34 +9,51 @@ import TrackPlayer, {
   Track 
 } from 'react-native-track-player';
 import { useHistory } from './HistoryContext';
+import { probeStream, StreamInfo } from '../lib/streamProbe';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PlayerState {
   isPlaying: boolean;
   isLoading: boolean;
-  currentStation: { id: string; name: string; streamUrl: string } | null;
+  currentStation: { id: string; name: string; streamUrl: string; logo?: string } | null;
+  streamInfo: StreamInfo | null;
   error: string | null;
 }
 
 interface PlayerContextType {
-  playerState: PlayerState;
-  playStation: (station: { id: string; name: string; streamUrl: string }) => Promise<void>;
-  pause: () => Promise<void>;
-  stop: () => Promise<void>;
+  playerState           : PlayerState;
+  playStation           : (station: { id: string; name: string; streamUrl: string; logo?: string }) => Promise<void>;
+  pause                 : () => Promise<void>;
+  stop                  : () => Promise<void>;
+  /** Patch the nowPlaying title in streamInfo without re-running the full probe. */
+  refreshNowPlayingTitle: (title: string) => void;
 }
 
+// ─── Context default ─────────────────────────────────────────────────────────
+
 const PlayerContext = createContext<PlayerContextType>({
-  playerState: { isPlaying: false, isLoading: false, currentStation: null, error: null },
-  playStation: async () => {},
-  pause: async () => {},
-  stop: async () => {},
+  playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null },
+  playStation           : async () => {},
+  pause                 : async () => {},
+  stop                  : async () => {},
+  refreshNowPlayingTitle: () => {},
 });
+
+// ─── Provider ────────────────────────────────────────────────────────────────
 
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToHistory } = useHistory();
-  const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isSetup, setIsSetup] = useState(false);
-  
+  const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string; logo?: string } | null>(null);
+  const [streamInfo, setStreamInfo]         = useState<StreamInfo | null>(null);
+  const [error, setError]                   = useState<string | null>(null);
+  const [isSetup, setIsSetup]               = useState(false);
+
+  // Ref tracking which station the in-flight probe was started for.
+  // If the user switches stations before the probe finishes, we discard
+  // the stale result — it belongs to the old station.
+  const probingForIdRef = useRef<string | null>(null);
+
   const playbackState = usePlaybackState();
 
   useEffect(() => {
@@ -69,11 +86,17 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   useTrackPlayerEvents([Event.PlaybackError], (event) => {
-    console.error('TrackPlayer error:', event);
-    setError('Failed to play station. Please try again.');
+    // console.warn (not .error) so Expo dev overlay doesn't appear for expected stream failures
+    console.warn('[Player] Playback error:', JSON.stringify(event));
+    const code = (event as any)?.code || '';
+    if (code === 'android-io-bad-http-status') {
+      setError('Stream unavailable. The station may be offline.');
+    } else {
+      setError('Failed to play station. Please try again.');
+    }
   });
 
-  const playStation = useCallback(async (station: { id: string; name: string; streamUrl: string }) => {
+  const playStation = useCallback(async (station: { id: string; name: string; streamUrl: string; logo?: string }) => {
     if (!isSetup) await setupPlayer();
     
     console.log('[Player] Playing station:', station.name);
@@ -83,10 +106,8 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Non-blocking history update
       addToHistory(station.id).catch(err => console.error('[Player] History error:', err));
 
-      // If it's already the current station, toggle play/pause
+      // ── Same station: toggle play / pause ──────────────────────────────────
       if (currentStation?.id === station.id) {
-        // TrackPlayer 4.0+ playbackState is an object: { state: State }
-        // We will just call play() if it's paused
         const state = (playbackState as any)?.state || playbackState;
         if (state === State.Playing) {
           console.log('[Player] Pausing current station');
@@ -98,22 +119,58 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
-      // New station logic
+      // ── New station ────────────────────────────────────────────────────────
       console.log('[Player] Switching to new station:', station.streamUrl);
+
+      // Clear previous stream info immediately so the UI shows a clean state
+      setStreamInfo(null);
       setCurrentStation(station);
-      
+
       const track: Track = {
-        id: station.id,
-        url: station.streamUrl,
-        title: station.name,
-        artist: 'Rezoa Radio',
-        artwork: 'https://via.placeholder.com/150', // Replace with actual logo if available
+        id     : station.id,
+        url    : station.streamUrl,
+        title  : station.name,
+        artist : 'Rezoa Radio',
+        // Use station logo if available, otherwise fall back to a placeholder
+        artwork: station.logo
+          ? (station.logo.startsWith('//') ? `https:${station.logo}` : station.logo)
+          : 'https://via.placeholder.com/150',
+        // Tell ICY/SHOUTcast servers to send inline metadata,
+        // and present as a known media player so stream hosts don't block us
+        headers: {
+          'Icy-MetaData': '1',
+          'User-Agent'  : 'VLC/3.0 LibVLC/3.0',
+        },
       };
 
       await TrackPlayer.reset();
       await TrackPlayer.add([track]);
       await TrackPlayer.play();
-      
+
+      // ── Fire stream probe NON-BLOCKING ─────────────────────────────────────
+      // TrackPlayer is already playing. We run the probe in the background and
+      // update the UI once metadata arrives (typically 1–5 seconds later).
+      // We tag which station the probe belongs to so we can discard stale results.
+      probingForIdRef.current = station.id;
+      const stationId = station.id;
+
+      probeStream(station.streamUrl).then(info => {
+        // Guard: ignore result if user has already switched away
+        if (probingForIdRef.current !== stationId) {
+          console.log('[Player] Discarding stale probe result for:', station.name);
+          return;
+        }
+        console.log('[Player] Stream probe result:', {
+          protocol  : info.protocol,
+          icyName   : info.icyName,
+          genre     : info.icyGenre,
+          bitrate   : info.icyBitrate,
+          nowPlaying: info.nowPlaying,
+        });
+        setStreamInfo(info);
+      });
+      // probeStream never rejects — no .catch() needed
+
     } catch (err) {
       setError('Failed to play station. Please try again.');
       console.error('[Player] Playback error:', err);
@@ -136,29 +193,38 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (err) {
       console.error('[Player] Stop error:', err);
     } finally {
+      probingForIdRef.current = null;
       setCurrentStation(null);
+      setStreamInfo(null);
       setError(null);
     }
   }, []);
 
-  // Compute playing/loading booleans efficiently
+  /** Patch only the nowPlaying field — avoids a full re-probe. */
+  const refreshNowPlayingTitle = useCallback((title: string) => {
+    setStreamInfo(prev =>
+      prev ? { ...prev, nowPlaying: title || null } : prev
+    );
+  }, []);
+
+  // ── Derived playback flags ────────────────────────────────────────────────
   // TrackPlayer 4.0+ returns an object with state from usePlaybackState
   const currentState = (playbackState as any)?.state || playbackState;
-  
-  const isPlaying = currentState === State.Playing;
-  const isLoading = currentState === State.Loading || currentState === State.Buffering;
+  const isPlaying    = currentState === State.Playing;
+  const isLoading    = currentState === State.Loading || currentState === State.Buffering;
 
-  // Memoize playerState so consumers only re-render when a value they care about actually changes
+  // ── Memoised context values ───────────────────────────────────────────────
   const playerState = useMemo<PlayerState>(() => ({
     isPlaying,
     isLoading,
     currentStation,
+    streamInfo,
     error,
-  }), [isPlaying, isLoading, currentStation, error]);
+  }), [isPlaying, isLoading, currentStation, streamInfo, error]);
 
-  // Memoize the context value object itself
-  const contextValue = useMemo(() => ({ playerState, playStation, pause, stop }),
-    [playerState, playStation, pause, stop]
+  const contextValue = useMemo(
+    () => ({ playerState, playStation, pause, stop, refreshNowPlayingTitle }),
+    [playerState, playStation, pause, stop, refreshNowPlayingTitle]
   );
 
   return (
@@ -168,15 +234,18 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
+// ─── Hook ────────────────────────────────────────────────────────────────────
+
 export const usePlayer = () => {
   const context = useContext(PlayerContext);
   if (!context) {
     console.warn('PlayerContext not found, using fallback.');
     return {
-      playerState: { isPlaying: false, isLoading: false, currentStation: null, error: null },
-      playStation: async () => {},
-      pause: async () => {},
-      stop: async () => {},
+      playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null },
+      playStation           : async () => {},
+      pause                 : async () => {},
+      stop                  : async () => {},
+      refreshNowPlayingTitle: () => {},
     };
   }
   return context;

@@ -1,32 +1,34 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { Redirect, Stack, usePathname } from 'expo-router';
+import { useEffect } from 'react';
+import { usePlayer } from '../contexts/PlayerContext';
 
 export default function NotFoundScreen() {
+  const pathname = usePathname();
+  const { playerState } = usePlayer();
+  
+  useEffect(() => {
+    // Log the unhandled deep link for debugging (e.g. from TrackPlayer notification)
+    console.log('[NotFound] Unhandled route intercepted:', pathname);
+  }, [pathname]);
+
+  // In a mobile app, users don't type URLs. Any unrecognized deep link 
+  // (such as the default intent fired by clicking the TrackPlayer notification)
+  // should gracefully return the user to the current station if one is playing,
+  // or fallback to the Home screen.
+  
+  if (playerState.currentStation) {
+    return (
+      <>
+        <Stack.Screen options={{ headerShown: false }} />
+        <Redirect href={`/station-details?id=${playerState.currentStation.id}`} />
+      </>
+    );
+  }
+
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen does not exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
+      <Stack.Screen options={{ headerShown: false }} />
+      <Redirect href="/" />
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-});

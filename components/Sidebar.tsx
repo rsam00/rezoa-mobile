@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   footer: {
-    paddingBottom: 40,
+    paddingBottom: 80,
     alignItems: 'center',
   },
   version: {

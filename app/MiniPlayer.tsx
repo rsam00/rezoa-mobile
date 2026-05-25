@@ -1,22 +1,45 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import TextTicker from 'react-native-text-ticker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
+import { refreshZenoNowPlaying } from '../lib/streamProbe';
 
 import { calculateProgramProgress, getCurrentProgram, Program } from '../utils/timeUtils';
 
 export default function MiniPlayer() {
   const insets = useSafeAreaInsets();
-  const { playerState, playStation, pause, stop } = usePlayer();
+  const { playerState, playStation, pause, stop, refreshNowPlayingTitle } = usePlayer();
   const { programs } = useData();
   const segments = useSegments();
   
   const slideAnim = useRef(new Animated.Value(200)).current; 
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
+
+  // Convenience alias for the stream probe result
+  const streamInfo = playerState.streamInfo;
+
+  // ── Periodic Zeno now-playing refresh ──────────────────────────────────────
+  // For Zeno streams (88% of stations), poll the Zeno API every 30 s so the
+  // MiniPlayer subtitle updates as the DJ changes tracks.
+  const updateNowPlaying = useCallback(async () => {
+    if (!playerState.currentStation?.streamUrl) return;
+    const title = await refreshZenoNowPlaying(playerState.currentStation.streamUrl);
+    if (title !== null) {
+      refreshNowPlayingTitle(title);
+    }
+  }, [playerState.currentStation?.streamUrl, refreshNowPlayingTitle]);
+
+  useEffect(() => {
+    if (!playerState.currentStation) return;
+    // Run once immediately after probe settles, then every 30 s
+    const interval = setInterval(updateNowPlaying, 30_000);
+    return () => clearInterval(interval);
+  }, [playerState.currentStation?.id, updateNowPlaying]);
 
   // Update live info periodically.
   // We compute Haiti time once per tick and share it across both calls to avoid
@@ -120,9 +143,8 @@ export default function MiniPlayer() {
         styles.container, 
         { 
           transform: [{ translateY: slideAnim }],
-          bottom: 0,
-          paddingBottom: bottomOffset,
-          height: 64 + bottomOffset,
+          bottom: bottomOffset,
+          height: 64,
         },
       ]}
     >
@@ -132,14 +154,32 @@ export default function MiniPlayer() {
             <View style={styles.scrollClip}>
               <Animated.View style={{ transform: [{ translateY }] }}>
                 <View style={styles.textTrack}>
-                  <Text style={styles.stationTitle} numberOfLines={1}>
+                  <TextTicker
+                    style={styles.stationTitle}
+                    scrollSpeed={40}
+                    loop
+                    bounce={false}
+                    repeatSpacer={50}
+                    marqueeDelay={2000}
+                  >
                     {playerState.currentStation.name}
-                  </Text>
+                  </TextTicker>
                 </View>
                 <View style={styles.textTrack}>
-                  <Text style={styles.programTitle} numberOfLines={1}>
-                    {liveInfo.program ? liveInfo.program.name : 'Live Stream'}
-                  </Text>
+                  <TextTicker
+                    style={styles.programTitle}
+                    scrollSpeed={40}
+                    loop
+                    bounce={false}
+                    repeatSpacer={50}
+                    marqueeDelay={2000}
+                  >
+                    {streamInfo?.nowPlaying
+                      ? streamInfo.nowPlaying
+                      : liveInfo.program
+                        ? liveInfo.program.name
+                        : 'Live Stream'}
+                  </TextTicker>
                 </View>
               </Animated.View>
             </View>

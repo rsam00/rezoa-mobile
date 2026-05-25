@@ -393,7 +393,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   </Text>
                 </View>
                 <Text style={styles.heroMeta}>
-                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : (featuredItem.station?.city || 'Haiti')}
+                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : (featuredItem.station?.city ? `${featuredItem.station.city}${featuredItem.station?.department ? `, ${featuredItem.station.department}` : ''}${featuredItem.station?.country ? `, ${featuredItem.station.country}` : ''}` : 'Haiti')}
                 </Text>
               </View>
               
@@ -430,7 +430,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   <Ionicons 
                     name={featuredItem.station && favorites.includes(featuredItem.station.id) ? 'heart' : 'heart-outline'} 
                     size={24} 
-                    color={featuredItem.station && favorites.includes(featuredItem.station.id) ? '#a78bfa' : '#fff'} 
+                    color={featuredItem.station && favorites.includes(featuredItem.station.id) ? '#ef4444' : '#fff'} 
                   />
                 </TouchableOpacity>
               </View>
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   badge: {
-    backgroundColor: '#a78bfa',
+    backgroundColor: '#ef4444',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 2,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   favoriteButtonHero: {
     width: 36,
     height: 36,
-    borderRadius: 4,
+    borderRadius: 18,
     overflow: 'hidden',
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',

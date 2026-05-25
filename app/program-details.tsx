@@ -239,12 +239,7 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 20,
-    backgroundColor: '#1c1c1e',
+    backgroundColor: 'transparent',
   },
   mainPoster: {
     width: '100%',

@@ -14,14 +14,18 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
-  Platform
+  Platform,
+  Modal,
+  TouchableWithoutFeedback
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   scrollTo,
   useAnimatedRef,
   useAnimatedScrollHandler,
-  useSharedValue
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming
 } from 'react-native-reanimated';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
@@ -105,6 +109,7 @@ function getBlocksForDay(programs: Program[], dayName: string) {
 }
 
 const GENRES = ['All', 'News', 'Music', 'Gospel', 'Sports', 'Talk', 'Culture'];
+type FilterType = 'Country' | 'Department' | 'City' | 'Genre' | null;
 
 export default function ProgramGuideScreen() {
   return <ProgramGuideContent />;
@@ -118,17 +123,125 @@ function ProgramGuideContent() {
   
   const [selectedDay, setSelectedDay] = useState<number>(getHaitiTime().day ? ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day) : new Date().getDay());
   const [haitiNow, setHaitiNow] = useState(getHaitiTime());
+  
+  const [selectedCountry, setSelectedCountry] = useState<string>('All');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('All');
+  const [selectedCity, setSelectedCity] = useState<string>('All');
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
+  const [activeFilter, setActiveFilter] = useState<FilterType>(null);
+  const [locationDetected, setLocationDetected] = useState(false);
+
+  const availableCountries = useMemo(() => {
+    const set = new Set<string>();
+    stations.forEach(s => s.country && set.add(s.country));
+    return ['All', ...Array.from(set).sort()];
+  }, [stations]);
+
+  const availableDepartments = useMemo(() => {
+    const set = new Set<string>();
+    stations.forEach(s => {
+      if ((selectedCountry === 'All' || s.country === selectedCountry) && s.department) {
+        set.add(s.department);
+      }
+    });
+    return ['All', ...Array.from(set).sort()];
+  }, [stations, selectedCountry]);
+
+  const availableCities = useMemo(() => {
+    const set = new Set<string>();
+    stations.forEach(s => {
+      if (
+        (selectedCountry === 'All' || s.country === selectedCountry) &&
+        (selectedDepartment === 'All' || s.department === selectedDepartment) &&
+        s.city
+      ) {
+        set.add(s.city);
+      }
+    });
+    return ['All', ...Array.from(set).sort()];
+  }, [stations, selectedCountry, selectedDepartment]);
+
+  useEffect(() => {
+    if (dataLoading || stations.length === 0 || locationDetected) return;
+    
+    // Auto-detect location via IP
+    fetch('http://ip-api.com/json/')
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const userCountry = data.country;
+          const userRegion = data.regionName;
+          
+          if (availableCountries.includes(userCountry)) {
+            setSelectedCountry(userCountry);
+            
+            const validDepartments = new Set<string>();
+            stations.forEach(s => {
+              if (s.country === userCountry && s.department) validDepartments.add(s.department);
+            });
+            if (validDepartments.has(userRegion)) {
+              setSelectedDepartment(userRegion);
+            }
+          }
+          setLocationDetected(true);
+        }
+      })
+      .catch(e => {
+        console.log('IP Location failed', e);
+        setLocationDetected(true); // Don't try again if it fails
+      });
+  }, [dataLoading, stations.length, availableCountries, locationDetected]);
+
+  const handleSelectCountry = (val: string) => {
+    setSelectedCountry(val);
+    setSelectedDepartment('All');
+    setSelectedCity('All');
+    setActiveFilter(null);
+  };
+  const handleSelectDepartment = (val: string) => {
+    setSelectedDepartment(val);
+    setSelectedCity('All');
+    setActiveFilter(null);
+  };
+  const handleSelectCity = (val: string) => {
+    setSelectedCity(val);
+    setActiveFilter(null);
+  };
+  const handleSelectGenre = (val: string) => {
+    setSelectedGenre(val);
+    setActiveFilter(null);
+  };
 
   const { width } = useWindowDimensions();
 
   const leftRef = useAnimatedRef<FlatList>();
   const rightRef = useAnimatedRef<FlatList>();
-  const horizontalScrollRef = useRef<ScrollView>(null);
+  const horizontalScrollRef = useAnimatedRef<Animated.ScrollView>();
   const dayScrollRef = useRef<ScrollView>(null);
 
   const isScrollingLeft = useSharedValue(false);
   const isScrollingRight = useSharedValue(false);
+  
+  const scrollX = useSharedValue(0);
+  const currentLineX = useSharedValue(0);
+
+  useEffect(() => {
+    currentLineX.value = (haitiNow.hours * 60 + haitiNow.minutes) * (CELL_WIDTH / 60);
+  }, [haitiNow]);
+
+  const horizontalScrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+  });
+
+  const liveDotStyle = useAnimatedStyle(() => {
+    const visibleWidth = width - LEFT_COLUMN_WIDTH;
+    const isVisible = currentLineX.value >= scrollX.value && currentLineX.value <= scrollX.value + visibleWidth;
+    return {
+      opacity: withTiming(isVisible ? 1 : 0.3, { duration: 300 })
+    };
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -169,13 +282,24 @@ function ProgramGuideContent() {
 
 
   const filteredStations = useMemo(() => {
-    const active = stations.filter(s => s.name && s.streamUrl);
-    if (selectedGenre === 'All') return active;
-    return active.filter(s => 
-      s.tag?.includes(selectedGenre) || 
-      s.name.toLowerCase().includes(selectedGenre.toLowerCase())
-    );
-  }, [stations, selectedGenre]);
+    let active = stations.filter(s => s.name && s.streamUrl);
+    if (selectedCountry !== 'All') {
+      active = active.filter(s => s.country === selectedCountry);
+    }
+    if (selectedDepartment !== 'All') {
+      active = active.filter(s => s.department === selectedDepartment);
+    }
+    if (selectedCity !== 'All') {
+      active = active.filter(s => s.city === selectedCity);
+    }
+    if (selectedGenre !== 'All') {
+      active = active.filter(s => 
+        s.tag?.includes(selectedGenre) || 
+        s.name.toLowerCase().includes(selectedGenre.toLowerCase())
+      );
+    }
+    return active;
+  }, [stations, selectedCountry, selectedDepartment, selectedCity, selectedGenre]);
 
   const programsByStation = useMemo(() => {
     const grouped: Record<string, Program[]> = {};
@@ -305,6 +429,7 @@ function ProgramGuideContent() {
       <TopNavigation 
         rightComponent={
           <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
+            <Animated.View style={[styles.liveDot, liveDotStyle]} />
             <Text style={styles.liveNowText}>LIVE</Text>
           </TouchableOpacity>
         }
@@ -312,15 +437,29 @@ function ProgramGuideContent() {
 
       <View style={[styles.genreStripContainer, { paddingTop: insets.top + 70 }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
-          {GENRES.map(genre => (
-            <TouchableOpacity 
-              key={genre} 
-              onPress={() => setSelectedGenre(genre)}
-              style={[styles.genreTab, selectedGenre === genre && styles.activeGenreTab]}
-            >
-              <Text style={[styles.genreText, selectedGenre === genre && styles.activeGenreText]}>{genre}</Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity onPress={() => setActiveFilter('Country')} style={[styles.genreTab, selectedCountry !== 'All' && styles.activeGenreTab]}>
+            <Text style={[styles.genreText, selectedCountry !== 'All' && styles.activeGenreText]}>
+              {selectedCountry === 'All' ? 'Country' : (selectedCountry === 'United States' ? 'USA' : (selectedCountry === 'Dominican Republic' ? 'Dom. Rep.' : selectedCountry))} <Ionicons name="chevron-down" size={12} color={selectedCountry !== 'All' ? '#a78bfa' : '#a1a1aa'} />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setActiveFilter('Department')} style={[styles.genreTab, selectedDepartment !== 'All' && styles.activeGenreTab]}>
+            <Text style={[styles.genreText, selectedDepartment !== 'All' && styles.activeGenreText]}>
+              {selectedDepartment === 'All' ? (selectedCountry === 'United States' || selectedCountry === 'USA' ? 'State' : 'Department') : selectedDepartment} <Ionicons name="chevron-down" size={12} color={selectedDepartment !== 'All' ? '#a78bfa' : '#a1a1aa'} />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setActiveFilter('City')} style={[styles.genreTab, selectedCity !== 'All' && styles.activeGenreTab]}>
+            <Text style={[styles.genreText, selectedCity !== 'All' && styles.activeGenreText]}>
+              {selectedCity === 'All' ? 'City' : selectedCity} <Ionicons name="chevron-down" size={12} color={selectedCity !== 'All' ? '#a78bfa' : '#a1a1aa'} />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setActiveFilter('Genre')} style={[styles.genreTab, selectedGenre !== 'All' && styles.activeGenreTab]}>
+            <Text style={[styles.genreText, selectedGenre !== 'All' && styles.activeGenreText]}>
+              {selectedGenre === 'All' ? 'Genre' : selectedGenre} <Ionicons name="chevron-down" size={12} color={selectedGenre !== 'All' ? '#a78bfa' : '#a1a1aa'} />
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -363,11 +502,12 @@ function ProgramGuideContent() {
           />
         </View>
 
-        <ScrollView 
+        <Animated.ScrollView 
           ref={horizontalScrollRef} 
           horizontal 
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
+          onScroll={horizontalScrollHandler}
         >
           <View>
             <View style={[styles.timeRow, { height: TIME_ROW_HEIGHT }]}>
@@ -411,22 +551,86 @@ function ProgramGuideContent() {
               { left: (haitiNow.hours * 60 + haitiNow.minutes) * (CELL_WIDTH / 60) },
             ]}
           />
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
+
+      <Modal visible={!!activeFilter} animationType="slide" transparent={true} onRequestClose={() => setActiveFilter(null)}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={() => setActiveFilter(null)}>
+            <View style={styles.modalBackdrop} />
+          </TouchableWithoutFeedback>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Select {activeFilter === 'Department' && (selectedCountry === 'USA' || selectedCountry === 'United States') ? 'State' : activeFilter}
+              </Text>
+              <TouchableOpacity onPress={() => setActiveFilter(null)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={
+                activeFilter === 'Country' ? availableCountries :
+                activeFilter === 'Department' ? availableDepartments :
+                activeFilter === 'City' ? availableCities :
+                activeFilter === 'Genre' ? GENRES : []
+              }
+              keyExtractor={item => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalOption}
+                  onPress={() => {
+                    if (activeFilter === 'Country') handleSelectCountry(item);
+                    else if (activeFilter === 'Department') handleSelectDepartment(item);
+                    else if (activeFilter === 'City') handleSelectCity(item);
+                    else if (activeFilter === 'Genre') handleSelectGenre(item);
+                  }}
+                >
+                  <Text style={[
+                    styles.modalOptionText,
+                    (activeFilter === 'Country' && selectedCountry === item) ||
+                    (activeFilter === 'Department' && selectedDepartment === item) ||
+                    (activeFilter === 'City' && selectedCity === item) ||
+                    (activeFilter === 'Genre' && selectedGenre === item) ? { color: '#a78bfa', fontWeight: 'bold' } : {}
+                  ]}>
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
-  liveNowButton: { backgroundColor: '#a78bfa', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 4 },
-  liveNowText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
+  liveNowButton: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 6, 
+    backgroundColor: 'rgba(255,255,255,0.08)', 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)'
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ef4444',
+  },
+  liveNowText: { color: '#fff', fontWeight: 'bold', fontSize: 12, letterSpacing: 0.5 },
   genreStripContainer: { backgroundColor: 'black', paddingBottom: 5 },
   genreStrip: { paddingHorizontal: 15, gap: 10 },
-  genreTab: { paddingHorizontal: 15, paddingVertical: 6, borderRadius: 20, backgroundColor: '#1c1c1e' },
-  activeGenreTab: { backgroundColor: '#a78bfa' },
-  genreText: { color: '#a1a1aa', fontWeight: '600' },
-  activeGenreText: { color: '#fff' },
+  genreTab: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'transparent', flexDirection: 'row', alignItems: 'center' },
+  activeGenreTab: { backgroundColor: 'rgba(167, 139, 250, 0.15)', borderColor: '#a78bfa' },
+  genreText: { color: '#d4d4d8', fontWeight: '600', fontSize: 13 },
+  activeGenreText: { color: '#fff', fontWeight: 'bold' },
   dayStripContainer: { borderBottomWidth: 1, borderBottomColor: '#27272a', backgroundColor: 'black' },
   dayStrip: { paddingHorizontal: 15, paddingVertical: 10, gap: 15 },
   dayTab: { paddingBottom: 5 },
@@ -466,4 +670,11 @@ const styles = StyleSheet.create({
     zIndex: 999,
     elevation: 999,
   },
+  modalOverlay: { flex: 1, justifyContent: 'flex-end' },
+  modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalContent: { backgroundColor: '#1c1c1e', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', padding: 20, paddingBottom: 40 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+  modalOption: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#27272a' },
+  modalOptionText: { color: '#fff', fontSize: 16 },
 });

@@ -141,7 +141,7 @@ export default function StationDetailsScreen() {
               </View>
               <View style={styles.stationText}>
                 <Text style={styles.stationName}>{station.name}</Text>
-                <Text style={styles.stationMeta}>{station.city}, {station.country}</Text>
+                <Text style={styles.stationMeta}>{station.city}{station.department ? `, ${station.department}` : ''}{station.country ? `, ${station.country}` : ''}</Text>
                 <Text style={styles.stationFrequency}>{station.frequency || 'Streaming Live'}</Text>
               </View>
             </View>
@@ -185,7 +185,7 @@ export default function StationDetailsScreen() {
                 <Ionicons 
                   name={favorites.includes(station.id) ? "heart" : "heart-outline"} 
                   size={24} 
-                  color={favorites.includes(station.id) ? "#a78bfa" : "white"} 
+                  color={favorites.includes(station.id) ? "#ef4444" : "white"} 
                 />
               </TouchableOpacity>
             </View>
@@ -201,7 +201,7 @@ export default function StationDetailsScreen() {
             ))}
           </View>
 
-          <Text style={styles.description}>{station.description || 'Welcome to ' + station.name + '. Streaming live from ' + (station.city || 'Haiti') + '.'}</Text>
+          <Text style={styles.description}>{station.description || 'Welcome to ' + station.name + '. Streaming live from ' + (station.city ? `${station.city}${station.department ? `, ${station.department}` : ''}${station.country ? `, ${station.country}` : ''}` : 'Haiti') + '.'}</Text>
 
           <View style={styles.programSection}>
             <View style={styles.sectionHeader}>
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   programInfo: { flex: 1 },
   programNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   programName: { color: 'white', fontSize: 17, fontWeight: 'bold' },
-  liveBadge: { backgroundColor: '#7c3aed', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
+  liveBadge: { backgroundColor: '#ef4444', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
   liveBadgeText: { color: 'white', fontSize: 10, fontWeight: '900' },
   programTime: { color: '#a1a1aa', fontSize: 13, marginTop: 4 },
   programHost: { color: '#71717a', fontSize: 13, marginTop: 2 },

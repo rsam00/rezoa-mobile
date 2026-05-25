@@ -27,8 +27,15 @@ import TrackPlayer from 'react-native-track-player';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-// Register the background playback service for Track Player
-TrackPlayer.registerPlaybackService(() => require('../service'));
+// Register the background playback service for Track Player.
+// We use a global flag to ensure this is only called once during development 
+// Fast Refresh, which prevents the "registerHeadlessTask called multiple times" warning.
+// @ts-ignore
+if (!global.__trackPlayerRegistered) {
+  TrackPlayer.registerPlaybackService(() => require('../service'));
+  // @ts-ignore
+  global.__trackPlayerRegistered = true;
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

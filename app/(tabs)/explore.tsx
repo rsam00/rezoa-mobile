@@ -37,7 +37,7 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
           onPress={onToggleFavorite}
           activeOpacity={0.7}
         >
-          <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={20} color={isFavorite ? "#a78bfa" : "#fff"} />
+          <Ionicons name={isFavorite ? "heart" : "heart-outline"} size={20} color={isFavorite ? "#ef4444" : "#fff"} />
         </TouchableOpacity>
 
         {/* Play Button Overlay (Bottom Right of Image) */}
@@ -49,14 +49,14 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
           {isLoading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-             <Ionicons name={isStationPlaying ? "pause" : "play"} size={20} color="#fff" style={{ marginLeft: isStationPlaying ? 0 : 2 }} />
+             <Ionicons name={isStationPlaying ? "pause" : "play"} size={16} color="#fff" style={{ marginLeft: isStationPlaying ? 0 : 2 }} />
           )}
         </TouchableOpacity>
       </View>
 
       <View style={styles.infoContainer}>
         <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.cardSubtitle} numberOfLines={1}>{item.city}</Text>
+        <Text style={styles.cardSubtitle} numberOfLines={1}>{item.city}{item.department ? `, ${item.department}` : ''}{item.country ? `, ${item.country}` : ''}</Text>
         {item.frequency && <Text style={styles.cardMeta}>{item.frequency}</Text>}
       </View>
     </TouchableOpacity>
@@ -170,7 +170,7 @@ function ExploreScreenContent() {
       <TopNavigation />
       <FlatList
         ListHeaderComponent={(
-          <View style={[styles.searchBarContainer, { paddingTop: insets.top + 70 }]}>
+          <View style={styles.searchBarContainer}>
             <TextInput
               style={styles.searchBar}
               placeholder="Find your sound..."
@@ -187,7 +187,7 @@ function ExploreScreenContent() {
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: 100 }}
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     top: 6,
     right: 6,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 12,
+    borderRadius: 16,
     width: 32,
     height: 32,
     justifyContent: 'center',
@@ -253,9 +253,9 @@ const styles = StyleSheet.create({
     bottom: 6,
     right: 6,
     backgroundColor: '#a78bfa',
-    borderRadius: 20,
-    width: 36,
-    height: 36,
+    borderRadius: 14,
+    width: 28,
+    height: 28,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 3,
