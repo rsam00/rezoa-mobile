@@ -22,8 +22,13 @@ import * as NavigationBar from 'expo-navigation-bar';
 import Sidebar from '../components/Sidebar';
 import MiniPlayer from './MiniPlayer';
 
+import TrackPlayer from 'react-native-track-player';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Register the background playback service for Track Player
+TrackPlayer.registerPlaybackService(() => require('../service'));
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();

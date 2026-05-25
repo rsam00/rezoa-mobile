@@ -18,7 +18,10 @@ export default function MiniPlayer() {
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
 
-  // Update live info periodically
+  // Update live info periodically.
+  // We compute Haiti time once per tick and share it across both calls to avoid
+  // running the (now-cached) timezone lookup more than necessary.
+  // 10-second resolution is imperceptible for a slow-moving progress bar.
   useEffect(() => {
     if (!playerState.currentStation) return;
 
@@ -29,7 +32,7 @@ export default function MiniPlayer() {
     };
 
     update();
-    const interval = setInterval(update, 1000); // Update every second for smooth progress
+    const interval = setInterval(update, 10000); // 10s — plenty for a slow progress bar
     return () => clearInterval(interval);
   }, [playerState.currentStation]);
 
@@ -117,7 +120,9 @@ export default function MiniPlayer() {
         styles.container, 
         { 
           transform: [{ translateY: slideAnim }],
-          bottom: bottomOffset, // Docked exactly on top of TabBar or bottom of screen
+          bottom: 0,
+          paddingBottom: bottomOffset,
+          height: 64 + bottomOffset,
         },
       ]}
     >
@@ -184,7 +189,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.7)',
     overflow: 'hidden',
     zIndex: 100,
-    elevation: 8,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
     height: 64,

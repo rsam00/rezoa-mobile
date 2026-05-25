@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { supabase } from '../lib/supabase';
 
 // Types matched to Supabase schema
@@ -50,58 +50,67 @@ const CACHE_KEYS = {
   PROGRAMS: '@rezoa_programs_v4',
 };
 
+// ---------------------------------------------------------------------------
+// Single state object + reducer
+// Previously there were 4 separate useState calls (stations, programs, loading,
+// isReady). Each individual setState() triggers its own render cycle, so a
+// sequence of setStations + setPrograms + setIsReady = 3 renders. By batching
+// them into one dispatch we guarantee a single render per logical update.
+// ---------------------------------------------------------------------------
+interface DataState {
+  stations: Station[];
+  programs: Program[];
+  loading: boolean;
+  isReady: boolean;
+}
+
+type DataAction =
+  | { type: 'LOAD_CACHE'; stations: Station[]; programs: Program[] }
+  | { type: 'LOAD_NETWORK'; stations: Station[]; programs: Program[] }
+  | { type: 'MARK_READY' }
+  | { type: 'SET_LOADING'; loading: boolean };
+
+const initialState: DataState = {
+  stations: [],
+  programs: [],
+  loading: true,
+  isReady: false,
+};
+
+function dataReducer(state: DataState, action: DataAction): DataState {
+  switch (action.type) {
+    case 'LOAD_CACHE':
+      // Single render: stations + programs + isReady all update together
+      return { ...state, stations: action.stations, programs: action.programs, isReady: true };
+    case 'LOAD_NETWORK':
+      // Single render: fresh data from network, mark done loading
+      return { stations: action.stations, programs: action.programs, isReady: true, loading: false };
+    case 'MARK_READY':
+      return { ...state, isReady: true, loading: false };
+    case 'SET_LOADING':
+      return { ...state, loading: action.loading };
+    default:
+      return state;
+  }
+}
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [stations, setStations] = useState<Station[]>([]);
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isReady, setIsReady] = useState(false);
+  const [state, dispatch] = useReducer(dataReducer, initialState);
 
-  useEffect(() => {
-    const startup = async () => {
-      console.log('--- DATA STARTUP BEGINS ---');
-      try {
-        const [cachedS, cachedP] = await Promise.all([
-          AsyncStorage.getItem(CACHE_KEYS.STATIONS),
-          AsyncStorage.getItem(CACHE_KEYS.PROGRAMS),
-        ]);
-
-        if (cachedS && cachedP) {
-          try {
-            const s = JSON.parse(cachedS);
-            const p = JSON.parse(cachedP);
-            if (Array.isArray(s) && Array.isArray(p)) {
-              setStations(s);
-              setPrograms(p);
-              setIsReady(true);
-              console.log('--- DATA LOADED FROM CACHE ---');
-            }
-          } catch (jsonErr) {
-            console.warn('--- CACHE PARSE ERROR ---');
-          }
-        }
-      } catch (e) {
-        console.warn('--- ASYNC STORAGE ERROR ---');
-      }
-
-      await performNetworkFetch();
-      setLoading(false);
-    };
-
-    startup();
-  }, []);
-
-  const performNetworkFetch = async () => {
+  const performNetworkFetch = useCallback(async () => {
     try {
       console.log('--- NETWORK FETCH STARTING ---');
       const fieldsS = 'id, name, logo, stream_url, city, country, tags, favorite_count, click_count, created_at, description';
       const fieldsP = 'id, name, station_id, poster, schedules, click_count, created_at';
 
-      const { data: sData, error: sErr } = await supabase.from('stations').select(fieldsS);
-      const { data: pData, error: pErr } = await supabase.from('programs').select(fieldsP);
+      const [{ data: sData, error: sErr }, { data: pData, error: pErr }] = await Promise.all([
+        supabase.from('stations').select(fieldsS),
+        supabase.from('programs').select(fieldsP),
+      ]);
 
       if (sErr || pErr) {
         console.error('--- SUPABASE ERROR ---');
-        setIsReady(true);
+        dispatch({ type: 'MARK_READY' });
         return;
       }
 
@@ -123,65 +132,97 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           createdAt: p.created_at
         }));
 
-        console.log('--- DATA SYNC COMPLETE - SETTING UI READY ---');
-        setStations(mappedS);
-        setPrograms(mappedP);
-        setIsReady(true);
+        console.log('--- DATA SYNC COMPLETE ---');
+        // ONE dispatch = ONE render (was 3 separate setState calls before)
+        dispatch({ type: 'LOAD_NETWORK', stations: mappedS, programs: mappedP });
 
-        // Sequence: Wait 2 seconds before stringifying and saving STATIONS
+        // Defer cache writes — these are fire-and-forget and don't affect UI
         setTimeout(() => {
-          console.log('--- [SEQUENCE 1] SAVING STATIONS TO CACHE ---');
-          const strS = JSON.stringify(mappedS);
-          console.log(`--- STATIONS STRING LENGTH: ${strS.length} ---`);
-          AsyncStorage.setItem(CACHE_KEYS.STATIONS, strS)
-            .then(() => console.log('--- STATIONS SAVE OK ---'))
+          AsyncStorage.setItem(CACHE_KEYS.STATIONS, JSON.stringify(mappedS))
             .catch(e => console.log('--- STATIONS SAVE ERROR ---', e));
         }, 2000);
 
-        // Sequence: Wait 4 seconds before stringifying and saving PROGRAMS
         setTimeout(() => {
-          console.log('--- [SEQUENCE 2] SAVING PROGRAMS TO CACHE ---');
-          const strP = JSON.stringify(mappedP);
-          console.log(`--- PROGRAMS STRING LENGTH: ${strP.length} ---`);
-          AsyncStorage.setItem(CACHE_KEYS.PROGRAMS, strP)
-            .then(() => console.log('--- PROGRAMS SAVE OK ---'))
+          AsyncStorage.setItem(CACHE_KEYS.PROGRAMS, JSON.stringify(mappedP))
             .catch(e => console.log('--- PROGRAMS SAVE ERROR ---', e));
         }, 4000);
-
       }
     } catch (e) {
       console.error('--- NETWORK CRASHED ---');
-      setIsReady(true);
+      dispatch({ type: 'MARK_READY' });
     }
-  };
+  }, []);
 
-  const recordClick = async (stationId: string) => {
+  useEffect(() => {
+    const startup = async () => {
+      console.log('--- DATA STARTUP BEGINS ---');
+      try {
+        const [cachedS, cachedP] = await Promise.all([
+          AsyncStorage.getItem(CACHE_KEYS.STATIONS),
+          AsyncStorage.getItem(CACHE_KEYS.PROGRAMS),
+        ]);
+
+        if (cachedS && cachedP) {
+          try {
+            const s = JSON.parse(cachedS);
+            const p = JSON.parse(cachedP);
+            if (Array.isArray(s) && Array.isArray(p)) {
+              // ONE dispatch = ONE render (was 3 setState calls before)
+              dispatch({ type: 'LOAD_CACHE', stations: s, programs: p });
+              console.log('--- DATA LOADED FROM CACHE ---');
+            }
+          } catch {
+            console.warn('--- CACHE PARSE ERROR ---');
+          }
+        }
+      } catch {
+        console.warn('--- ASYNC STORAGE ERROR ---');
+      }
+
+      await performNetworkFetch();
+    };
+
+    startup();
+  }, [performNetworkFetch]);
+
+  const recordClick = useCallback(async (stationId: string) => {
     try {
       await supabase.rpc('increment_station_click', { station_id_param: stationId });
-    } catch (e) {
+    } catch {
       console.warn('--- CLICK RECORD ERROR ---');
     }
-  };
+  }, []);
 
-  const recordProgramClick = async (programId: string) => {
+  const recordProgramClick = useCallback(async (programId: string) => {
     try {
       await supabase.rpc('increment_program_click', { program_id_param: programId });
-    } catch (e) {
+    } catch {
       console.warn('--- PROG CLICK ERROR ---');
     }
-  };
+  }, []);
+
+  // Memoize the getProgramsForStation function AND the context value object.
+  // Without this, the Provider recreates a new plain object {} on every render,
+  // which forces ALL consumers (HomeScreen, ProgramGuide, etc.) to re-render
+  // even when the data hasn't changed.
+  const getProgramsForStation = useCallback(
+    (id: string) => state.programs.filter(p => p.stationId === id),
+    [state.programs]
+  );
+
+  const contextValue = useMemo(() => ({
+    stations: state.stations,
+    programs: state.programs,
+    loading: state.loading,
+    isReady: state.isReady,
+    refreshData: performNetworkFetch,
+    getProgramsForStation,
+    recordClick,
+    recordProgramClick,
+  }), [state, performNetworkFetch, getProgramsForStation, recordClick, recordProgramClick]);
 
   return (
-    <DataContext.Provider value={{ 
-      stations, 
-      programs, 
-      loading,
-      isReady,
-      refreshData: performNetworkFetch,
-      getProgramsForStation: (id) => programs.filter(p => p.stationId === id),
-      recordClick,
-      recordProgramClick
-    }}>
+    <DataContext.Provider value={contextValue}>
       {children}
     </DataContext.Provider>
   );

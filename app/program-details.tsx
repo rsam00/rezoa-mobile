@@ -1,8 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
 import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
@@ -29,6 +31,7 @@ function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
 }
 
 export default function ProgramDetailsScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const { programs, stations, loading, recordProgramClick } = useData();
   const program = programs.find(p => p.id === id);
@@ -61,6 +64,12 @@ export default function ProgramDetailsScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
+        </TouchableOpacity>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Header Hero Section */}
         <View style={styles.heroRoot}>
@@ -87,16 +96,11 @@ export default function ProgramDetailsScreen() {
             </View>
           </View>
           
-          <TouchableOpacity onPress={() => router.back()} style={styles.floatBackButton}>
-            <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
-            <Text style={styles.backButtonText}>✕</Text>
-          </TouchableOpacity>
-
           {/* Centered Poster or Fallback */}
           <View style={styles.posterWrapper}>
             {program.poster ? (
               <AnimatedCard style={styles.posterContainer} onPress={() => {}}>
-                <Image source={{ uri: program.poster }} style={styles.mainPoster} resizeMode="cover" />
+                <Image source={{ uri: program.poster }} style={styles.mainPoster} resizeMode="contain" />
               </AnimatedCard>
             ) : (
               <View style={styles.fallbackContainer}>
@@ -203,17 +207,21 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  floatBackButton: {
+  stickyHeader: {
     position: 'absolute',
-    top: 50,
-    left: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    overflow: 'hidden',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    zIndex: 100,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100,
   },
   backButtonText: {
     color: '#fff',
@@ -227,8 +235,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   posterContainer: {
-    width: 180,
-    height: 260,
+    width: SCREEN_WIDTH * 0.75,
+    height: 180,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDrawer } from '../contexts/DrawerContext';
 
 interface Props {
@@ -15,6 +16,7 @@ export default function TopNavigation({ rightComponent }: Props) {
 
   // Determine current active tab based on route segments safely
   const currentRoute = Array.isArray(segments) && segments.length > 0 ? segments[segments.length - 1] : 'index';
+  const insets = useSafeAreaInsets();
 
   const tabs = [
     { name: 'Home', route: 'index' },
@@ -23,8 +25,9 @@ export default function TopNavigation({ rightComponent }: Props) {
   ];
 
   return (
-    <View style={styles.headerRow}>
-      <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
+    <View style={[styles.headerWrapper, { paddingTop: insets.top, height: insets.top + 60 }]}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
         <Text style={styles.profileButtonText}>☰</Text>
       </TouchableOpacity>
       
@@ -49,19 +52,26 @@ export default function TopNavigation({ rightComponent }: Props) {
       <View style={styles.rightContainer}>
         {rightComponent ? rightComponent : <View style={{ width: 44 }} />}
       </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  headerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    zIndex: 100,
+  },
   headerRow: {
-    paddingTop: 10,
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    zIndex: 100,
-    backgroundColor: 'black',
     paddingBottom: 10,
   },
   profileButton: { 

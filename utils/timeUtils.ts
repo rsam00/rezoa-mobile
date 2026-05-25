@@ -5,57 +5,76 @@ export interface Program {
   schedules: { startTime: string; endTime: string; days: string[] }[];
 }
 
-/**
- * Gets the current time and day in Haiti (America/Port-au-Prince)
- */
-export function getHaitiTime() {
-  const now = new Date();
-  
+// ---------------------------------------------------------------------------
+// Haiti timezone cache
+// Intl.DateTimeFormat.formatToParts() with a non-local timezone is expensive
+// on the JS thread. We cache the UTC-to-Haiti offset and only refresh it once
+// per minute (the offset only changes twice a year for DST).
+// ---------------------------------------------------------------------------
+let _cachedOffsetMinutes: number | null = null;
+let _cacheRefreshedAtMinute = -1;
+
+function getHaitiOffsetMinutes(): number {
+  const nowMs = Date.now();
+  const nowMinute = Math.floor(nowMs / 60000);
+
+  if (_cachedOffsetMinutes !== null && nowMinute === _cacheRefreshedAtMinute) {
+    return _cachedOffsetMinutes;
+  }
+
   try {
-    const haitiFormatter = new Intl.DateTimeFormat('en-US', {
+    // One cheap Intl call per minute to get the offset
+    const formatter = new Intl.DateTimeFormat('en-US', {
       timeZone: 'America/Port-au-Prince',
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
       hour: 'numeric',
       minute: 'numeric',
-      second: 'numeric',
       hour12: false,
-      weekday: 'long',
     });
-    const parts = haitiFormatter.formatToParts(now);
-    const dateMap: Record<string, string> = {};
-    parts.forEach(p => { dateMap[p.type] = p.value; });
-
-
-    // Weekday normalization
-    let day = dateMap.weekday;
-    if (!day) {
-        // Fallback weekday calculation if Intl parts are missing weekday
-        const haitiString = now.toLocaleString('en-US', { timeZone: 'America/Port-au-Prince' });
-        const haitiDate = new Date(haitiString);
-        day = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][haitiDate.getDay()];
+    const utcDate = new Date(nowMs);
+    const parts = formatter.formatToParts(utcDate);
+    const pm = parts.find(p => p.type === 'minute');
+    const ph = parts.find(p => p.type === 'hour');
+    if (pm && ph) {
+      const haitiH = parseInt(ph.value, 10);
+      const haitiM = parseInt(pm.value, 10);
+      const haitiTotalMinutes = haitiH * 60 + haitiM;
+      const utcH = utcDate.getUTCHours();
+      const utcM = utcDate.getUTCMinutes();
+      const utcTotalMinutes = utcH * 60 + utcM;
+      _cachedOffsetMinutes = haitiTotalMinutes - utcTotalMinutes;
     }
-
-    const result = {
-      day: day, // Should be "Saturday", "Sunday", etc.
-      hours: parseInt(dateMap.hour, 10),
-      minutes: parseInt(dateMap.minute, 10),
-      seconds: parseInt(dateMap.second, 10),
-      totalSeconds: (parseInt(dateMap.hour, 10) || 0) * 3600 + (parseInt(dateMap.minute, 10) || 0) * 60 + (parseInt(dateMap.second, 10) || 0),
-    };
-    return result;
-  } catch (e) {
-    console.error('[timeUtils] Error in getHaitiTime:', e);
-    // Absolute fallback to local time if everything fails
-    return {
-      day: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][now.getDay()],
-      hours: now.getHours(),
-      minutes: now.getMinutes(),
-      seconds: now.getSeconds(),
-      totalSeconds: now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(),
-    };
+  } catch {
+    _cachedOffsetMinutes = -300; // Haiti is UTC-5 (EST) as a safe fallback
   }
+
+  _cacheRefreshedAtMinute = nowMinute;
+  return _cachedOffsetMinutes ?? -300;
+}
+
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/**
+ * Gets the current time and day in Haiti (America/Port-au-Prince).
+ * Uses a cached UTC offset so the expensive Intl call only runs once per minute.
+ */
+export function getHaitiTime() {
+  const nowMs = Date.now();
+  const offsetMinutes = getHaitiOffsetMinutes();
+  const haitiMs = nowMs + offsetMinutes * 60000;
+  const d = new Date(haitiMs);
+
+  const hours = d.getUTCHours();
+  const minutes = d.getUTCMinutes();
+  const seconds = d.getUTCSeconds();
+  const day = DAYS[d.getUTCDay()];
+
+  return {
+    day,
+    hours,
+    minutes,
+    seconds,
+    totalSeconds: hours * 3600 + minutes * 60 + seconds,
+  };
 }
 
 /**

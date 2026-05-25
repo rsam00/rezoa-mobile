@@ -250,12 +250,13 @@ function ProgramGuideContent() {
         {blocks.map((block, i) => (
           <TouchableOpacity
             key={i}
+            activeOpacity={0.8}
             style={[
               styles.programBlock,
               {
                 left: (block.startMinute / 60) * CELL_WIDTH,
                 width: (block.duration / 60) * CELL_WIDTH,
-                backgroundColor: block.isCurrent ? '#4c1d95' : '#1c1c1e'
+                backgroundColor: block.isCurrent ? 'rgba(76, 29, 149, 0.15)' : '#1c1c1e'
               },
               block.isCurrent && styles.currentProgramBlock
             ]}
@@ -300,7 +301,7 @@ function ProgramGuideContent() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <TopNavigation 
         rightComponent={
           <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
@@ -309,7 +310,7 @@ function ProgramGuideContent() {
         }
       />
 
-      <View style={styles.genreStripContainer}>
+      <View style={[styles.genreStripContainer, { paddingTop: insets.top + 70 }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
           {GENRES.map(genre => (
             <TouchableOpacity 
@@ -375,7 +376,6 @@ function ProgramGuideContent() {
                   <Text style={styles.timeText}>{hour}:00</Text>
                 </View>
               ))}
-              <View style={[styles.currentTimeIndicator, { left: (haitiNow.hours * 60 + haitiNow.minutes) * (CELL_WIDTH / 60) }]} />
             </View>
 
             <ReanimatedFlatList
@@ -403,6 +403,14 @@ function ProgramGuideContent() {
               removeClippedSubviews={true}
             />
           </View>
+          {/* Red "now" line rendered LAST so it always paints above program blocks */}
+          <View
+            pointerEvents="none"
+            style={[
+              styles.currentTimeIndicator,
+              { left: (haitiNow.hours * 60 + haitiNow.minutes) * (CELL_WIDTH / 60) },
+            ]}
+          />
         </ScrollView>
       </View>
     </View>
@@ -449,5 +457,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  currentTimeIndicator: { position: 'absolute', top: 0, bottom: -10000, width: 2, backgroundColor: '#ef4444', zIndex: 100 },
+  currentTimeIndicator: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: '#ef4444',
+    zIndex: 999,
+    elevation: 999,
+  },
 });

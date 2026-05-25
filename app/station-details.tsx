@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
 import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
 import { useFavorites } from '../contexts/FavoritesContext';
@@ -74,6 +75,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
 });
 
 export default function StationDetailsScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const { stations, getProgramsForStation, loading, recordClick, recordProgramClick } = useData();
   const station = stations.find(s => s.id === id);
@@ -115,7 +117,15 @@ export default function StationDetailsScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+      
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroSection}>
           <Image source={logoSource} style={styles.heroBg} blurRadius={15} resizeMode="cover" />
@@ -125,14 +135,6 @@ export default function StationDetailsScreen() {
           />
           
           <View style={styles.heroContent}>
-            <View style={styles.topBar}>
-              <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                <BlurView intensity={30} tint="light" style={styles.backButtonBlur}>
-                  <Ionicons name="chevron-back" size={24} color="white" />
-                </BlurView>
-              </TouchableOpacity>
-            </View>
-
             <View style={styles.stationHeader}>
               <View style={styles.logoRing}>
                 <Image source={logoSource} style={styles.stationLogo} resizeMode="contain" />
@@ -243,21 +245,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, 
     paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 50,
     paddingBottom: 30,
-    justifyContent: 'space-between'
+    justifyContent: 'flex-end'
   },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
+  stickyHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    zIndex: 100,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   backButton: { 
     width: 44, 
     height: 44, 
-    borderRadius: 22, 
-    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.1)',
   },
   backButtonBlur: { 
     width: '100%', 

@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useIsFocused } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
@@ -104,9 +105,12 @@ export default function HomeScreen() {
   return <HomeScreenContent />;
 }
 
-function HomeScreenContent() {
+// React.memo prevents re-renders unless HomeScreenContent's own state/context
+// values actually change. Since it takes no props, React can freely bail out.
+const HomeScreenContent = React.memo(function HomeScreenContent() {
   console.log('--- RENDERING HOME SCREEN CONTENT ---');
   const insets = useSafeAreaInsets();
+  const isFocused = useIsFocused();
   const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
 
   useEffect(() => {
@@ -123,11 +127,24 @@ function HomeScreenContent() {
   const [categoriesReady, setCategoriesReady] = useState(false);
   const [extraCategoriesReady, setExtraCategoriesReady] = useState(false);
 
-  // Tiered computation: Stage 1 for the first few rows, Stage 2 for everything else
+  // Tiered computation: defer secondary category lists until after the initial
+  // render and all animations have settled. InteractionManager is the correct
+  // tool here — it avoids the forced re-renders that setTimeout causes.
   useEffect(() => {
-    const t1 = setTimeout(() => setCategoriesReady(true), 100);
-    const t2 = setTimeout(() => setExtraCategoriesReady(true), 1500); 
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Stage 1: show first-priority categories right after interactions finish
+    const task1 = InteractionManager.runAfterInteractions(() => {
+      setCategoriesReady(true);
+    });
+    // Stage 2: defer lower-priority categories by an additional 800ms
+    let task2Timer: ReturnType<typeof setTimeout>;
+    const task2 = InteractionManager.runAfterInteractions(() => {
+      task2Timer = setTimeout(() => setExtraCategoriesReady(true), 800);
+    });
+    return () => {
+      task1.cancel();
+      task2.cancel();
+      clearTimeout(task2Timer);
+    };
   }, []);
 
   const liveNow = useMemo(() => {
@@ -149,12 +166,12 @@ function HomeScreenContent() {
   }, [programs, stations]);
 
   useEffect(() => {
-    if (liveNow.length <= 1 || playerState.isPlaying || selectedHero) return;
+    if (!isFocused || liveNow.length <= 1 || playerState.isPlaying || selectedHero) return;
     const timer = setInterval(() => {
       setCurrentHeroIndex(prev => (prev + 1) % liveNow.length);
     }, HERO_ROTATION_INTERVAL);
     return () => clearInterval(timer);
-  }, [liveNow.length, playerState.isPlaying, selectedHero]);
+  }, [isFocused, liveNow.length, playerState.isPlaying, selectedHero]);
 
   useEffect(() => {
     if (!selectedHero) return;
@@ -164,11 +181,16 @@ function HomeScreenContent() {
     return () => clearTimeout(timer);
   }, [selectedHero]);
 
+  // Use the station ID (a stable string) instead of the currentStation object
+  // reference to avoid recomputing this whenever PlayerContext re-renders.
+  // We also don't depend on `programs` globally — we look up the current station's
+  // programs inline which is much cheaper.
+  const currentStationId = playerState.currentStation?.id ?? null;
   const featuredItem = useMemo(() => {
     console.log('--- COMPUTING FEATURED ITEM ---');
     if (selectedHero) return selectedHero;
-    if (playerState.currentStation) {
-      const station = stations.find(s => s.id === playerState.currentStation!.id);
+    if (currentStationId) {
+      const station = stations.find(s => s.id === currentStationId);
       const program = station ? getCurrentProgram(programs, station.id) : undefined;
       return { station, program };
     }
@@ -180,9 +202,8 @@ function HomeScreenContent() {
     // Final fallback: If no live now and no stations fetched yet, return null
     if (stations.length === 0) return { station: null, program: null };
     
-    console.log('--- COMPUTING FEATURED ITEM DONE ---');
     return { station: stations[0], program: null };
-  }, [selectedHero, liveNow, currentHeroIndex, playerState.currentStation, stations, programs]);
+  }, [selectedHero, liveNow, currentHeroIndex, currentStationId, stations]);
 
   // Only calculate these once the screen has finished its first "Hero" render
   const recentlyPlayed = useMemo(() => {
@@ -273,11 +294,11 @@ function HomeScreenContent() {
         item={item}
         onPress={() => {
           recordClick(item.id);
-          setSelectedHero({ station: item, program: getCurrentProgram(programs, item.id) });
+          router.push({ pathname: '/station-details', params: { id: item.id } });
         }}
       />
     );
-  }, [programs, recordClick]);
+  }, [recordClick, router]);
 
   const renderProgramItem = useCallback(({ item, index }: { item: any, index: number }) => {
     const station = stations.find(s => s.id === item.stationId);
@@ -287,12 +308,12 @@ function HomeScreenContent() {
         rank={index}
         onPress={() => {
           recordProgramClick(item.id);
-          setSelectedHero({ station, program: item });
+          router.push({ pathname: '/program-details', params: { id: item.id } });
         }}
         station={station}
       />
     );
-  }, [stations, recordProgramClick]);
+  }, [stations, recordProgramClick, router]);
 
   const navigateToDetails = useCallback(() => {
     const { station, program } = featuredItem;
@@ -318,13 +339,13 @@ function HomeScreenContent() {
 
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <TopNavigation />
       
       <ScrollView 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
       >
         {featuredItem?.station && (
           <TouchableOpacity 
@@ -547,7 +568,7 @@ function HomeScreenContent() {
       </ScrollView>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

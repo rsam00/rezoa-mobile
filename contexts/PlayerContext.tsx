@@ -1,5 +1,13 @@
-import { setAudioModeAsync, useAudioPlayerStatus } from 'expo-audio';
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import TrackPlayer, { 
+  AppKilledPlaybackBehavior, 
+  Capability, 
+  State, 
+  usePlaybackState, 
+  useTrackPlayerEvents, 
+  Event, 
+  Track 
+} from 'react-native-track-player';
 import { useHistory } from './HistoryContext';
 
 interface PlayerState {
@@ -23,153 +31,138 @@ const PlayerContext = createContext<PlayerContextType>({
   stop: async () => {},
 });
 
-const PlayerStatusListener = React.memo(({ player, onStatusChange }: { player: any, onStatusChange: (status: any) => void }) => {
-  const status = useAudioPlayerStatus(player);
-  useEffect(() => {
-    onStatusChange(status);
-  }, [status, onStatusChange]);
-  return null;
-});
-
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToHistory } = useHistory();
   const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [player, setPlayerState] = useState<AudioPlayer | null>(null);
-  const loadingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isSetup, setIsSetup] = useState(false);
   
-  const [status, setStatus] = useState({
-    isLoaded: false,
-    playing: false,
-    currentTime: 0,
-    duration: 0,
-    playbackState: 'stopped',
-    timeControlStatus: 'paused',
-    reasonForWaitingToPlay: '',
-    mute: false,
-    loop: false,
-    didJustFinish: false,
-    isBuffering: false,
-    playbackRate: 1,
-    shouldCorrectPitch: false
-  });
-
-  const handleStatusChange = useCallback((newStatus: any) => {
-    setStatus(newStatus);
-  }, []);
+  const playbackState = usePlaybackState();
 
   useEffect(() => {
-    if (player) {
-      player.volume = 1.0;
+    setupPlayer();
+  }, []);
+
+  const setupPlayer = async () => {
+    try {
+      await TrackPlayer.setupPlayer();
+      await TrackPlayer.updateOptions({
+        android: {
+          appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+        },
+        capabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+        ],
+        compactCapabilities: [
+          Capability.Play,
+          Capability.Pause,
+          Capability.Stop,
+        ],
+      });
+      setIsSetup(true);
+    } catch (e) {
+      console.log('TrackPlayer setup error (may already be setup):', e);
+      setIsSetup(true);
     }
-  }, [player]);
+  };
 
-  let audioModeConfigured = false;
+  useTrackPlayerEvents([Event.PlaybackError], (event) => {
+    console.error('TrackPlayer error:', event);
+    setError('Failed to play station. Please try again.');
+  });
 
-  const playStation = async (station: { id: string; name: string; streamUrl: string }) => {
+  const playStation = useCallback(async (station: { id: string; name: string; streamUrl: string }) => {
+    if (!isSetup) await setupPlayer();
+    
     console.log('[Player] Playing station:', station.name);
     try {
-      if (!audioModeConfigured) {
-        await setAudioModeAsync({
-          playsInSilentMode: true,
-          shouldPlayInBackground: true,
-          interruptionMode: 'doNotMix',
-          interruptionModeAndroid: 'doNotMix',
-        }).catch(err => console.log('Error setting audio mode:', err));
-        audioModeConfigured = true;
-      }
-
       setError(null);
-      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
 
-      // 1. Non-blocking history update
+      // Non-blocking history update
       addToHistory(station.id).catch(err => console.error('[Player] History error:', err));
 
-      let currentPlayer = player;
-
-      // 2. If it's already the current station, toggle play/pause
-      if (currentStation?.id === station.id && currentPlayer) {
-        if (status.playing) {
+      // If it's already the current station, toggle play/pause
+      if (currentStation?.id === station.id) {
+        // TrackPlayer 4.0+ playbackState is an object: { state: State }
+        // We will just call play() if it's paused
+        const state = (playbackState as any)?.state || playbackState;
+        if (state === State.Playing) {
           console.log('[Player] Pausing current station');
-          currentPlayer.pause();
+          await TrackPlayer.pause();
         } else {
           console.log('[Player] Resuming current station');
-          currentPlayer.play();
+          await TrackPlayer.play();
         }
         return;
       }
 
-      // 3. New station logic
+      // New station logic
       console.log('[Player] Switching to new station:', station.streamUrl);
       setCurrentStation(station);
       
-      if (!currentPlayer) {
-        import('expo-audio').then(({ createAudioPlayer }) => {
-          const newPlayer = createAudioPlayer(station.streamUrl);
-          setPlayerState(newPlayer);
-          newPlayer.play();
-        });
-      } else {
-        currentPlayer.pause();
-        currentPlayer.replace({ uri: station.streamUrl });
-        currentPlayer.play();
-      }
+      const track: Track = {
+        id: station.id,
+        url: station.streamUrl,
+        title: station.name,
+        artist: 'Rezoa Radio',
+        artwork: 'https://via.placeholder.com/150', // Replace with actual logo if available
+      };
 
-      // Start a 15-second timeout for loading
-      loadingTimeoutRef.current = setTimeout(() => {
-        if (player && !player.playing && !player.isBuffering) {
-          setError('Station is currently unreachable. Please try another.');
-          console.warn('[Player] Loading timeout reached');
-          stop();
-        }
-      }, 15000);
+      await TrackPlayer.reset();
+      await TrackPlayer.add([track]);
+      await TrackPlayer.play();
+      
     } catch (err) {
       setError('Failed to play station. Please try again.');
       console.error('[Player] Playback error:', err);
     }
-  };
+  }, [isSetup, currentStation?.id, playbackState, addToHistory]);
 
-  const pause = async () => {
+  const pause = useCallback(async () => {
     console.log('[Player] Pause called');
     try {
-      if (player) player.pause();
+      await TrackPlayer.pause();
     } catch (err) {
       console.error('[Player] Pause error:', err);
     }
-  };
+  }, []);
 
-  const stop = async () => {
+  const stop = useCallback(async () => {
     console.log('[Player] Stop called');
     try {
-      if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
-      if (player) player.pause();
+      await TrackPlayer.stop();
     } catch (err) {
       console.error('[Player] Stop error:', err);
     } finally {
       setCurrentStation(null);
       setError(null);
     }
-  };
+  }, []);
 
-  // Clear timeout when playback starts
-  useEffect(() => {
-    if (status.playing && loadingTimeoutRef.current) {
-      clearTimeout(loadingTimeoutRef.current);
-      loadingTimeoutRef.current = null;
-      console.log('[Player] Playback started, cleared timeout');
-    }
-  }, [status.playing]);
+  // Compute playing/loading booleans efficiently
+  // TrackPlayer 4.0+ returns an object with state from usePlaybackState
+  const currentState = (playbackState as any)?.state || playbackState;
+  
+  const isPlaying = currentState === State.Playing;
+  const isLoading = currentState === State.Loading || currentState === State.Buffering;
 
-  const playerState: PlayerState = {
-    isPlaying: status.playing,
-    isLoading: (status.isBuffering && !status.playing) || (currentStation !== null && !status.isLoaded && !status.playing),
+  // Memoize playerState so consumers only re-render when a value they care about actually changes
+  const playerState = useMemo<PlayerState>(() => ({
+    isPlaying,
+    isLoading,
     currentStation,
-    error: error,
-  };
+    error,
+  }), [isPlaying, isLoading, currentStation, error]);
+
+  // Memoize the context value object itself
+  const contextValue = useMemo(() => ({ playerState, playStation, pause, stop }),
+    [playerState, playStation, pause, stop]
+  );
 
   return (
-    <PlayerContext.Provider value={{ playerState, playStation, pause, stop }}>
-      {player && <PlayerStatusListener player={player} onStatusChange={handleStatusChange} />}
+    <PlayerContext.Provider value={contextValue}>
       {children}
     </PlayerContext.Provider>
   );
@@ -188,4 +181,3 @@ export const usePlayer = () => {
   }
   return context;
 };
- 

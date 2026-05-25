@@ -166,22 +166,24 @@ function ExploreScreenContent() {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       <TopNavigation />
-      <View style={styles.searchBarContainer}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Find your sound..."
-          placeholderTextColor="#a1a1aa"
-          value={search}
-          onChangeText={setSearch}
-          autoCorrect={false}
-          autoCapitalize="none"
-          clearButtonMode="while-editing"
-        />
-        <Ionicons name="search" size={20} color="#a78bfa" style={styles.searchIcon} />
-      </View>
       <FlatList
+        ListHeaderComponent={(
+          <View style={[styles.searchBarContainer, { paddingTop: insets.top + 70 }]}>
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Find your sound..."
+              placeholderTextColor="#a1a1aa"
+              value={search}
+              onChangeText={setSearch}
+              autoCorrect={false}
+              autoCapitalize="none"
+              clearButtonMode="while-editing"
+            />
+            <Ionicons name="search" size={20} color="#a78bfa" style={styles.searchIcon} />
+          </View>
+        )}
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}

@@ -1,5 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -12,12 +14,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function ContributeProgramScreen() {
+  const insets = useSafeAreaInsets();
   const { stationId } = useLocalSearchParams();
   const { stations } = useData();
   const station = stations.find((s) => s.id === stationId);
@@ -85,15 +89,16 @@ export default function ContributeProgramScreen() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
       <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>✕</Text>
+      
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Program</Text>
-        <View style={{ width: 32 }} />
       </View>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.stationBanner}>
              <Text style={styles.contributingTo}>CONTRIBUTING TO</Text>
@@ -160,11 +165,23 @@ export default function ContributeProgramScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingHorizontal: 20, paddingBottom: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
-  closeButton: { width: 32, height: 32, justifyContent: 'center' },
-  closeButtonText: { color: '#fff', fontSize: 20, fontWeight: '300' },
-  headerTitle: { color: '#fff', fontSize: 17, fontWeight: '700' },
-  scrollContent: { padding: 20, paddingBottom: 60 },
+  stickyHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    zIndex: 100,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: { padding: 20, paddingTop: 100, paddingBottom: 140 },
   stationBanner: { marginBottom: 30, alignItems: 'center' },
   contributingTo: { color: '#a1a1aa', fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 4 },
   stationName: { color: '#fff', fontSize: 24, fontWeight: '900' },
