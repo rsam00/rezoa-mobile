@@ -54,7 +54,12 @@ export default function RootLayout() {
           console.log('Mobile Ads Initialized', adapterStatuses);
         });
     }, 3000);
-      
+
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync('rgba(0,0,0,0.7)');
+      NavigationBar.setButtonStyleAsync('light');
+      NavigationBar.setPositionAsync('absolute');
+    }
   }, []);
   
   if (!loaded) {

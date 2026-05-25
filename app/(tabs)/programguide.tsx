@@ -25,7 +25,10 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
   useAnimatedStyle,
-  withTiming
+  withTiming,
+  withRepeat,
+  withSequence,
+  withDelay
 } from 'react-native-reanimated';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
@@ -110,6 +113,30 @@ function getBlocksForDay(programs: Program[], dayName: string) {
 
 const GENRES = ['All', 'News', 'Music', 'Gospel', 'Sports', 'Talk', 'Culture'];
 type FilterType = 'Country' | 'Department' | 'City' | 'Genre' | null;
+
+function AnimatedEqualizer() {
+  const bar1 = useSharedValue(4);
+  const bar2 = useSharedValue(4);
+  const bar3 = useSharedValue(4);
+
+  useEffect(() => {
+    bar1.value = withRepeat(withSequence(withTiming(12, { duration: 400 }), withTiming(4, { duration: 400 })), -1, true);
+    bar2.value = withDelay(200, withRepeat(withSequence(withTiming(14, { duration: 350 }), withTiming(4, { duration: 350 })), -1, true));
+    bar3.value = withDelay(400, withRepeat(withSequence(withTiming(10, { duration: 300 }), withTiming(4, { duration: 300 })), -1, true));
+  }, []);
+
+  const style1 = useAnimatedStyle(() => ({ height: bar1.value }));
+  const style2 = useAnimatedStyle(() => ({ height: bar2.value }));
+  const style3 = useAnimatedStyle(() => ({ height: bar3.value }));
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 14, marginTop: 4 }}>
+      <Animated.View style={[{ width: 3, backgroundColor: '#a78bfa', borderRadius: 2 }, style1]} />
+      <Animated.View style={[{ width: 3, backgroundColor: '#a78bfa', borderRadius: 2 }, style2]} />
+      <Animated.View style={[{ width: 3, backgroundColor: '#a78bfa', borderRadius: 2 }, style3]} />
+    </View>
+  );
+}
 
 export default function ProgramGuideScreen() {
   return <ProgramGuideContent />;
@@ -346,21 +373,35 @@ function ProgramGuideContent() {
     },
   });
 
-  const LogoColumnItem = React.memo(({ item }: { item: Station }) => (
-    <View style={styles.logoCell}>
-      <Pressable 
-        onPress={() => router.push({ pathname: '/station-details', params: { id: item.id } })}
-        style={({pressed}) => [styles.logoContainer, pressed && { opacity: 0.7 }]}
-      >
-        <Image 
-          source={item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/favicon.png')} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Text style={styles.stationNameMini} numberOfLines={1}>{item.name}</Text>
-      </Pressable>
-    </View>
-  ));
+  const renderLogoColumnItem = React.useCallback(({ item }: any) => {
+    if (item.isAd) {
+      return (
+        <View style={{ height: STATION_ROW_HEIGHT, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: '#555', fontSize: 8, fontWeight: '900' }}>SPONSORED</Text>
+        </View>
+      );
+    }
+    const isPlaying = playerState.isPlaying && playerState.currentStation?.id === item.id;
+    return (
+      <View style={[styles.logoCell, isPlaying && { backgroundColor: 'rgba(167, 139, 250, 0.05)' }]}>
+        <Pressable 
+          onPress={() => router.push({ pathname: '/station-details', params: { id: item.id } })}
+          style={({pressed}) => [styles.logoContainer, pressed && { opacity: 0.7 }]}
+        >
+          <Image 
+            source={item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/favicon.png')} 
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          {isPlaying ? (
+            <AnimatedEqualizer />
+          ) : (
+            <Text style={styles.stationNameMini} numberOfLines={1}>{item.name}</Text>
+          )}
+        </Pressable>
+      </View>
+    );
+  }, [playerState.isPlaying, playerState.currentStation?.id, router]);
 
   const ProgramRow = React.memo(({ station }: { station: Station }) => {
     const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][selectedDay];
@@ -426,14 +467,7 @@ function ProgramGuideContent() {
 
   return (
     <View style={styles.container}>
-      <TopNavigation 
-        rightComponent={
-          <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
-            <Animated.View style={[styles.liveDot, liveDotStyle]} />
-            <Text style={styles.liveNowText}>LIVE</Text>
-          </TouchableOpacity>
-        }
-      />
+      <TopNavigation />
 
       <View style={[styles.genreStripContainer, { paddingTop: insets.top + 70 }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
@@ -463,8 +497,8 @@ function ProgramGuideContent() {
         </ScrollView>
       </View>
 
-      <View style={styles.dayStripContainer}>
-        <ScrollView ref={dayScrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dayStrip}>
+      <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15 }]}>
+        <ScrollView ref={dayScrollRef} horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={styles.dayStrip}>
           {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, i) => (
             <TouchableOpacity 
               key={day} 
@@ -475,6 +509,10 @@ function ProgramGuideContent() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
+          <Animated.View style={[styles.liveDot, liveDotStyle]} />
+          <Text style={styles.liveNowText}>LIVE</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -484,11 +522,7 @@ function ProgramGuideContent() {
             ref={leftRef}
             data={guideData}
             keyExtractor={(item: any) => item.id}
-            renderItem={({ item }: any) => item.isAd ? (
-              <View style={{ height: STATION_ROW_HEIGHT, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ color: '#555', fontSize: 8, fontWeight: '900' }}>SPONSORED</Text>
-              </View>
-            ) : <LogoColumnItem item={item} />}
+            renderItem={renderLogoColumnItem}
             contentContainerStyle={{ paddingBottom: 100 }}
             showsVerticalScrollIndicator={false}
             scrollEventThrottle={16}

@@ -178,10 +178,9 @@ export default function StationDetailsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.favButtonCircle}
+                style={{ padding: 4 }}
                 onPress={() => toggleFavorite(station.id)}
               >
-                <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
                 <Ionicons 
                   name={favorites.includes(station.id) ? "heart" : "heart-outline"} 
                   size={24} 

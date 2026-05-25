@@ -426,7 +426,6 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                     if (featuredItem.station) toggleFavorite(featuredItem.station.id);
                   }}
                 >
-                  <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
                   <Ionicons 
                     name={featuredItem.station && favorites.includes(featuredItem.station.id) ? 'heart' : 'heart-outline'} 
                     size={24} 
@@ -668,13 +667,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   favoriteButtonHero: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 4,
   },
   favoriteButtonTextHero: {
     color: '#fff',

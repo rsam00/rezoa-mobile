@@ -239,14 +239,9 @@ const styles = StyleSheet.create({
   },
   floatingHeart: {
     position: 'absolute',
-    top: 6,
-    right: 6,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    top: 10,
+    right: 10,
+    padding: 4,
   },
   floatingPlay: {
     position: 'absolute',

@@ -9,6 +9,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import Animated, {
@@ -46,7 +47,6 @@ export default function Sidebar() {
 
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    pointerEvents: isOpen ? 'auto' : 'none',
   }));
 
   const handleNav = (path: any) => {
@@ -67,8 +67,10 @@ export default function Sidebar() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
       {isOpen && (
-        <Animated.View style={[styles.backdrop, backdropStyle]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={closeDrawer} />
+        <Animated.View style={[styles.backdrop, backdropStyle]} pointerEvents={isOpen ? 'auto' : 'none'}>
+          <TouchableWithoutFeedback onPress={closeDrawer}>
+            <View style={StyleSheet.absoluteFill} />
+          </TouchableWithoutFeedback>
         </Animated.View>
       )}
 
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.7)',
     zIndex: 1000,
+    elevation: 10,
   },
   container: {
     position: 'absolute',
