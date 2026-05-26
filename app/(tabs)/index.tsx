@@ -28,7 +28,7 @@ const CarouselCard = React.memo(function CarouselCard({ item, onPress }: { item:
     if (typeof uri !== 'string' || uri.trim() === '' || uri === 'null' || uri === 'undefined') return null;
     return uri.startsWith('http') ? uri : `https:${uri}`;
   };
-  
+
   const safeLogo = getSafeUri(item.logo);
 
   return (
@@ -55,7 +55,7 @@ interface ProgramCardProps {
 
 const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, rank }: ProgramCardProps) {
   const [imgError, setImgError] = React.useState(false);
-  
+
   const getSafeUri = (uri: any) => {
     if (typeof uri !== 'string' || uri.trim() === '' || uri === 'null' || uri === 'undefined') return null;
     return uri.startsWith('http') ? uri : `https:${uri}`;
@@ -63,7 +63,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
 
   const safeStationLogo = getSafeUri(station?.logo);
   const safePoster = getSafeUri(item.poster);
-  
+
   const fallbackSource = safeStationLogo ? { uri: safeStationLogo } : require('../../assets/images/favicon.png');
 
   return (
@@ -90,7 +90,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     // Hide native splash screen once the JS Home Screen mounts/renders
-    SplashScreen.hideAsync().catch(() => {});
+    SplashScreen.hideAsync().catch(() => { });
   }, []);
 
   if (!isReady) {
@@ -123,7 +123,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [selectedHero, setSelectedHero] = useState<any>(null);
-  
+
   const [categoriesReady, setCategoriesReady] = useState(false);
   const [extraCategoriesReady, setExtraCategoriesReady] = useState(false);
 
@@ -194,14 +194,14 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
       const program = station ? getCurrentProgram(programs, station.id) : undefined;
       return { station, program };
     }
-    
+
     // Safety check: ensure the index is still valid for the current liveNow array
     const safeIndex = currentHeroIndex >= liveNow.length ? 0 : currentHeroIndex;
     if (liveNow.length > 0) return liveNow[safeIndex];
-    
+
     // Final fallback: If no live now and no stations fetched yet, return null
     if (stations.length === 0) return { station: null, program: null };
-    
+
     return { station: stations[0], program: null };
   }, [selectedHero, liveNow, currentHeroIndex, currentStationId, stations]);
 
@@ -230,10 +230,10 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
     return stations.filter(s => {
       const desc = typeof s.description === 'string' ? s.description.toLowerCase() : '';
       const name = typeof s.name === 'string' ? s.name.toLowerCase() : '';
-      return desc.includes('christian') || 
-             desc.includes('evangelique') ||
-             name.includes('radio 4veh') ||
-             name.includes('lumiere');
+      return desc.includes('christian') ||
+        desc.includes('evangelique') ||
+        name.includes('radio 4veh') ||
+        name.includes('lumiere');
     }).slice(0, 15);
   }, [stations, extraCategoriesReady]);
 
@@ -248,7 +248,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
   const justAdded = useMemo(() => {
     if (!extraCategoriesReady) return [];
-    return [...stations].sort((a, b) => 
+    return [...stations].sort((a, b) =>
       new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
     ).slice(0, 15);
   }, [stations, extraCategoriesReady]);
@@ -266,8 +266,8 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
       filtered = stations.filter(s => typeof s.description === 'string' && s.description.toLowerCase().includes('entertainment')).slice(0, 10);
     } else if (hours >= 23 || hours < 6) {
       title = "Late Night Radio";
-      filtered = stations.filter(s => 
-        (typeof s.description === 'string' && s.description.toLowerCase().includes('smooth')) || 
+      filtered = stations.filter(s =>
+        (typeof s.description === 'string' && s.description.toLowerCase().includes('smooth')) ||
         (Array.isArray(s.tag) && s.tag.some(t => typeof t === 'string' && t.toLowerCase().includes('chill')))
       ).slice(0, 10);
     }
@@ -276,14 +276,14 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
   const popular = useMemo(() => {
     if (!extraCategoriesReady) return [];
-    return [...stations].sort((a, b) => 
+    return [...stations].sort((a, b) =>
       (b.favoriteCount || 0) - (a.favoriteCount || 0)
     ).slice(0, 15);
   }, [stations, extraCategoriesReady]);
 
   const trendingShows = useMemo(() => {
     if (!extraCategoriesReady) return [];
-    return [...programs].sort((a, b) => 
+    return [...programs].sort((a, b) =>
       (b.clickCount || 0) - (a.clickCount || 0)
     ).slice(0, 15);
   }, [programs, extraCategoriesReady]);
@@ -341,25 +341,25 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
   return (
     <View style={styles.container}>
       <TopNavigation />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
       >
         {featuredItem?.station && (
-          <TouchableOpacity 
-            style={styles.heroContainer} 
+          <TouchableOpacity
+            style={styles.heroContainer}
             onPress={navigateToDetails}
             activeOpacity={0.9}
           >
             <Image
               source={
                 (featuredItem.program?.poster && featuredItem.program.poster.trim() !== '')
-                  ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` } 
-                  : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== '' 
-                      ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } 
-                      : require('../../assets/images/favicon.png'))
+                  ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` }
+                  : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== ''
+                    ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` }
+                    : require('../../assets/images/favicon.png'))
               }
               style={styles.heroImage}
               resizeMode="cover"
@@ -370,10 +370,10 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
               <Image
                 source={
                   (featuredItem.program?.poster && featuredItem.program.poster.trim() !== '')
-                    ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` } 
-                    : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== '' 
-                        ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` } 
-                        : require('../../assets/images/favicon.png'))
+                    ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` }
+                    : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== ''
+                      ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` }
+                      : require('../../assets/images/favicon.png'))
                 }
                 style={styles.heroImageForeground}
                 resizeMode="contain"
@@ -381,7 +381,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
             </View>
 
             <View style={[styles.heroGradient, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
-            
+
             <View style={styles.heroContent}>
               <Text style={styles.heroTitle} numberOfLines={2}>
                 {featuredItem.program ? featuredItem.program.name : (featuredItem.station?.name || 'Unknown')}
@@ -393,10 +393,10 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   </Text>
                 </View>
                 <Text style={styles.heroMeta}>
-                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : (featuredItem.station?.city ? `${featuredItem.station.city}${featuredItem.station?.department ? `, ${featuredItem.station.department}` : ''}${featuredItem.station?.country ? `, ${featuredItem.station.country}` : ''}` : 'Haiti')}
+                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : ([featuredItem.station?.city, featuredItem.station?.department, featuredItem.station?.country].filter(Boolean).join(', ') || 'Haiti')}
                 </Text>
               </View>
-              
+
               <View style={styles.heroActions}>
                 <TouchableOpacity
                   style={styles.playButtonMain}
@@ -411,25 +411,25 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                     {Boolean(playerState.isPlaying && playerState.currentStation && featuredItem.station && playerState.currentStation.id === featuredItem.station.id) ? '⏸ PAUSE' : '▶️ LISTEN LIVE'}
                   </Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={styles.infoButton} 
+
+                <TouchableOpacity
+                  style={styles.infoButton}
                   onPress={navigateToDetails}
                 >
                   <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
                   <Text style={styles.infoButtonText}>ⓘ MORE INFO</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity 
-                  style={styles.favoriteButtonHero} 
+                <TouchableOpacity
+                  style={styles.favoriteButtonHero}
                   onPress={() => {
                     if (featuredItem.station) toggleFavorite(featuredItem.station.id);
                   }}
                 >
-                  <Ionicons 
-                    name={featuredItem.station && favorites.includes(featuredItem.station.id) ? 'heart' : 'heart-outline'} 
-                    size={24} 
-                    color={featuredItem.station && favorites.includes(featuredItem.station.id) ? '#ef4444' : '#fff'} 
+                  <Ionicons
+                    name={featuredItem.station && favorites.includes(featuredItem.station.id) ? 'heart' : 'heart-outline'}
+                    size={24}
+                    color={featuredItem.station && favorites.includes(featuredItem.station.id) ? '#ef4444' : '#fff'}
                   />
                 </TouchableOpacity>
               </View>

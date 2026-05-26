@@ -30,10 +30,10 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
           resizeMode="contain"
           onError={() => setImgError(true)}
         />
-        
+
         {/* Favorite Button (Top Right) */}
-        <TouchableOpacity 
-          style={styles.floatingHeart} 
+        <TouchableOpacity
+          style={styles.floatingHeart}
           onPress={onToggleFavorite}
           activeOpacity={0.7}
         >
@@ -41,7 +41,7 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
         </TouchableOpacity>
 
         {/* Play Button Overlay (Bottom Right of Image) */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.floatingPlay}
           onPress={onPlayPause}
           disabled={isLoading}
@@ -49,14 +49,14 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
           {isLoading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-             <Ionicons name={isStationPlaying ? "pause" : "play"} size={16} color="#fff" style={{ marginLeft: isStationPlaying ? 0 : 2 }} />
+            <Ionicons name={isStationPlaying ? "pause" : "play"} size={16} color="#fff" style={{ marginLeft: isStationPlaying ? 0 : 2 }} />
           )}
         </TouchableOpacity>
       </View>
 
       <View style={styles.infoContainer}>
         <Text style={styles.cardTitle} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.cardSubtitle} numberOfLines={1}>{item.city}{item.department ? `, ${item.department}` : ''}{item.country ? `, ${item.country}` : ''}</Text>
+        <Text style={styles.cardSubtitle} numberOfLines={1}>{[item.city, item.department, item.country].filter(Boolean).join(', ')}</Text>
         {item.frequency && <Text style={styles.cardMeta}>{item.frequency}</Text>}
       </View>
     </TouchableOpacity>
@@ -89,7 +89,7 @@ function ExploreScreenContent() {
   const exploreData = useMemo(() => {
     const data: any[] = [];
     const rows: any[] = [];
-    
+
     // Group into pairs
     for (let i = 0; i < filteredStations.length; i += 2) {
       rows.push(filteredStations.slice(i, i + 2));
@@ -125,7 +125,7 @@ function ExploreScreenContent() {
           const isFavorite = favorites.includes(station.id);
           const isStationPlaying = playerState.isPlaying && playerState.currentStation?.id === station.id;
           const isLoading = playerState.isLoading && playerState.currentStation?.id === station.id;
-          
+
           const handlePlayPause = async () => {
             if (isStationPlaying) await pause();
             else await playStation(station as any);
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   imageContainer: {
-    height: CARD_WIDTH * 0.85, 
+    height: CARD_WIDTH * 0.85,
     width: '100%',
     backgroundColor: '#27272a',
     justifyContent: 'center',

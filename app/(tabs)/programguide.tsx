@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-
 import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import * as Location from 'expo-location';
 import {
   ActivityIndicator,
   FlatList,
@@ -190,34 +190,88 @@ function ProgramGuideContent() {
 
   useEffect(() => {
     if (dataLoading || stations.length === 0 || locationDetected) return;
-    
-    // Auto-detect location via IP
-    fetch('http://ip-api.com/json/')
-      .then(r => r.json())
-      .then(data => {
+
+    const detectLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+          const geocode = await Location.reverseGeocodeAsync({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude
+          });
+          
+          if (geocode && geocode.length > 0) {
+            const place = geocode[0];
+            const userCountry = place.country;
+            const userRegion = place.region;
+            const userCity = place.city;
+            
+            if (userCountry && availableCountries.includes(userCountry)) {
+              setSelectedCountry(userCountry);
+              
+              const validDepartments = new Set<string>();
+              const validCities = new Set<string>();
+              
+              stations.forEach(s => {
+                if (s.country === userCountry && s.department) validDepartments.add(s.department);
+                if (s.country === userCountry && s.department === userRegion && s.city) validCities.add(s.city);
+              });
+              
+              if (userRegion && validDepartments.has(userRegion)) {
+                setSelectedDepartment(userRegion);
+              }
+              if (userCity && validCities.has(userCity)) {
+                setSelectedCity(userCity);
+              }
+            }
+            setLocationDetected(true);
+            return; // Exit early if GPS succeeded
+          }
+        }
+      } catch (err) {
+        console.log('GPS Location failed', err);
+      }
+      
+      // Fallback to IP Location
+      try {
+        const response = await fetch('http://ip-api.com/json/');
+        const data = await response.json();
+        
         if (data.status === 'success') {
           const userCountry = data.country;
           const userRegion = data.regionName;
+          const userCity = data.city;
           
           if (availableCountries.includes(userCountry)) {
             setSelectedCountry(userCountry);
             
             const validDepartments = new Set<string>();
+            const validCities = new Set<string>();
+            
             stations.forEach(s => {
               if (s.country === userCountry && s.department) validDepartments.add(s.department);
+              if (s.country === userCountry && s.department === userRegion && s.city) validCities.add(s.city);
             });
-            if (validDepartments.has(userRegion)) {
+            
+            if (userRegion && validDepartments.has(userRegion)) {
               setSelectedDepartment(userRegion);
             }
+            if (userCity && validCities.has(userCity)) {
+              setSelectedCity(userCity);
+            }
           }
-          setLocationDetected(true);
         }
-      })
-      .catch(e => {
+      } catch (e) {
         console.log('IP Location failed', e);
-        setLocationDetected(true); // Don't try again if it fails
-      });
-  }, [dataLoading, stations.length, availableCountries, locationDetected]);
+      } finally {
+        setLocationDetected(true);
+      }
+    };
+    
+    detectLocation();
+  }, [dataLoading, stations, availableCountries, locationDetected]);
 
   const handleSelectCountry = (val: string) => {
     setSelectedCountry(val);

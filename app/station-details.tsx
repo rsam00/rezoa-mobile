@@ -14,7 +14,7 @@ import { getCurrentProgram as isLive } from '../utils/timeUtils';
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const HERO_HEIGHT = SCREEN_HEIGHT * 0.5;
 
-type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any; [key: string]: any }>;
+type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any;[key: string]: any }>;
 function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
   const scale = useRef(new Animated.Value(1)).current;
   return (
@@ -40,7 +40,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.programInfo}>
         <View style={styles.programNameRow}>
           <Text style={styles.programName} numberOfLines={1}>{item.name}</Text>
@@ -55,20 +55,20 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
             </View>
           )}
         </View>
-        
+
         {item.schedules && item.schedules[0] && (
           <Text style={styles.programTime}>
             {item.schedules[0].startTime} - {item.schedules[0].endTime}
           </Text>
         )}
-        
+
         {item.host && (
           <Text style={styles.programHost} numberOfLines={1}>
             Host: {item.host}
           </Text>
         )}
       </View>
-      
+
       <Ionicons name="chevron-forward" size={20} color="#52525b" />
     </AnimatedCard>
   );
@@ -119,7 +119,7 @@ export default function StationDetailsScreen() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-      
+
       <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
@@ -129,11 +129,11 @@ export default function StationDetailsScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.heroSection}>
           <Image source={logoSource} style={styles.heroBg} blurRadius={15} resizeMode="cover" />
-          <LinearGradient 
-            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)', 'black']} 
-            style={StyleSheet.absoluteFill} 
+          <LinearGradient
+            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)', 'black']}
+            style={StyleSheet.absoluteFill}
           />
-          
+
           <View style={styles.heroContent}>
             <View style={styles.stationHeader}>
               <View style={styles.logoRing}>
@@ -141,7 +141,7 @@ export default function StationDetailsScreen() {
               </View>
               <View style={styles.stationText}>
                 <Text style={styles.stationName}>{station.name}</Text>
-                <Text style={styles.stationMeta}>{station.city}{station.department ? `, ${station.department}` : ''}{station.country ? `, ${station.country}` : ''}</Text>
+                <Text style={styles.stationMeta}>{[station.city, station.department, station.country].filter(Boolean).join(', ')}</Text>
                 <Text style={styles.stationFrequency}>{station.frequency || 'Streaming Live'}</Text>
               </View>
             </View>
@@ -164,10 +164,10 @@ export default function StationDetailsScreen() {
                   <ActivityIndicator color={isStationPlaying ? "#fff" : "#000"} />
                 ) : (
                   <View style={styles.buttonContent}>
-                    <Ionicons 
-                      name={isStationPlaying ? "pause" : "play"} 
-                      size={20} 
-                      color={isStationPlaying ? "#fff" : "#000"} 
+                    <Ionicons
+                      name={isStationPlaying ? "pause" : "play"}
+                      size={20}
+                      color={isStationPlaying ? "#fff" : "#000"}
                       style={{ marginRight: 8 }}
                     />
                     <Text style={[styles.playButtonText, { color: isStationPlaying ? "#fff" : "#000" }]}>
@@ -181,10 +181,10 @@ export default function StationDetailsScreen() {
                 style={{ padding: 4 }}
                 onPress={() => toggleFavorite(station.id)}
               >
-                <Ionicons 
-                  name={favorites.includes(station.id) ? "heart" : "heart-outline"} 
-                  size={24} 
-                  color={favorites.includes(station.id) ? "#ef4444" : "white"} 
+                <Ionicons
+                  name={favorites.includes(station.id) ? "heart" : "heart-outline"}
+                  size={24}
+                  color={favorites.includes(station.id) ? "#ef4444" : "white"}
                 />
               </TouchableOpacity>
             </View>
@@ -200,7 +200,7 @@ export default function StationDetailsScreen() {
             ))}
           </View>
 
-          <Text style={styles.description}>{station.description || 'Welcome to ' + station.name + '. Streaming live from ' + (station.city ? `${station.city}${station.department ? `, ${station.department}` : ''}${station.country ? `, ${station.country}` : ''}` : 'Haiti') + '.'}</Text>
+          <Text style={styles.description}>{station.description || 'Welcome to ' + station.name + '. Streaming live from ' + ([station.city, station.department, station.country].filter(Boolean).join(', ') || 'Haiti') + '.'}</Text>
 
           <View style={styles.programSection}>
             <View style={styles.sectionHeader}>
@@ -239,9 +239,9 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 150 },
   heroSection: { height: HERO_HEIGHT, width: '100%' },
   heroBg: { ...StyleSheet.absoluteFillObject, width: '100%', height: HERO_HEIGHT },
-  heroContent: { 
-    flex: 1, 
-    paddingHorizontal: 20, 
+  heroContent: {
+    flex: 1,
+    paddingHorizontal: 20,
     paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 50,
     paddingBottom: 30,
     justifyContent: 'flex-end'
@@ -256,37 +256,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  backButton: { 
-    width: 44, 
-    height: 44, 
+  backButton: {
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backButtonBlur: { 
-    width: '100%', 
-    height: '100%', 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+  backButtonBlur: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  backButtonInline: { 
+  backButtonInline: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15, 
+    padding: 15,
     marginTop: 40,
     gap: 10
   },
   backButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  stationHeader: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
+  stationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 20,
     marginBottom: 20,
   },
-  logoRing: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 20, 
-    backgroundColor: 'rgba(255,255,255,0.08)', 
+  logoRing: {
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.08)',
     padding: 12,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
@@ -297,13 +297,13 @@ const styles = StyleSheet.create({
   stationMeta: { color: 'rgba(255,255,255,0.7)', fontSize: 16, fontWeight: '600', marginTop: 4 },
   stationFrequency: { color: '#a78bfa', fontSize: 14, fontWeight: '700', marginTop: 2 },
   heroActions: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-  mainPlayButton: { 
-    flex: 1, 
-    backgroundColor: '#fff', 
-    height: 56, 
-    borderRadius: 16, 
-    overflow: 'hidden', 
-    justifyContent: 'center', 
+  mainPlayButton: {
+    flex: 1,
+    backgroundColor: '#fff',
+    height: 56,
+    borderRadius: 16,
+    overflow: 'hidden',
+    justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#fff',
     shadowOffset: { width: 0, height: 4 },
@@ -319,21 +319,21 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   playButtonText: { fontWeight: '900', fontSize: 16, letterSpacing: 1 },
-  favButtonCircle: { 
-    width: 56, 
-    height: 56, 
-    borderRadius: 28, 
-    backgroundColor: 'rgba(255,255,255,0.1)', 
-    justifyContent: 'center', 
+  favButtonCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  detailsBody: { 
-    padding: 20, 
-    backgroundColor: 'black', 
-    borderTopLeftRadius: 30, 
+  detailsBody: {
+    padding: 20,
+    backgroundColor: 'black',
+    borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     marginTop: -30,
   },
