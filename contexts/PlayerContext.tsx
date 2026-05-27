@@ -6,10 +6,12 @@ import TrackPlayer, {
   usePlaybackState, 
   useTrackPlayerEvents, 
   Event, 
-  Track 
+  Track,
+  TrackType
 } from 'react-native-track-player';
 import { useHistory } from './HistoryContext';
 import { probeStream, StreamInfo } from '../lib/streamProbe';
+import { resolveStreamUrl } from '../lib/playlistParser';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -126,9 +128,12 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setStreamInfo(null);
       setCurrentStation(station);
 
+      const resolvedAudioUrl = await resolveStreamUrl(station.streamUrl);
+
       const track: Track = {
         id     : station.id,
-        url    : station.streamUrl,
+        url    : resolvedAudioUrl,
+        type   : resolvedAudioUrl.includes('.m3u8') ? TrackType.HLS : TrackType.Default,
         title  : station.name,
         artist : 'Rezoa Radio',
         // Use station logo if available, otherwise fall back to a placeholder

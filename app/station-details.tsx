@@ -113,7 +113,7 @@ export default function StationDetailsScreen() {
     );
   }
 
-  const logoSource = station.logo ? { uri: station.logo.startsWith('http') ? station.logo : `https:${station.logo}` } : require('../assets/images/favicon.png');
+  const logoSource = station.logo ? { uri: station.logo.startsWith('http') ? station.logo : `https:${station.logo}` } : require('../assets/images/app-icon-primary.png');
 
   return (
     <View style={styles.container}>

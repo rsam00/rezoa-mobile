@@ -101,16 +101,51 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const performNetworkFetch = useCallback(async () => {
     try {
       console.log('--- NETWORK FETCH STARTING ---');
-      const fieldsS = 'id, name, logo, stream_url, city, country, department, tags, favorite_count, click_count, created_at, description';
+      const fieldsS = 'id, name, logo, stream_url, city, country, department, tags, favorite_count, click_count, created_at, description, frequency';
       const fieldsP = 'id, name, station_id, poster, schedules, click_count, created_at';
 
-      const [{ data: sData, error: sErr }, { data: pData, error: pErr }] = await Promise.all([
-        supabase.from('stations').select(fieldsS),
-        supabase.from('programs').select(fieldsP),
-      ]);
+      const fetchAll = async (table: string, fields: string) => {
+        let allData: any[] = [];
+        let from = 0;
+        const limit = 1000;
+        let hasMore = true;
 
-      if (sErr || pErr) {
-        console.error('--- SUPABASE ERROR ---');
+        while (hasMore) {
+          const { data, error } = await supabase
+            .from(table)
+            .select(fields)
+            .range(from, from + limit - 1);
+
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            allData = allData.concat(data);
+            from += limit;
+            if (data.length < limit) {
+              hasMore = false;
+            }
+          } else {
+            hasMore = false;
+          }
+        }
+        return allData;
+      };
+
+      let sData: any[] = [];
+      let pData: any[] = [];
+      let fetchError = false;
+
+      try {
+        [sData, pData] = await Promise.all([
+          fetchAll('stations', fieldsS),
+          fetchAll('programs', fieldsP),
+        ]);
+      } catch (err) {
+        console.error('--- SUPABASE ERROR ---', err);
+        fetchError = true;
+      }
+
+      if (fetchError) {
         dispatch({ type: 'MARK_READY' });
         return;
       }

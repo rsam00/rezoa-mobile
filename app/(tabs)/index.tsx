@@ -38,7 +38,7 @@ const CarouselCard = React.memo(function CarouselCard({ item, onPress }: { item:
       activeOpacity={0.85}
     >
       <Image
-        source={safeLogo ? { uri: safeLogo } : require('../../assets/images/favicon.png')}
+        source={safeLogo ? { uri: safeLogo } : require('../../assets/images/app-icon-primary.png')}
         style={styles.thumbImage}
         resizeMode="contain"
       />
@@ -64,7 +64,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
   const safeStationLogo = getSafeUri(station?.logo);
   const safePoster = getSafeUri(item.poster);
 
-  const fallbackSource = safeStationLogo ? { uri: safeStationLogo } : require('../../assets/images/favicon.png');
+  const fallbackSource = safeStationLogo ? { uri: safeStationLogo } : require('../../assets/images/app-icon-primary.png');
 
   return (
     <TouchableOpacity
@@ -359,7 +359,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` }
                   : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== ''
                     ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` }
-                    : require('../../assets/images/favicon.png'))
+                    : require('../../assets/images/app-icon-primary.png'))
               }
               style={styles.heroImage}
               resizeMode="cover"
@@ -373,7 +373,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                     ? { uri: featuredItem.program.poster.startsWith('http') ? featuredItem.program.poster : `https:${featuredItem.program.poster}` }
                     : (featuredItem.station?.logo && featuredItem.station.logo.trim() !== ''
                       ? { uri: featuredItem.station.logo.startsWith('http') ? featuredItem.station.logo : `https:${featuredItem.station.logo}` }
-                      : require('../../assets/images/favicon.png'))
+                      : require('../../assets/images/app-icon-primary.png'))
                 }
                 style={styles.heroImageForeground}
                 resizeMode="contain"

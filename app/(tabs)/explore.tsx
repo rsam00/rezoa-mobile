@@ -25,7 +25,7 @@ const StationCard = React.memo(function StationCard({ item, isFavorite, isStatio
     >
       <View style={styles.imageContainer}>
         <Image
-          source={imgError ? require('../../assets/images/favicon.png') : (item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/favicon.png'))}
+          source={imgError ? require('../../assets/images/app-icon-primary.png') : (item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/app-icon-primary.png'))}
           style={styles.stationLogo}
           resizeMode="contain"
           onError={() => setImgError(true)}
