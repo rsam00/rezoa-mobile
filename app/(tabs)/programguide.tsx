@@ -111,7 +111,35 @@ function getBlocksForDay(programs: Program[], dayName: string) {
   return blocks;
 }
 
-const GENRES = ['All', 'News', 'Music', 'Gospel', 'Sports', 'Talk', 'Culture'];
+const GENRE_MAPPING: Record<string, string[]> = {
+  'Pop': ['pop', 'pop music', 'top 40', 'contemporary hits'],
+  'Rock': ['rock', 'hard rock', 'indie rock'],
+  'Classic Rock': ['classic rock', 'classic hits'],
+  'Alternative / Indie': ['alternative', 'alternative rock', 'indie', 'adult album alternative'],
+  'Country': ['country', 'classic country', 'americana'],
+  'Classical': ['classical', 'classical music'],
+  'Jazz & Blues': ['jazz', 'smooth jazz', 'blues'],
+  'Hip Hop & R&B': ['hip hop', 'hip-hop', 'hiphop', 'rap', 'rnb', 'r&b', 'soul', 'funk'],
+  'Electronic & Dance': ['electronic', 'electronica', 'dance', 'house', 'disco'],
+  'Chill & Ambient': ['chillout', 'ambient', 'downtempo', 'lounge'],
+  'Latin & Caribbean': ['regional mexican', 'banda', 'reggae'],
+  'Folk & Acoustic': ['folk', 'bluegrass'],
+  'World Music': ['world music'],
+  'News': ['news', 'local news', 'information'],
+  'Talk Radio': ['talk', 'talk radio', 'conservative talk', 'news talk'],
+  'Sports': ['sports', 'sport'],
+  'Public Radio': ['public radio', 'npr', 'pri', 'bbc', 'apm'],
+  'College & Community': ['community radio', 'college radio', 'university radio', 'freeform'],
+  'Christian & Gospel': ['christian', 'christian contemporary', 'gospel', 'religious'],
+  'Oldies': ['oldies'],
+  '60s': ['60s'],
+  '70s': ['70s'],
+  '80s': ['80s', "80's"],
+  '90s': ['90s'],
+  'Holiday': ['christmas music', 'christmas']
+};
+
+const GENRES = ['All', ...Object.keys(GENRE_MAPPING)];
 type FilterType = 'Country' | 'Department' | 'City' | 'Genre' | null;
 
 function AnimatedEqualizer() {
@@ -374,10 +402,16 @@ function ProgramGuideContent() {
       active = active.filter(s => s.city === selectedCity);
     }
     if (selectedGenre !== 'All') {
-      active = active.filter(s => 
-        s.tag?.includes(selectedGenre) || 
-        s.name.toLowerCase().includes(selectedGenre.toLowerCase())
-      );
+      const mappedTags = GENRE_MAPPING[selectedGenre] || [selectedGenre.toLowerCase()];
+      active = active.filter(s => {
+        if (s.name.toLowerCase().includes(selectedGenre.toLowerCase())) return true;
+        
+        if (s.tag && s.tag.length > 0) {
+          const stationTags = s.tag.map(t => t.toLowerCase());
+          return mappedTags.some(mapped => stationTags.includes(mapped) || stationTags.some(t => t.includes(mapped)));
+        }
+        return false;
+      });
     }
     return active;
   }, [stations, selectedCountry, selectedDepartment, selectedCity, selectedGenre]);

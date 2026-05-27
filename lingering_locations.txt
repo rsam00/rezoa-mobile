@@ -1,0 +1,870 @@
+Found 869 possible lingering locations.
+WALM - Old Time Radio
+Mix 96 Sacramento, CA
+WVGV Radio 89.7 FM - West Virginia Gospel Voice
+92.3 WXRK Charlottesville, VA
+Rock 94 & 1/2 - KHTQ - Spokane
+WQSV 106.3 Staunton, VA
+WABC 770 AM - NewYork, NY
+WYNK-HD2 Downtown Radio 97.7 FM - Baton Rouge, LA
+WTIX 94.3-FM New Orleans, LA
+WVAM-AM 1450, FM 98.1 & 107.9 "The True Oldies Channel" Parkersburg, WV
+WRRR-FM 93.9 "Lite Rock 93R" St. Mary's, WV
+WXCR-FM 92.3  New Martinsville, WV
+WBLW 88.1 FM - Living Word FM - Gaylord, MI
+KMGX The X 100.7 FM Bend, OR
+103.7 KISS FM - WXKJ
+WCSP 90.1 "C-SPAN Radio" Washington, DC
+WHUR-HD3 "96.3 WHBC" Howard University - Washington, DC
+WHUR-HD2 96.3 "WHUR World" Washington, DC
+WHUR 96.3 "Howard University Radio" Washington, DC
+WHUR-HD4 96.3 "DC Radio" Washington, DC
+Your Classical - Relax
+KLRE Classical 90.5 (UALR Public Radio) Little Rock, AR
+103.1 The Beat Birmingham, AL
+WUAL 91.5 Alabama Public Radio - Tuscaloosa, AL
+WGOK Gospel 900 Mobile, AL
+KMCK "The Power" 105.7 FM Prairie Grove, AR
+KUAR 89.1 (UALR Public Radio) Little Rock, AR
+KRMW "94.9 Radio Jon Deek" Cedarville, AR
+KNBA 90.3 Koahnic Broadcasting - Anchorage, AK
+KTNA-FM 88.9 Talkeetna, AK
+KTOO-FM 104.3 Juneau, AK
+KXLL 100.7 "Excellent Radio" Juneau, AK
+KCAW 104.7 "Raven Radio" Sitka, AK
+KUAC 89.9 Fairbanks, AK
+KYUK-AM 640 Bethel, AK
+KMXT-FM 100.1  Kodiak, AK
+KFSK 100.9 Petersburg, AK
+KDJF "CHET FM 93.5" Ester, AK
+KRBD 105.3 Ketchikan, AK
+KIYU-FM 88.1 "Big River Public Broadcasting" Galena, AK
+KRNN 102.7 "Rain Country Radio" Juneau, AK
+KPUB 91.7 Arizona Public Radio - Flagstaff, AZ
+KFNX 1100 News-Talk Radio - Cave Creek, AZ
+KSWG 96.3 Real Country Wickenburg, AZ
+KJZZ 91.5 Phoenix, AZ
+KDUS "NBC Sports 1060" Tempe, AZ
+KBLA 1580 Santa Monica, CA
+KUAZ 89.1 "Arizona Public Media" Tucson, AZ
+KTDT-LP "Downtown Radio" Tucson 99.1 FM Tucson, AZ
+KTUC 1400 Tucson, AZ
+KSZR 97.5 "The Vibe" Oro Valley, AZ
+KNAU 88.7 "Arizona Public Radio" Flagstaff, AZ
+KHHM "Hot 103.5" Sacramento, CA
+KHYT "K-Hit 107.5" Tucson, AZ
+KRCB 91.1 "North Bay Public Media" Windsor, CA
+KCRW 88.9 FM - Live
+KQED 88.5 San Francisco, CA
+KPOO 89.5 San Francisco, CA
+KNBR 680 AM San Francisco, CA
+KSDS "Jazz 88.3" San Diego, CA
+KOLA 99.9 Redlands, CA
+KBBF 89.1 "La Voz de Tu Communidad" Calistoga, CA
+KHHK 104.1 "The Hawk" Modesto, CA
+KMUD 91.1 Redwood Community Radio, Garberville, CA
+99.1 KISS FM - KJNY
+KJLH "Radio Free 102.3" Compton, CA
+KVNO 90.7 University of Nebraska at Omaha, NE
+KUZZ 550 & 107.9 Bakersfield, CA
+KHUM 104.7 & 104.3 Cutten, CA
+KCSS 91.9 Turlock, CA
+KMIX 100.9 "La Tricolor" Tracy, CA
+KAAD-LP 103.5 Sonora, CA
+KWBE 1450 "News Channel Nebraska" Beatrice, NE
+KRKQ - Mountain Chill
+KXKL 105.1 "Kool 105" Denver, CO
+KRZA 88.7 Alamosa, CO
+KCME 88.7 Manitou Springs, CO
+KSJD 91.5 Cortez, CO
+KAJX 91.5 - Aspen Public Radio, CO
+KVOQ 102.3 -Colorado Public Radio "OpenAir" - Denver, CO  AAC
+KVNF 90.9 Paonia, CO
+KXPK 96.5 "La Tricolor" Evergreen, CO
+KBUT 90.3 Crested Butte, CO
+WSHU 91.1 Fairfield, CT
+WNPR 90.5 Connecticut Public Radio - Meriden, CT
+WBMW 106.5 Pawcatuck, CT
+WMOS "102.3 The Wolf" Stonington, CT
+WQGN 105.5 "Q105" Groton, CT
+WMRQ 104.1 Waterbury, CT
+WDDE 91.1 Dover, DE
+WPNN 790 Pensacola, FL
+WBZE "Star 98.9" Tallahassee, FL
+WJTQ "Jet 100.7" Pensacola, FL
+WGCU 90.1 Fort Myers, FL
+WRUF - AM
+WLOV 99.5 Daytona Beach Shores, FL
+WHBX "96.1 Jamz" Tallahassee, FL
+WRFG 89.3FM Atlanta, GA
+WREK 91.1 Atlanta, GA
+WCLK 91.9 Atlanta, GA
+WWWQ 99.7 "Q100" Atlanta, GA
+WRAS 88.5 "Album 88" Atlanta, GA
+WEAS 93.1 "E 93" Springfield, GA
+WJCL 96.5 "KIX 96" Savannah, GA
+KGRA 98.9 Jefferson, IA
+KBVU 97.5 "The Edge"  Alta, IA
+KGU 760 & 95.1 Honolulu, HI
+WIBC 93.1 Indianapolis, IN
+KIZN 92.3 "Kissin' 92" Boise, ID
+KISU 91.1 Idaho State University - Pocatello, ID
+WGN 720 Chicago, IL
+WSOY-AM 1340 & 103.3 Decatur, IL
+WCRX-FM 88.1 Columbia College - Chicago, IL
+WLS-AM 890 Chicago, IL
+WVLI 92.7 "The Valley" Kankakee, IL
+WDZQ 95.1 "Q 95" Decatur, IL
+WHRU-LP 101.5 "Huntley Community Radio" Huntley, IL
+WSIE 88.7 FM Edwardsville,IL
+Super Hits WILY 1210 AM - Centralia, IL
+WSOY-FM 102.9 "Y103" Decatur, IL
+WSRB 106.3 FM Chicago's R&B - Lansing, IL
+WHCM 88.3 "Hawk Radio" - Harper College - Palatine, IL
+WXRX "The X 104.9"  Belvidere, IL
+WIIT 88.9 Illinois Institute of Technology, Chicago, IL
+WLUP 97.9 "The Loop" Chicago, IL
+WXRX-HD2 "100 FM" Belivdere, IL
+WXLW 950 "Freedom 95" Indianapolis, IN
+WBAA News On AM 920 - West Lafayette, IN
+WLPR 89.1 Lakeshore Public Radio - Lowell, IN
+93.5 MAX - WMXQ - Maximum Classic Rock
+WVPE 88.1 Elkhardt, IN
+WIBQ 1230 "The Talk Station" Terre Haute, IN
+WBCL 90.3 FM Ft. Wayne, IN
+WIKY 104.1 Evansville, IN
+WFYI 90.1 Indianapolis, IN
+WABX 107.5 Evansville, IN
+WZVN 107.1 FM - Z107 - Lowell, IN
+WMGI 100.7 "Mix FM" Terre Haute, IN
+KCEP 88.1 "Power 88" Las Vegas, NV
+KIYX 106.1 "Super Hits" Sageville, IA
+KRUI Radio 89.7 Iowa City, IA
+KMA -960 & 99.1 "KMAland" Shenandoah, IA
+KTOP-FM 102.9 "Nash Icon" St. Marys, KS
+KDVV 100.3 "V-100" Topeka, KS
+KWIC 99.3 "The Eagle" Topeka, KS
+KTOP-AM "Sports Radio 1490" Topeka, KS
+KMAJ-FM "Majic 107.7" Carbondale, KS
+WFMB-FM 104.5 Springfield, IL
+WFPL 89.3 News Louisville, KY
+WHVE - The Wave 92.7 - Russell Springs, KY
+WSTO 96.1 "Hot 96"  Owensboro, KY
+ARTxFM WXOX 97.1 Louisville, KY
+WUOL 90.5 Classical Louisville, KY
+WNOP 740 Sacred Heart Radio - Newport, KY
+WHHT "Nash Icon 103.7" Cave City, KY
+WKYU 88.9 "WKU Public Radio" Bowling Green, KY
+WFPK 91.9 Independent Louisville, KY
+WWOZ 90.7 New Orleans, LA
+WWNO 89.9 University of New Orleans, LA
+WYLK "The Lake 94.7"  - Lacombe, LA
+WRKN "Alt 92.3" LaPlace, LA
+KRMD-FM "Country 101.1" Oil City, LA
+WBSP-FM 90.1 - Maine Public Radio
+WNSX "Star 97.7" Winter Harbor, ME
+WHOU 100.1 - The Best - Classic Hits Radio
+WMEA 90.1Maine Public Public Broadcasting - Portland, ME
+WUOM 91.7 "Michigan Radio" - Ann Arbor, MI
+WHTC 1450 & 99.7 "Real News Now" Holland, MI
+WOLV 97.7 "The Wolf" Houghton, MI
+WJR 760 Detroit, MI
+WTMD 89.7 Towson University, MD
+WSDL 90.7 Delmarva Public Radio "Rhythm & News" - Ocean City, MD
+WESM 91.3 Princess Anne, MD
+WHFC 91.1 Hartford Community College - Bel Air, MD
+WSCL 89.5 Delmarva Public Radio "Fine Arts & Culture" - Salisbury, MD
+WJEJ 1240 Hagerstown, MD
+WSMD "Star 98.3" Mechanicsville, MD
+WEAA 88.9 Morgan State University - Baltimore, MD
+KNOW 91.1 Minnesota Public Radio News - Minneapolis-St. Paul, MN
+WHRB 95.3 - Harvard Radio Broadcasting - Cambridge, MA
+WXRV "92.5 The River" Andover, MA
+WMBR 88.1 - Cambridge, MA
+WJJW 91.1 Massachusetts College of Liberal Arts - North Adams, MA
+WGCS 91.1 "The Globe" Goshen, IN
+WFCR 88.5 New England Public Radio - Amherst, MA
+WVVY-LP 96.7 Tisbury, MA
+WMFO 91.5 Tufts University - Medford, MA
+WCTK 98.1 "Cat Country" New Bedford, MA
+WXLO "104.5 XLO" Fitchburg, MA
+WORC-FM "Nash Icon 98.9" Webster, MA
+99.5 WCRB - Bach Channel
+WWFX 100.1 "The Pike 100" Southbridge, MA
+WUNH 91.3 University of New Hampshire - Durham, NH
+WJXQ 106.1 "Q 106" Charlotte, MI
+WKAR AM 870 NewsTalk - East Lansing, MI
+WYVN "VAN 92.7" Saugatuck, MI
+WKUF-LP 94.3 Kettering University - Flint, MI
+WJKN 1510 Good Shepherd Catholic Radio - Jackson, MI
+WKAR 90.5 East Lansing, MI
+WKZO 590 & 106.9 Kalamazoo, MI
+WVBI-LP 100.1 Beaver Island, MI
+KXXR 93.7 "93X" Minneapolis, MN
+Bob 95 FM - Fargo
+KQRS 92.1 Golden Valley, MN
+KDAL "My 95.7" Duluth, MN
+KMOJ 89.9 Minneapolis, MN
+KGLT 91.9 "Montana State University" Bozeman, MT
+KMMS "The Moose" 95.1 FM Bozeman, MT
+KLMB 88.1 Roundup  Community Radio, MT
+KXEI "Your Network of Praise" 95.1 FM Havre, MT
+KUFM 89.1 "Montana Public Radio" Missoula, MT
+KSMU 90.1 "Ozarks Public Radio" Springfield, MO
+KKFI 90.1 Kansas City, MO
+WWFM 89.1 "The Classical Network" Trenton, NJ
+WMSC 90.3 Montclair University - Upper Montclair, NJ
+WPRB 103.3 FM - Princeton, NJ
+KENW 89.5 Portales, NM
+WFAE 90.7 Charlotte, NC
+WCBE 90.5 Columbus, OH
+KANW 89.1 Albuquerque, NM
+KUNM 89.9 "New Mexico Public Radio" Albuquerque, NM
+WKTU "KTU 103.5 The Beat of New York" - Lake Success, NY
+WPTY "Party 105.3" Calverton-Roanoke, NY
+WVKR 91.3 Vassar College - Poughkeepsie, NY
+WLVL 1340 & & 105.3 Lockport, NY
+WAER 88.3 Syracuse, NY
+WSKO "The Score 1260" Syracuse, NY
+WPNR 90.7 "Utica College Pioneer Radio" Utica, NY
+WAQX 95.7 "95X" Manlius, NY
+WEXT "Exit 97.7" Amsterdam, NY
+WNIR 100.1 Kent, OH
+WIZS 1450 Henderson, NC
+WKXS 94.5 "The Hawk" Leland, NC
+WMNX "Coast 97.3" Wilmington, NC
+WGNI "102.7 GNI" Wilmington, NC
+WWQQ 101.3 Wilmington, NC
+WQQO-HD2 "Talk 100.7 Radio" Sylvania, OH
+WKKY 104.7 Geneva, OH
+WOUB-FM 91.3 Athens, OH
+WOUB-AM 1340 Athens, OH
+WCPN 90.3 "Ideastream" Cleveland, OH
+WAPS 91.3 "The Summit" Akron, OH
+WYSO 91.3 Yellow Springs, OH
+WEGE 104.9 "The Eagle" Lima, OH
+WBBW "Sports Radio 1240" Youngstown, OH
+WQXK 105.1 "K 105" Salem, OH
+WFGF 92.1 "The Frog"  Wapakoneta, OH
+WKKO 99.9 "K 100" Toledo, OH
+WMKV 89.3 FM Reading, OH
+WDOH "Fun 107.1" Delphos, OH
+WRQN 93.5 Bowling Green, OH
+KADA "Cool 99.3" Ada, OK
+KBOO 90.7 Portland, OR
+KOPB 91.5 Oregon Public Broadcasting - Portland, OR
+KWRL 102.3 "The River" La Grande, OR
+KWVA 88.1 University of Oregon - Eugene, OR
+KNRQ "Alternative 103.7" Eugene, OR
+KRVM 91.9 Eugene, OR
+KUMA 92.1 "Party FM" Pilot Rock, OR
+KKKJ "Jammin" 105.5 FM Merrill, OR
+WHYY 90.9  Philadelphia, PA
+WSBA "News Talk 93.9 & 910" York, PA
+WPSU 91.5 Penn State University - State College, PA
+WVIA 89.9 Scranton, PA
+WSJR "Nash FM 93.7" Dallas, PA
+WWRR 104.9 "105 The River" Scranton, PA
+WITF 89.5 Harrisburg, PA
+WWIZ 103.0 "Z104" West Middlesex, PA
+WLLF "Sports Radio 96.7" Mercer, PA
+WDIY 88.1 Allentown, PA
+WZXR 99.3 & 103.7 Williamsport, PA
+WWNW 88.9 "Titan Radio" Westminster College - New Wilmington, PA
+WZBT 91.1 Gettysburg College, PA
+WSOX "96.1 SOX" Red Lion, PA
+WCUC 91.7 Clarion, PA
+The Lion 90.7 FM - WKPS
+WBSX "97.9 X" Hazelton, PA
+WBHT 97.1 & 95.7 "BHT" Mountain Top, PA
+WIOV 105.1 "I 105" Ephrata, PA
+WBLQ 1230 Westerly, RI
+RIPR - The Public's Radio - WNPN
+KLND 89.5 Little Eagle, SD
+KTWB "Big Country 92.5" Sioux Falls, SD
+KUSD 89.7 "South Dakota Public Broadcasting" Vermillion, SD
+KWSN "Sports Radio" 1230 & 98.1 Sioux Falls, SD
+KELO-FM 101.9 Sioux Falls, SD
+KHXS 102.7 "102 The Bear" Abilene, TX
+KNWC "Life 96.5" Sioux Falls, SD
+WRJA 88.1 "South Carolina Public Radio" Sumter, SC
+WSYN "Sunny 103.1" Surfside Beach, SC
+WDAI "98.5 KISS FM" Pawleys Island, SC
+WLTR 91.3 "South Carolina Public Radio Classical" Columbia, SC
+WWWZ 93.3 "Z93 Jamz" Summerville, SC
+WSEA "Sports Radio 100.3 The Team" Atlantic Beach, SC
+WTYB "Magic 103.9" Bluffton, SC
+KRRO 103.7 Sioux Falls, SD
+KELO-AM 1320 Sioux Falls, SD
+WSM 650 Nashville, TN
+WEVL 89.9 Memphis, TN
+WPLN AM 1430 Nashville Public Radio, TN
+WUOT | 91.9 FM, Knoxville, TN
+WUTC 88.1 Chattanooga, TN
+WIMZ 103.5 Knoxville, TN
+WGFX "The Zone" 104.5 FM Gallatin, TN
+WCJK "96.3 Jack FM" Murfreesboro, TN
+WQUT 101.5 Johnson City, TN
+WGNS 1450 AM Murfreesboro, TN
+WKDF "Nash FM 103.3" Nashville, TN
+WKOS 104.9 "Nash Icon" Kingsport, TN
+WJCW 910 "Tri-Cities Talk Radio" Johnson City, TN
+WJXA "Mix 92.9" Nashville, TN
+WJXB "B 97.5" Knoxville, TN
+WVPS 107.9 "Vermont Public Radio" Burlington, VT
+KTTZ 89.1 "Texas Tech Public Media" Lubbock, TX
+KSCS "New Country 96.3" Fort Worth, TX
+KFNC 97.5  "ESPN Houston" Mont Belevieu, TX
+KEOS 89.1 College Station, TX
+Stinger FM 102.9 - KITY
+KFYO 790 AM Lubbock, TX
+KOKE 99.3 & 98.5 FM - Austin, TX
+KVLU 91.3 Lamar University - Beaumont, TX
+KXTR-LP 100.7 "The Planet" Tarleton University, Stephenville, TX
+KTSU 90.9 "The Choice" Houston, TX
+KNTU 88.1 University of North Texas - McKinney, TX
+KQXC "Hot 103.9" Electra, TX
+KPLX 99.5 "The Wolf" Fort Worth, TX
+KQHN "Q 97.3" Waskom, TX
+KYYI 104.7 "The Bear" Burkburnett, TX
+KLTG-FM "The Beach 96.5" Corpus Christi, TX
+KXWT 91.3 "West Texas Public Radio" Odessa, TX
+KROV 91.7HD-2 San Antonio, TX
+KTEP 88.5 El Paso, TX
+KTXK 91.5 Texarkana, TX
+KACU 89.5 "Abilene Public Radio", TX
+KUAA-LP 99.9 FM Salt Lake City, UT
+KUSU 91.5 FM/HD1 Logan, UT
+WUVT 90.7 Virginia Tech University - Blacksburg, VA
+Classical Charlottesville (A service of WTJU 91.1 FM) | The University of Virginia, Charlottesville, VA
+WNRN 91.9 Charlottesville, VA
+WXTJ 100.1 FM | Student Radio @ The University of Virginia, Charlottesville, VA
+2000 FM - Chillin
+KPTZ 91.9 "Radio Port Townsend" Port Townsend, WA
+KSVR 91.7 Mount Vernon, WA
+KXLX "700 ESPN" Airway Heights, WA
+KAOS 89.3 Community Radio - Olympia, WA
+KXLY-AM 920 Spokane, WA
+KUKN "Cookin' Country" 105.5 FM   Longview, WA
+WNCY 100.3 "Y100 Country" Neenah-Menasha, WI
+WIXX 101.1 "WIXX 101" Green Bay, WI
+WPVL "Xtreme 107.1" Platteville, WI
+WXRW-LP 104.1 "Riverwest Radio" Milwaukee, WI
+WDGY 740, 92.1, 103.7 Hudson, WI
+WYMS 88.9 "Radio Milwaukee", WI
+WRXS Pure Oldies 106.9 FM - Milwaukee, WI
+WKRU "KRUZ @106.7" Green Bay, WI
+Converge Radio 101.9 FM Eau Claire, WI
+W270CW Iron Country 101.9 FM & WGEZ 1490 AM - Beloit,WI
+105.5 WERC Birmingham, AL
+WJAB 90.9 Huntsville, AL
+WEGL 91.1 Auburn University, AL
+KZHE 100.5 "Classic Country" Stamps, AR
+KUAF 91.3 Fayetteville, AR
+KSCO "Talk Back Radio" 1080 AM Santa Cruz, CA
+KXLU 88.9FM Los Angeles, CA
+KCLU 88.3 Thousand Oaks, CA
+KZYX 90.7 Philo, CA
+KCHO 91.7 "North State Public Radio" Chico, CA
+CC - The Great Escape
+LITT Live - Hits
+KSKS 93.7 "Kiss Country" Fresno, CA
+KSFO 560 AM San Francisco, CA
+KBCZ 90.1 Radio Boulder Creek, CA
+KSLG 93.1 Ferndale, CA
+KMJ "News Talk" 580 AM Fresno, CA
+Radio Sausalito 1610 - Sausalito, CA
+WNJT 88.1 "New Jersey Public Radio" Trenton, NJ
+WCNI 90.9 New London, CT
+WGMD "News Radio 92.7" Rehoboth Beach, DE
+America's OTR - Gunsmoke
+WRMI 9955 Shortwave - Miami, FL
+WPOZ "Zradio" 88.3 FM Orlando, FL
+WFLA 970 AM Tampa Bay, FL
+WGLF 104.1 "Gulf 104" Tallahassee, FL
+Your Classical - Lullabies
+Purple Current - Minnesota Public Radio
+KTMY "My Talk 107.1" Coon Rapids, MN
+KCMP 89.3 "The Local Current" Northfield, MN
+KXCV 90.5 "Northwest Missouri Public Radio" Maryville, MO
+KRCU 90.9 "Southeast Public Radio" Cape Girardeau, MO
+KJLU "Smooth Jazz 88.9" Jefferson City, MO
+The Indie Beat Radio - Ambient Channel
+KXCV-HD2 "Northwest Missouri Public Radio" Maryville, MO
+The Indie Beat Radio - Jazz Channel
+The Indie Beat Radio - Rock Channel
+WFDU-HD2 Fairleigh Dickinson University - Teaneck, NJ
+KMMS 1450 AM Bozeman, MT
+KRWG 90.7 Las Cruces, NM
+KFGO "The Mighty 790" Fargo, ND
+WeRave Music Radio 01 - Dark and Underground
+WFUV 90.7 Fordham University - New York, NY
+WAMC 90.3 "Northeast Public Radio" Albany, NY
+WGRF 96.9 "97 Rock" Buffalo, NY
+WKCR 89.9 Columbia University - New York, NY
+WGSU 89.3 State University of New York at Geneseo, NY
+WWTN "Super Talk 99.7" Hendersonville, TN
+WBFO-FM 88.7 Buffalo, NY
+Radio Free Brooklyn.com - Brooklyn, NY
+NCPR - North Country Public Radio
+Jefferson County (NY) Police, Fire and EMS
+WHTT 104.1 Buffalo, NY
+WRVO-2 PRX Remix Oswego, NY
+Deep Link Radio - Old House Music
+WUSB 90.1 State University of New York at Stony Brook, NY
+WMHT Classical 89.1 - Schenectady, NY
+WREM 88.7 "Public Radio Remix" Canton, NY
+WRVO 89.9 Oswego, NY
+WSUF 89.9 Noyack, NY
+WEDG-FM 103.3 Buffalo, NY
+WRCN 103.9 "LI News Radio" Riverhead, NY
+WJVC "My Country 96.1" Center Moriches, NY
+WFKL "Fickle 93.3" Fairport, NY
+KEDT-FM 90.3 "KEDT Public Radio" Corpus Christi, TX
+WAYO-LP 104.3 Rochester, NY
+WBTA 1490 & 100.1 - Batavia, NY
+KXRY 91.1 "X Ray FM" Portland, OR
+KSOR 90.1 "Jefferson Public Radio" Ashland, OR
+KSRG 88.3 "Jefferson Public Radio" Ashland, OR
+KSFL-LP 99.1 "Portland Radio Project", OR
+KCMB 104.7 Baker City, OR
+WXPN 88.5 Philadelphia, PA
+KLIF 570 AM Dallas, TX
+WOXR 90.9 Vermont Public Radio Classical Stream - Burlington, VT
+Alex Jones - Infowars
+Owl Radio - San Antonio, TX
+Rice University Radio - Houston
+War Room With Owen Shroyer - Infowars
+181.FM - True Blues
+181.FM - Beatles
+181.FM - Real Country
+181.FM - Soul
+181.FM - Classical Jazz
+181.FM - Mellow Gold
+181.FM - BeBop Jazz
+KBER 101.1 FM Ogden, UT
+181.FM - Acid Jazz
+K-Talk 1640 AM Salt Lake City, UT
+181.FM - Classical Music
+181.FM - Vocal Jazz
+181.FM - The Office
+181.FM - Trance Jazz
+181.FM - Christmas Soundtracks
+181.FM - Christmas Kountry
+181.FM - Christmas Fun
+181.FM - Chilled Out
+WTJU 91.1 FM | The University of Virginia, Charlottesville, VA
+181.FM - The Ball
+181.FM - Christmas Smooth Jazz
+181.FM - Christmas Power
+181.FM - Christmas Mix
+181.FM - Christmas Kids
+181.FM - Christmas Blender
+WHEO 1270 Stuart, VA
+WROX "96X" 96.1 - Exmore, VA
+KZUM 89.3 - Lincoln, NE
+181.FM - Salsa
+181.FM - Christmas Highway
+WNOB 93.7 "BOB FM" Chesapeake, VA
+Northwest Public Broadcasting - News
+2000 FM - Hard Rock
+Big R Radio - The Love Channel
+Big R Radio - Golden Oldies
+KMBI - Moody Radio Northwest
+Radiostorm - Oldies
+Radiostorm - Comedy
+Radiostorm - At Work
+Talk 650 KSTE - Where Sacramento Comes To Talk
+KLVZ Legends 810AM/95.3 FM - Denver, CO
+WFYI 90.1 HD2 The Point Indianapolis, IN
+WXXM "Rewind 92.1" Sun Prairie, WI
+WCLO 1230 AM - Janesville, WI
+WNAM 1280 Neenah-Menasha, WI
+WZEE 104.1 "Z-104" Madison, WI
+WGLR 97.7 Lancaster, WI
+The Bear - South Bend
+Radiostorm - Rock 104 - Classic Rock
+KPUB 91.7 NPR, Flagstaff AZ - New URL fix
+KYSR 98.7 FM Los Angeles, CA
+KHOP 95.1 Oakdale, CA
+KUCI 88.9 Irvine, CA
+KJOY 99.3 FM Stockton, CA
+KUTT "Ol' Red 99.5"  Fairbury, NE
+KVOQ - Indie
+WFMU 91.1 East Orange, NJ
+WRRC 107.7 "The Bronc" Rider University, Lawrenceville, NJ
+WKNL "100.9 K HITS" New London, CT
+WPRK 91.5 FM Winter Park, FL
+WSOS 103.9 St. Augustine, FL
+WNCV "Coast 93.3" Shallmar, FL
+WNDB 1150 & 93.5 Daytona Beach, FL
+WDCB 90.9 "Jazz & Blues" Chicago, IL
+WCPT 820 Heartland Signal Progresive Talk, Willow Springs IL
+KRFP 90.3  "Radio Free Moscow" Moscow, ID
+WMVP 1000 AM - ESPN Chicago, IL
+WILL-AM 580 Urbana, IL
+WCKG 1530 & 102.3 Elmhurst, IL
+WKQX 101.1 Chicago, IL
+WCGO 1590 Evanston, IL
+WNWI 1080 Oak Lawn, IL
+WGFB 103.1 "B 103" Rockton, IL
+WWVR "98.5 The River" Paris, IL
+WSIU 91.9 Carbondale, IL
+WRTB "95.3 The Bull"  Winnebago, IL
+WHCR-LP 101.5 Huntley Community Radio - Huntley, IL
+WBAA Jazz 101.3 HD-2 West Lafayette, IN
+WTHI 99.9 "HI-99" Terre Haute, IN
+KUNR 88.7 "Reno Public Radio", NV
+KBCU-FM 88.1 Bethel College - North Newton, KS
+KANU 91.5 "Kansas Public Radio" Lawrence, KS
+WFXY - Foxy
+KHLA - The Lake
+KKND "Power 102.9" Belle Chasse, LA
+WRKF 89,3 Baton Rouge, LA
+KMEZ "Old School 106.7" New Orleans, LA
+KMJJ 99.7 Shreveport, LA
+KVMA "Magic 102.9" Shreveport, LA
+WHSN 89.3 Husson University - Bangor, ME
+WRSI 93.9 - The River
+WLOY 1620 Loyola Radio - Baltimore, MD
+WFCB-LP 100.7 "Ferndale Radio" Ferndale, MI
+WTCM 580 Traverse City, MI
+WNWN "WIN 98.5" Coldwater, MI
+WPON 1460 Walled Lake, MI
+WRSR "The Fox" 103.9 FM Owosso, MI
+WVFM 106.5 Kalamazoo, MI
+WWDK 94.1 "Duke FM" Jackson, MI
+KMSU 89.7 Mankato, MN
+Jammin Oldies Radio - Jammin
+WKOE - Coast Country
+WFDU 89.1 Fairleigh Dickinson University - Teaneck, NJ
+WNED "Classical 94.5" Buffalo, NY
+WFTU 1570 Five Towns College - Riverhead, NY
+WGMC "Jazz 90.1" Rochester, NY
+WUFO 1080 Amherst, NY
+WLW - 700 AM - Cincinnati, OH
+WUNC 91.5 HD-2 Chapel Hill, NC
+WHCL 97.9 Chapelboro Chapel Hill, NC
+WDAV 89.9 "Classical Public Radio" Charlotte, NC
+KOMA 92.5 "Oklahoma's Greatest Hits" Okahoma City, OK
+KOSU 91.7 Stillwater, OK
+KMGL "Magic 104.1" Oklahoma City, OK
+WPIC "News Talk 790" Sharon, PA
+KPPT 100.7 "The Otter" Newport, OR
+KXFC 105.5 "The X Factor" Coalgate, OK
+KCCU 89.3 Lawton, OK
+KUCO 90.1 Edmond, OK
+KMUN 91.9 "Coast Community Radio" Astoria, OR
+KWVN "Hot 107.7" Pendleton, OR
+Mix 102.9 FM - Dallas
+WPLN FM 90.3 Nashville Public Radio, TN
+KMFA 89.5  Austin, TX
+Star 102.1 FM - Dallas
+WXSM 640 Blountville, TN
+WFCL "Classical 91.1"  Nashville Public Radio, TN
+KOOPRadio - 91.7 FM - Austin, TX
+KVLY 107.9 "Mix FM" Edinburg, TX
+KUZU-LP 92.9 FM Denton, TX
+KOFX "The Fox 92.3" El Paso, TX
+KNCH 90.1 Texas Tech University Public Media - San Angelo, TX
+WTAR "Sports Radio 850 & 96.5" Norfolk,VA
+WQLU 90.9 - The Light - Lynchburg, VA
+WLUR 91.5 Lexington, VA
+WZRV "The River 95.3" Front Royal, VA
+KEXP 90.3 Seattle, WA
+2000 FM - Country
+KKXA "KXA 1520" & 101.1 Everett, WA
+KXLY-FM "Big 99.9 Coyote Country" Spokane, WA
+KKNW 1150 "Alternative Talk" Seattle, WA
+Hot 102 Milwaukee, WI
+KRPI 1550 "Sher-E-Punjab Radio" Ferndale, WA
+KEZE "Hot 96.9" Spokane, WA
+WLUM 102.1 FM Milwaukee, WI
+WGEE 93.5 & 99.7 "Duke FM" New London, WI
+WSPT 97.9 Stevens Point, WI
+WXPR 91.7 Rhinelander, WI
+WDRT 91.9 Viroqua, WI
+WFZZ 104.3 The Fuse Seymour, WI
+93.1 KMKT - KATY COUNTRY
+WNHN-LP FM Concord, NH
+KLNZ 103.5 "La Tricolor" Glendale, AZ
+KVVA 107.1 & 106.9 "Jose FM" Apache Junction, AZ
+KPST 103.5 "La Tricolor" Coachella, CA
+KLOB "Jose FM 94.7" Thousand Palms, CA
+KPVW 107.1 & 104.3 "La Tricolor" Aspen, CO
+KJMN "Jose FM 92.1" Castle Rock, CO
+WORC-AM "La Mega" 1310 & 106.1 Worcester, MA
+KRZY-FM "Jose 105.9" Santa Fe, NM
+WKY 930 "ESPN Deportes"  Oklahoma City, OK
+KTUZ 106.7 "La Z" Okarche, OK
+WKKB-FM "Latina 100.3" Middletown, RI
+KINT "Jose FM 93.9" El Paso, TX
+KKPS 99.5 "La Nueva" Brownsville, TX
+KDNA 91.9 "La Voz del Campesino" Yakima, WA
+KLYY "Jose FM 97.5 & 103.1" Riverside, CA
+KZNB 1490 & 102.5 "La Z" Petaluma, CA
+KLOK 99.5 & 99.9 "La Tricolor" Greenfield, CA
+KMXX 99.3 "La Tricolor" Imperial, CA
+KRCX "La Tri Color 99.9" Marysville, CA
+Kolombia Estéreo - Salsa Barranquillera
+WSNR 620 "Davidzon Radio" Jersey City, NJ
+KIYE 88.7 FM Kamiah, ID
+88.9 Titan Radio - New Wilmington, PA
+Sangeet Radio FM 95.1 AM 1460 Houston, TX, US
+KALL radio, ESPN
+Radio Maria USA - In Italiano
+KHND - The Mix
+KMJO "Duke FM 104.7" Hope, ND
+KRWK 101.9 "Jack FM" Fargo, ND
+Real Presence Radio Fargo, ND
+XL93 - The Forks Hit Music Station
+KFNW "Life 97.9" Fargo, ND
+KOYY 93.7 "Y94" Fargo, ND
+KNFL 740 & 107.3 "The Fan" Fargo, ND
+WPFX 107.7 "The Wolf" Luckey, OH
+WQQO "Q105.5" Sylvania, OH
+WGUC "Classical 90.9" Cincinatti, OH
+WHOT 101.1 "Hot 101" Youngstown, OH
+WDEV 550 AM Waterbury, VT
+2000 FM - Alternative Rock
+KHOL 89.1 Jackson, WY
+WAJH 91.1 Jazz Hall Radio Birmingham, AL
+WBHM 90.3 Birmingham, AL
+WERC-HD3 B106.5 Birmingham, AL
+WUAL-HD2 Alabama Public Radio "XPoNential Radio" Tuscaloosa, AL
+WDJC 93.7 Birmingham, AL
+Hallelujah 105.1 Birmingham, AL
+WUAL-HD3 Alabama Public Radio - BBC World Service - Tuscaloosa, AL
+W297BF 107.3 Birmingham Mountain Radio, AL
+Hot 107.7 Birmingham, AL
+KUAF-HD3 Jazz Stream - Fayetteville, AR
+KOTZ 720 Kotzebue Broadcasting, AK
+KBBI 890 Homer, AK
+KDLL 91.9 Kenai, AK
+KFSK Petersburg, AK
+Abiding Radio - Instrumental
+Smooth Groove Radio - The Vibe
+Abiding Radio - Kids
+Abiding Radio - Bluegrass Hymns
+Abiding Radio - Sacred
+KPUP-LP 100.5 Patagonia, AZ
+KUAF-HD2 Classical Stream - Fayetteville, AR
+GotRadio - AAA Boulevard
+Fox Sports Radio - LA
+100Hitz - Alternative Hitz
+GotRadio - Alternative Rock
+KHUG - Best Blues Rock Streaming Commercial Free
+KCBX San Luis Obispo, CA
+CC - Classical Americana
+KCEA - 89.1FM Atherton, CA
+Onondaga County Public Safety - VHF - Syracuse, NY
+KFBK "News Radio 93.1 & 1530" Sacramento, CA
+KDRT-LP 95.7 Davis, CA
+KZSC 88.1 Santa Cruz, CA
+KQBM-LP 90.7 & 103.7 "Blue Mountain Radio"  West Point, CA
+KWIN 97.7 & 98.3 Lodi, CA
+KSES "Jose 107.1" Seaside, CA
+KZSU-HD2 Stanford University, CA
+CC - Christmas
+KBUU-LP 97.5 Malibu, CA
+KSVG - Savage Radio
+KSEH "Radio Jose 94.5" Brawley, CA
+CC - Ultimate Playlist
+The Indie Beat Radio - Audio Interface Channel
+The Indie Beat Radio - Everything Channel
+The Indie Beat Radio - Bonkwave Channel
+KSUT Four Corners Public Radio Ignacio, CO
+WSHU Classical Stream - Fairfield, CT
+Radio Symphony - Mobile
+WVUD-HD2 "The Basement", Newark, DE
+WESU 88.1 Middletown, CT
+WSHU 1260 Fairfield, CT
+WXLM 980 Groton, CT
+Robin Hood Radio - WHDD
+WVUD 91.3 University of Delaware - Newark, DE
+WMFE-HD2 Orlando, FL
+RoadBlock Radio - Caribbean Vibez
+Reign Radio 1 - The Rock Station
+SubSonic Radio - Background
+Panafrican All Stars.com - College Park, GA
+WHOG 95.7 "The Hog" Ormond-By-The-Sea, FL
+WYMM 1530 "Radio Puissance Inter" Jacksonville, FL
+WWWQ-HD3 "OG 979" Atlanta, GA
+WVPE HD3 - Blues
+Ancient Faith Radio - English Talk
+WBEZ-HD2 "Vocalo Stream" Chicago, IL
+WVKC Knox College, Galesburg, IL
+WCPT 820 AM Willow Springs, IL
+WXJ71 162.475 NOAA Weather Radio Peoria, IL
+WJVX/Oak Lawn-Chicago,IL
+WCSF 88.7 University of St. Francis, Joliet, IL
+WDZ "1050 ESPN" Decatur, IL
+WONC 89.1 North Central College, Napierville, IL
+WFMB-AM "Sports Radio 1450" Springfield, IL
+Lutheran Public Radio - Collinsville, IL
+CRIS Radio - The Chicago Lighthouse
+WNTA "Sports Fan Radio 1330" Rockford, IL
+WVPE News2 Elkhardt, IN
+Ancient Faith Radio - English Music
+NOAA Weather Radio KEC74 Indianapolis, IN
+88.7 WICR - The Diamond
+WBAA Classical 101.3 HD-2 West Lafayette, IN
+KWNK - Reno Community Radio
+Z102.9 (KZIA) - Cedar Rapids - IA
+KMCP - McPherson Ad Astra Radio
+Radio Kansas HD3 - Breeze
+KCJK "X105.1" Mission, KS
+KANU-HD2 "Kansas Public Radio" News Stream - Lawrence, KS
+WUKY - NPR Rocks
+WZ2523 - NOAA Weather Radio
+WWOZ - New Orleans Public Radio
+Red River Radio - Main Channel
+WWNO Jazz Stream - University of New Orleans, LA
+WWNO Classical Stream - University of New Orleans, LA
+KDAQ-HD2 "Red River Radio Classical Stream" Shreveport, LA
+WMEA Maine Public Broadcasting Classical Stream - Portland, ME
+WMEA Maine Public Broadcasting Classical Stereo Stream - Portland, ME
+WBAL "News Radio1090"  Baltimore, MD
+WCBN 88.3 Ann Arbor, MI
+WEMU 89.1 Ypsilanti, MI
+WBJC 91.5 FM - Baltimore
+WUMB French Accent Stream - Boston, MA
+WUMB Studio Archives Stream - Boston, MA
+WKAR Jazz - East Lansing, MI
+WNZK 690 & 680 Dearborn Heights, MI
+WKAR Classical - East Lansing, MI
+WLMI "i92.9" Grand Lodge, MI
+WKAR Radio Reading Service - East Lansing, MI
+Your Classical - Choral
+KCMP Minnesota Public Radio "Radio Heartland" Stream - Northfield, MN
+KCMP Minnesota Public Radio "Rock the Cradle" Stream - Northfield, MN
+KVOX "Froggy 99.9"  Moorhead, MN
+KQAL 89.5  Winona State University, MN
+KTCO "Kat Country 98.9" Duluth, MN
+KTIS "Faith 900" 900 AM Minneapolis, MN
+WGVX 105.1 "105 The Vibe" Lakeville, MN
+KSMU-HD2 "Jazzworks" Ozarks Public Radio - Springfield, MO
+KBXR 102.3 BXR Columbia, MO
+KADI 1340AM "The Ozark's Big Talker" Springfield, MO
+The Indie Beat Radio - Electronic Channel
+The Indie Beat Radio - Pop Channel
+The Indie Beat Radio - Spoken Word Channel
+WQXR "Q2 Stream" New York Public Radio - Newark, NJ
+The Indie Beat Radio - NHAM Channel
+WUNC 91.5 Chapel Hill, NC
+WXYC 89.3 University of North Carolina - Chapel Hill, NC
+WPVM-LP 103.7  Asheville, NC
+KSFR-FM 101.1 "Santa Fe Public Radio" Santa Fe, NM
+WRVO-3 BBC World Service Stream - Oswego, NY
+The World Famous LIR Long Island, NY
+WeRave Music Radio 02 - Study and Chillout
+POWERHITZ.COM - Total Country
+POWERHITZ.COM - The Timeblender
+Deep Link Radio - Old Soulful House Music
+Radio New York Live - Devices
+WGMC "Swing & Blues" Stream - Rochester, NY
+BMFR - Blues Music Fan Radio
+Deep Link Radio - Jazzier Link Radio
+Deep Link Radio - Deep
+WAMC-HD2 Northeast Public Radio - Albany, NY
+WOOC 105.3 FM - Troy NY - The Sanctuary for Independent Media
+WVNR Viva Nostalgia Radio.com - Lewiston, NY
+Deep Link Radio - Soulful Link Radio
+Village Radio.net Hilton, NY
+WBKM 107.1 Dannemora, NY
+WCOM- LP 103.5 Carrboro, NC
+WPNC-FM - Magic
+WHDZ101.5 "Radio Hatteras" Buxton, NC
+WFAE-HD3 "Public Radio Remix" Charlotte, NC
+WFAE-HD2 "Charlotte Jazz Channel", NC
+WOVV 90.1 Ocracoke Radio, NC
+WIOZ "Star 102.5" Southern Pines, NC
+KOSU-HD2 "The Spy"  Stillwater, OK
+WZFX 99.1 "Foxy 99" Whiteville, NC
+WGUC-HD2 Jazz Stream - Cincinatti, OH
+CDU - Columbus Alternative Underground
+WZNP 89.3 "The River" Newark, OH
+WXKR "94.5 XKR" Port Clinton, OH
+KLCC 89.7 Eugene, OR
+University Of Oregon - KWAX
+KEPW - Eugene PeaceWorks Homegrown Community Radio
+KXIX 94.1 "Power 94" Sunriver, OR
+WXPN HD2 - XPoNential
+Pittsburgh Police, Fire and EMS
+WPSU-HD2 "Public Radio Mix" Stream - State College, PA
+WPPM - PhillyCAM
+Tube City Online Radio - McKeesport
+WVIA-HD3 "Chiaroscuro Channel" Scranton, PA
+WVIA-HD2 Scranton, PA
+WESS 90.3 East Stroudsburg University, PA
+WINB Shortwave - Red Lion, PA
+WPSU-HD3 Jazz Stream - State College, PA
+WMGS 92.9 "Magic 93" Wilkes-Barre, PA
+WLEV 100.7 Allentown, PA
+WARM 103.3 York, PA
+KUSD-HD2 "South Dakota Public Broadcasting" Vermillion, SD
+WYFM 102.9 "Y103" Sharon, PA
+RBN - Republic Broadcastin Network
+Alex Jones Live - AJN
+WMXP-LP 95.5 FM Greenville, SC
+WKNO 91.1 Memphis, TN
+WMOT "MTSU Jazz Network" Murfreesboro, TN
+WKNO-HD2 Memphis, TN
+WWCR Shortwave - Nashville, TN
+WNFN "i106.7" Millersville, TN
+WVPS-HD3 Vermont Public Radio - BBC World Service Stream - Burlington, VT
+WVPS Vermont Public Radio Replay Stream - Burlington, VT
+WEQX 102.7 FM Manchester, VT
+KNCT - Simply Beautiful - Copperas Cove
+181.FM - Reggae Roots
+KDRP-LP "Sun Radio" 100.1 FM Austin, TX
+KLAQ 95.5 El Paso, TX
+KWVH - Wimberley Valley Radio
+KRTS 93.5 Marfa Public Radio - Marfa, TX
+KZFM-FM 95.5 "Hot Z95" Corpus Christi, TX
+KAZI  88,7  Austin, TX
+KLUR 99.9 Wichita Falls, TX
+KNVO "Jose 101.1" Port Isabel, TX
+GUITAR - SEGOVIA
+181.FM - Comedy Club
+KKXT "KXT 91.7" Dallas, TX
+KALP 92.7 Alpine, TX
+KYSE 94.7 "La Tricolor" El Paso, TX
+KXGL - FM
+181.FM - The Mix
+FM100.3 - Better Music Better Work Day
+181.FM - Classical Guitar
+181.FM - The Vibe of Vegas
+181.FM - Techno Club
+181.FM - Fusion Jazz
+181.FM - The Point
+181.FM - Christmas Gospel
+181.FM - Good Time Oldies Radio
+WNIS "News Talk 790" Norfolk, VA
+181.FM - The Breeze
+181.FM - Smooth AC
+WVVV-FM "V96.9" Willliamstown, WV
+181.FM - Christmas Spirit
+181.FM - Christmas Oldies
+181.FM - Christmas Rock
+WVPB 88.5 "West Virginia Public Broadcasting" - Charleston, WV
+181.FM - Christmas Standards
+181.FM - Christmas Swing
+181.FM - Christmas Classics
+Big R Radio - Grunge FM
+KNHC "C89.5" Seattle, WA
+Big R Radio - Country Gold
+Northwest Public Broadcasting - Classical and News
+KOZI FM - Radio Lake Chelan
+Big R Radio - Post Grunge Rock
+Big R Radio - Country Mix
+Big R Radio - 80s and 90s Pop Mix - Mill Creek, WA
+Big R Radio - Gospel Channel
+Big R Radio - The Wave
+KZZU 92.9 "ZZU" Spokane, WA
+WGTB - Georgetown Radio
+Big R Radio - Alternative Rock
+KUGS 89.3 Western Washington University - Bellingham, WA
+WTAQ 1360 & 92.5 Green Bay, WI
+WORT 89.9 Madison, WI
+Steel Bridge Radio - Sturgeon Bay, WI
