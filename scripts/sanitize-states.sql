@@ -1,0 +1,18 @@
+UPDATE stations SET department = 'California' WHERE department = 'San Francisco CA';
+UPDATE stations SET department = NULL WHERE department = 'US';
+UPDATE stations SET department = 'Florida' WHERE department = 'Coconut Creek, Florida 33073';
+UPDATE stations SET department = 'Ohio' WHERE department = 'Columbus Ohio';
+UPDATE stations SET department = 'Oregon' WHERE department = 'oregon';
+UPDATE stations SET department = 'Wyoming' WHERE department = 'Manderson, Wyoming';
+UPDATE stations SET department = 'Wyoming' WHERE department = 'Cheyenne, Wyoming';
+UPDATE stations SET department = 'California' WHERE department = 'Los Angeles, California';
+UPDATE stations SET department = 'New York' WHERE department = 'New York NY';
+UPDATE stations SET department = 'Alabama' WHERE department = 'Birmingham Alabama';
+UPDATE stations SET department = 'New York' WHERE department = 'NY';
+UPDATE stations SET department = 'Florida' WHERE department = 'Tallahassee Florida';
+UPDATE stations SET department = 'Arkansas' WHERE department = 'Jonesboro, Arkansas';
+UPDATE stations SET department = 'California' WHERE department = 'california';
+UPDATE stations SET department = 'California' WHERE department = 'California ';
+UPDATE stations SET department = 'California' WHERE department = ' California';
+UPDATE stations SET department = 'California' WHERE department = 'Northern California';
+UPDATE stations SET department = 'California' WHERE department = 'California, San Francisco';

@@ -1,0 +1,15 @@
+UPDATE stations SET city = 'Cap-Haïtien' WHERE city = 'Cap-Haitien';
+UPDATE stations SET city = 'Saint-Marc' WHERE city = 'Saint Marc';
+UPDATE stations SET city = 'New York' WHERE city = 'New York NY';
+UPDATE stations SET city = NULL WHERE city = 'Haiti';
+UPDATE stations SET city = 'New York' WHERE city = 'NY';
+UPDATE stations SET city = 'San Francisco' WHERE city = 'San Francisco CA';
+UPDATE stations SET city = NULL WHERE city = 'US';
+UPDATE stations SET city = NULL WHERE city = 'California';
+UPDATE stations SET city = NULL WHERE city = 'Florida';
+UPDATE stations SET city = NULL WHERE city = 'Pennsylvania';
+UPDATE stations SET city = NULL WHERE city = 'Ohio';
+UPDATE stations SET city = NULL WHERE city = 'Wisconsin';
+UPDATE stations SET city = 'Los Angeles' WHERE city = 'Los Angeles, California';
+UPDATE stations SET city = NULL WHERE city = 'Minnesota';
+UPDATE stations SET city = NULL WHERE city = 'Virginia';
