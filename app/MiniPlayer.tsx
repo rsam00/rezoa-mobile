@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
@@ -12,13 +12,14 @@ import { calculateProgramProgress, getCurrentProgram, Program } from '../utils/t
 
 export default function MiniPlayer() {
   const insets = useSafeAreaInsets();
-  const { playerState, playStation, pause, stop, refreshNowPlayingTitle } = usePlayer();
+  const { playerState, playStation, pause, stop, refreshNowPlayingTitle, setPreferredQuality } = usePlayer();
   const { programs } = useData();
   const segments = useSegments();
   
   const slideAnim = useRef(new Animated.Value(200)).current; 
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
+  const [isQualityMenuVisible, setQualityMenuVisible] = useState(false);
 
   // Convenience alias for the stream probe result
   const streamInfo = playerState.streamInfo;
@@ -130,6 +131,22 @@ export default function MiniPlayer() {
     else await playStation(playerState.currentStation!);
   };
 
+  const handleSelectQuality = (qualityUrl: string | 'auto') => {
+    setQualityMenuVisible(false);
+    setPreferredQuality(qualityUrl);
+    if (playerState.isPlaying && playerState.currentStation) {
+      // Force a re-fetch of the stream with the new quality
+      const stationCopy = { ...playerState.currentStation };
+      stop().then(() => playStation(stationCopy));
+    }
+  };
+
+  const getQualityBtnLabel = () => {
+    if (playerState.preferredQuality === 'auto') return 'AUTO';
+    const stream = playerState.currentStation?.streams?.find(s => s.url === playerState.preferredQuality);
+    return stream ? `${stream.bitrate}k` : 'AUTO';
+  };
+
   const translateY = scrollAnim.interpolate({
     inputRange: [-1, 0],
     outputRange: [-24, 0], // Heights for the vertical shift
@@ -192,6 +209,13 @@ export default function MiniPlayer() {
           </View>
 
           <View style={styles.controls}>
+            {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 && (
+              <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.qualityBtn} activeOpacity={0.7}>
+                <Text style={styles.qualityText}>
+                  {getQualityBtnLabel()}
+                </Text>
+              </TouchableOpacity>
+            )}
             {playerState.isLoading ? (
               <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
             ) : (
@@ -216,6 +240,45 @@ export default function MiniPlayer() {
           </View>
         )}
       </View>
+
+        {/* Quality Selection Modal */}
+        <Modal visible={isQualityMenuVisible} transparent animationType="fade">
+          <TouchableWithoutFeedback onPress={() => setQualityMenuVisible(false)}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>Stream Quality</Text>
+                  <ScrollView style={styles.modalScroll}>
+                    <TouchableOpacity 
+                      style={[styles.modalOption, playerState.preferredQuality === 'auto' && styles.modalOptionActive]} 
+                      onPress={() => handleSelectQuality('auto')}
+                    >
+                      <Text style={[styles.modalOptionText, playerState.preferredQuality === 'auto' && styles.modalOptionTextActive]}>
+                        Auto (Smart Selection)
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    {playerState.currentStation?.streams && [...playerState.currentStation.streams].sort((a, b) => b.bitrate - a.bitrate).map((stream, idx) => {
+                      const isActive = playerState.preferredQuality === stream.url;
+                      return (
+                        <TouchableOpacity 
+                          key={idx}
+                          style={[styles.modalOption, isActive && styles.modalOptionActive]} 
+                          onPress={() => handleSelectQuality(stream.url)}
+                        >
+                          <Text style={[styles.modalOptionText, isActive && styles.modalOptionTextActive]}>
+                            {stream.label} ({stream.bitrate}k {stream.format.toUpperCase()})
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
     </Animated.View>
   );
 }
@@ -308,4 +371,59 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#a78bfa',
   },
+  qualityBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginRight: 4,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qualityText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: 280,
+    backgroundColor: '#1f2937',
+    borderRadius: 12,
+    padding: 16,
+    maxHeight: 400,
+  },
+  modalTitle: {
+    color: '#a78bfa',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalScroll: {
+    maxHeight: 300,
+  },
+  modalOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 4,
+  },
+  modalOptionActive: {
+    backgroundColor: 'rgba(167, 139, 250, 0.2)',
+  },
+  modalOptionText: {
+    color: '#d1d5db',
+    fontSize: 16,
+  },
+  modalOptionTextActive: {
+    color: '#a78bfa',
+    fontWeight: 'bold',
+  }
 });

@@ -12,44 +12,49 @@ import TrackPlayer, {
 import { useHistory } from './HistoryContext';
 import { probeStream, StreamInfo } from '../lib/streamProbe';
 import { resolveStreamUrl } from '../lib/playlistParser';
+import * as Network from 'expo-network';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PlayerState {
   isPlaying: boolean;
   isLoading: boolean;
-  currentStation: { id: string; name: string; streamUrl: string; logo?: string } | null;
+  currentStation: { id: string; name: string; streamUrl: string; logo?: string; streams?: { url: string; bitrate: number; format: string; label: string }[] } | null;
   streamInfo: StreamInfo | null;
   error: string | null;
+  preferredQuality: 'auto' | string;
 }
 
 interface PlayerContextType {
   playerState           : PlayerState;
-  playStation           : (station: { id: string; name: string; streamUrl: string; logo?: string }) => Promise<void>;
+  playStation           : (station: { id: string; name: string; streamUrl: string; logo?: string; streams?: { url: string; bitrate: number; format: string; label: string }[] }) => Promise<void>;
   pause                 : () => Promise<void>;
   stop                  : () => Promise<void>;
   /** Patch the nowPlaying title in streamInfo without re-running the full probe. */
   refreshNowPlayingTitle: (title: string) => void;
+  setPreferredQuality   : (quality: 'auto' | string) => void;
 }
 
 // ─── Context default ─────────────────────────────────────────────────────────
 
 const PlayerContext = createContext<PlayerContextType>({
-  playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null },
+  playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null, preferredQuality: 'auto' },
   playStation           : async () => {},
   pause                 : async () => {},
   stop                  : async () => {},
   refreshNowPlayingTitle: () => {},
+  setPreferredQuality   : () => {},
 });
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { addToHistory } = useHistory();
-  const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string; logo?: string } | null>(null);
+  const [currentStation, setCurrentStation] = useState<{ id: string; name: string; streamUrl: string; logo?: string; streams?: { url: string; bitrate: number; format: string; label: string }[] } | null>(null);
   const [streamInfo, setStreamInfo]         = useState<StreamInfo | null>(null);
   const [error, setError]                   = useState<string | null>(null);
   const [isSetup, setIsSetup]               = useState(false);
+  const [preferredQuality, setPreferredQuality] = useState<'auto' | string>('auto');
 
   // Ref tracking which station the in-flight probe was started for.
   // If the user switches stations before the probe finishes, we discard
@@ -98,7 +103,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   });
 
-  const playStation = useCallback(async (station: { id: string; name: string; streamUrl: string; logo?: string }) => {
+  const playStation = useCallback(async (station: { id: string; name: string; streamUrl: string; logo?: string; streams?: any[] }) => {
     if (!isSetup) await setupPlayer();
     
     console.log('[Player] Playing station:', station.name);
@@ -122,13 +127,46 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       // ── New station ────────────────────────────────────────────────────────
-      console.log('[Player] Switching to new station:', station.streamUrl);
+      console.log('[Player] Switching to new station:', station.name);
 
       // Clear previous stream info immediately so the UI shows a clean state
       setStreamInfo(null);
       setCurrentStation(station);
 
-      const resolvedAudioUrl = await resolveStreamUrl(station.streamUrl);
+      // ── Stream Selection Logic ─────────────────────────────────────────────
+      let selectedUrl = station.streamUrl;
+      let label = 'Legacy';
+      if (station.streams && station.streams.length > 0) {
+        // sort by bitrate ascending
+        const sortedStreams = [...station.streams].sort((a, b) => a.bitrate - b.bitrate);
+        if (preferredQuality === 'auto') {
+          // auto: check network
+          const netState = await Network.getNetworkStateAsync();
+          if (netState.type === Network.NetworkStateType.CELLULAR) {
+            console.log('[Player] Cellular network detected. Selecting low bitrate stream.');
+            selectedUrl = sortedStreams[0].url;
+            label = sortedStreams[0].label;
+          } else {
+            console.log('[Player] Wi-Fi or other network detected. Selecting high bitrate stream.');
+            selectedUrl = sortedStreams[sortedStreams.length - 1].url;
+            label = sortedStreams[sortedStreams.length - 1].label;
+          }
+        } else {
+          const selectedStream = sortedStreams.find(s => s.url === preferredQuality);
+          if (selectedStream) {
+            selectedUrl = selectedStream.url;
+            label = selectedStream.label;
+          } else {
+            // fallback if stream url doesn't exist anymore
+            selectedUrl = sortedStreams[sortedStreams.length - 1].url;
+            label = sortedStreams[sortedStreams.length - 1].label;
+            setPreferredQuality('auto');
+          }
+        }
+      }
+
+      console.log(`[Player] Selected URL (${label}):`, selectedUrl);
+      const resolvedAudioUrl = await resolveStreamUrl(selectedUrl);
 
       const track: Track = {
         id     : station.id,
@@ -180,7 +218,7 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError('Failed to play station. Please try again.');
       console.error('[Player] Playback error:', err);
     }
-  }, [isSetup, currentStation?.id, playbackState, addToHistory]);
+  }, [isSetup, currentStation?.id, playbackState, addToHistory, preferredQuality]);
 
   const pause = useCallback(async () => {
     console.log('[Player] Pause called');
@@ -225,11 +263,12 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     currentStation,
     streamInfo,
     error,
-  }), [isPlaying, isLoading, currentStation, streamInfo, error]);
+    preferredQuality,
+  }), [isPlaying, isLoading, currentStation, streamInfo, error, preferredQuality]);
 
   const contextValue = useMemo(
-    () => ({ playerState, playStation, pause, stop, refreshNowPlayingTitle }),
-    [playerState, playStation, pause, stop, refreshNowPlayingTitle]
+    () => ({ playerState, playStation, pause, stop, refreshNowPlayingTitle, setPreferredQuality }),
+    [playerState, playStation, pause, stop, refreshNowPlayingTitle, setPreferredQuality]
   );
 
   return (
@@ -246,11 +285,12 @@ export const usePlayer = () => {
   if (!context) {
     console.warn('PlayerContext not found, using fallback.');
     return {
-      playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null },
+      playerState           : { isPlaying: false, isLoading: false, currentStation: null, streamInfo: null, error: null, preferredQuality: 'auto' },
       playStation           : async () => {},
       pause                 : async () => {},
       stop                  : async () => {},
       refreshNowPlayingTitle: () => {},
+      setPreferredQuality   : () => {},
     };
   }
   return context;

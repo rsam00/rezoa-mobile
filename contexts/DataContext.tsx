@@ -19,6 +19,7 @@ export interface Station {
   favoriteCount?: number;
   clickCount?: number;
   createdAt?: string;
+  streams?: { url: string; bitrate: number; format: string; label: string }[];
 }
 
 export interface Program {
@@ -101,7 +102,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const performNetworkFetch = useCallback(async () => {
     try {
       console.log('--- NETWORK FETCH STARTING ---');
-      const fieldsS = 'id, name, logo, stream_url, city, country, department, tags, favorite_count, click_count, created_at, description, frequency';
+      const fieldsS = 'id, name, logo, stream_url, city, country, department, tags, favorite_count, click_count, created_at, description, frequency, streams';
       const fieldsP = 'id, name, station_id, poster, schedules, click_count, created_at';
 
       const fetchAll = async (table: string, fields: string) => {
@@ -159,7 +160,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           favoriteCount: s.favorite_count || 0,
           clickCount: s.click_count || 0,
           createdAt: s.created_at,
-          description: s.description || ''
+          description: s.description || '',
+          streams: s.streams || []
         }));
         
         const mappedP = pData.map(p => ({
