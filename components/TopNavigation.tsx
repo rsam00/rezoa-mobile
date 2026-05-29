@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useSegments } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDrawer } from '../contexts/DrawerContext';
 
@@ -24,14 +24,21 @@ export default function TopNavigation({ rightComponent }: Props) {
     { name: 'Explore', route: 'explore' },
   ];
 
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+
   return (
-    <View style={[styles.headerWrapper, { paddingTop: insets.top, height: insets.top + 60 }]}>
-      <View style={styles.headerRow}>
+    <View style={[
+      styles.headerWrapper, 
+      isLandscape ? styles.headerWrapperLandscape : {},
+      { paddingTop: isLandscape ? insets.top + 20 : insets.top, height: isLandscape ? '100%' : insets.top + 60 }
+    ]}>
+      <View style={[styles.headerRow, isLandscape ? styles.headerRowLandscape : {}]}>
         <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
         <Text style={styles.profileButtonText}>☰</Text>
       </TouchableOpacity>
       
-      <View style={styles.navContainer}>
+      <View style={[styles.navContainer, isLandscape ? styles.navContainerLandscape : {}]}>
         {tabs.map((tab) => {
           // Both `index` and `(tabs)` root can match Home
           const isActive = currentRoute === tab.route || (currentRoute === '(tabs)' && tab.route === 'index');
@@ -49,9 +56,11 @@ export default function TopNavigation({ rightComponent }: Props) {
         })}
       </View>
 
-      <View style={styles.rightContainer}>
-        {rightComponent ? rightComponent : <View style={{ width: 44 }} />}
-      </View>
+      {!isLandscape && (
+        <View style={styles.rightContainer}>
+          {rightComponent ? rightComponent : <View style={{ width: 44 }} />}
+        </View>
+      )}
       </View>
     </View>
   );
@@ -66,6 +75,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.7)',
     zIndex: 100,
   },
+  headerWrapperLandscape: {
+    bottom: 0,
+    right: 'auto',
+    width: 160,
+    borderRightWidth: 1,
+    borderRightColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#121212',
+  },
   headerRow: {
     flex: 1,
     flexDirection: 'row',
@@ -73,6 +90,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingBottom: 10,
+  },
+  headerRowLandscape: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    gap: 40,
+    paddingHorizontal: 20,
   },
   profileButton: { 
     padding: 4 
@@ -86,6 +110,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
+  },
+  navContainerLandscape: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    width: '100%',
+    gap: 20,
   },
   navTab: {
     paddingHorizontal: 15, 

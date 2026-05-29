@@ -172,6 +172,8 @@ export default function ProgramGuideScreen() {
 
 function ProgramGuideContent() {
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
   const router = useRouter();
   const { playStation, playerState, pause } = usePlayer();
   const { stations, programs, loading: dataLoading } = useData();
@@ -184,6 +186,7 @@ function ProgramGuideContent() {
   const [selectedCity, setSelectedCity] = useState<string>('All');
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
   const [activeFilter, setActiveFilter] = useState<FilterType>(null);
+  const [showFiltersMenu, setShowFiltersMenu] = useState(false);
   const [locationDetected, setLocationDetected] = useState(false);
 
   const availableCountries = useMemo(() => {
@@ -320,8 +323,6 @@ function ProgramGuideContent() {
     setSelectedGenre(val);
     setActiveFilter(null);
   };
-
-  const { width } = useWindowDimensions();
 
   const leftRef = useAnimatedRef<FlatList>();
   const rightRef = useAnimatedRef<FlatList>();
@@ -556,36 +557,14 @@ function ProgramGuideContent() {
   return (
     <View style={styles.container}>
       <TopNavigation />
-
-      <View style={[styles.genreStripContainer, { paddingTop: insets.top + 70 }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.genreStrip}>
-          <TouchableOpacity onPress={() => setActiveFilter('Country')} style={[styles.genreTab, selectedCountry !== 'All' && styles.activeGenreTab]}>
-            <Text style={[styles.genreText, selectedCountry !== 'All' && styles.activeGenreText]}>
-              {selectedCountry === 'All' ? 'Country' : (selectedCountry === 'United States' ? 'USA' : (selectedCountry === 'Dominican Republic' ? 'Dom. Rep.' : selectedCountry))} <Ionicons name="chevron-down" size={12} color={selectedCountry !== 'All' ? '#a78bfa' : '#a1a1aa'} />
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setActiveFilter('Department')} style={[styles.genreTab, selectedDepartment !== 'All' && styles.activeGenreTab]}>
-            <Text style={[styles.genreText, selectedDepartment !== 'All' && styles.activeGenreText]}>
-              {selectedDepartment === 'All' ? (selectedCountry === 'United States' || selectedCountry === 'USA' ? 'State' : 'Department') : selectedDepartment} <Ionicons name="chevron-down" size={12} color={selectedDepartment !== 'All' ? '#a78bfa' : '#a1a1aa'} />
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setActiveFilter('City')} style={[styles.genreTab, selectedCity !== 'All' && styles.activeGenreTab]}>
-            <Text style={[styles.genreText, selectedCity !== 'All' && styles.activeGenreText]}>
-              {selectedCity === 'All' ? 'City' : selectedCity} <Ionicons name="chevron-down" size={12} color={selectedCity !== 'All' ? '#a78bfa' : '#a1a1aa'} />
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setActiveFilter('Genre')} style={[styles.genreTab, selectedGenre !== 'All' && styles.activeGenreTab]}>
-            <Text style={[styles.genreText, selectedGenre !== 'All' && styles.activeGenreText]}>
-              {selectedGenre === 'All' ? 'Genre' : selectedGenre} <Ionicons name="chevron-down" size={12} color={selectedGenre !== 'All' ? '#a78bfa' : '#a1a1aa'} />
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
-
-      <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15 }]}>
+      
+      <View style={[{ flex: 1 }, isLandscape ? { marginLeft: 160 } : {}]}>
+        <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15, paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }]}>
+        <TouchableOpacity style={styles.filtersButton} onPress={() => setShowFiltersMenu(true)}>
+           <Ionicons name="filter" size={16} color="#d4d4d8" />
+           <Text style={styles.filtersButtonText}>Filters</Text>
+        </TouchableOpacity>
+        
         <ScrollView ref={dayScrollRef} horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={styles.dayStrip}>
           {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((day, i) => (
             <TouchableOpacity 
@@ -675,6 +654,35 @@ function ProgramGuideContent() {
           />
         </Animated.ScrollView>
       </View>
+      </View>
+
+      <Modal visible={showFiltersMenu} animationType="fade" transparent={true} onRequestClose={() => setShowFiltersMenu(false)}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback onPress={() => setShowFiltersMenu(false)}>
+            <View style={styles.modalBackdrop} />
+          </TouchableWithoutFeedback>
+          <View style={[styles.modalContent, { maxHeight: 'auto' }]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filters</Text>
+              <TouchableOpacity onPress={() => setShowFiltersMenu(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Country'); }}>
+              <Text style={styles.modalOptionText}>Country: <Text style={{color:'#a78bfa'}}>{selectedCountry === 'United States' ? 'USA' : selectedCountry}</Text></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Department'); }}>
+              <Text style={styles.modalOptionText}>{(selectedCountry === 'United States' || selectedCountry === 'USA') ? 'State' : 'Department'}: <Text style={{color:'#a78bfa'}}>{selectedDepartment}</Text></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('City'); }}>
+              <Text style={styles.modalOptionText}>City: <Text style={{color:'#a78bfa'}}>{selectedCity}</Text></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Genre'); }}>
+              <Text style={styles.modalOptionText}>Genre: <Text style={{color:'#a78bfa'}}>{selectedGenre}</Text></Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={!!activeFilter} animationType="slide" transparent={true} onRequestClose={() => setActiveFilter(null)}>
         <View style={styles.modalOverlay}>
@@ -753,6 +761,8 @@ const styles = StyleSheet.create({
   activeGenreTab: { backgroundColor: 'rgba(167, 139, 250, 0.15)', borderColor: '#a78bfa' },
   genreText: { color: '#d4d4d8', fontWeight: '600', fontSize: 13 },
   activeGenreText: { color: '#fff', fontWeight: 'bold' },
+  filtersButton: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 15, paddingVertical: 10, borderRightWidth: 1, borderRightColor: '#27272a' },
+  filtersButtonText: { color: '#d4d4d8', fontWeight: 'bold', fontSize: 13 },
   dayStripContainer: { borderBottomWidth: 1, borderBottomColor: '#27272a', backgroundColor: 'black' },
   dayStrip: { paddingHorizontal: 15, paddingVertical: 10, gap: 15 },
   dayTab: { paddingBottom: 5 },
@@ -794,7 +804,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: { flex: 1, justifyContent: 'flex-end' },
   modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
-  modalContent: { backgroundColor: '#1c1c1e', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', padding: 20, paddingBottom: 40 },
+  modalContent: { backgroundColor: '#1c1c1e', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', padding: 20, paddingBottom: 40, width: '100%', maxWidth: 500, alignSelf: 'center' },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   modalOption: { paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#27272a' },

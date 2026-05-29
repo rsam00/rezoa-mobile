@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
@@ -11,19 +11,16 @@ import { usePlayer } from '../../contexts/PlayerContext';
 import TopNavigation from '../../components/TopNavigation';
 
 const CARD_GAP = 12;
-const NUM_COLUMNS = 2;
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_WIDTH = (SCREEN_WIDTH - (30 + CARD_GAP)) / 2; // 30 = paddingHorizontal * 2
 
-const StationCard = React.memo(function StationCard({ item, isFavorite, isStationPlaying, isLoading, onPress, onToggleFavorite, onPlayPause }: any) {
+const StationCard = React.memo(function StationCard({ item, isFavorite, isStationPlaying, isLoading, onPress, onToggleFavorite, onPlayPause, cardWidth }: any) {
   const [imgError, setImgError] = useState(false);
   return (
     <TouchableOpacity
-      style={styles.cardContainer}
+      style={[styles.cardContainer, { width: cardWidth }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { height: cardWidth * 0.85 }]}>
         <Image
           source={imgError ? require('../../assets/images/app-icon-primary.png') : (item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/app-icon-primary.png'))}
           style={styles.stationLogo}
@@ -69,6 +66,10 @@ export default function ExploreScreen() {
 
 function ExploreScreenContent() {
   const insets = useSafeAreaInsets();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const isLandscape = screenWidth > screenHeight;
+  const numColumns = isLandscape ? 4 : 2;
+  const cardWidth = (screenWidth - (30 + (numColumns - 1) * CARD_GAP)) / numColumns;
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
@@ -90,9 +91,9 @@ function ExploreScreenContent() {
     const data: any[] = [];
     const rows: any[] = [];
 
-    // Group into pairs
-    for (let i = 0; i < filteredStations.length; i += 2) {
-      rows.push(filteredStations.slice(i, i + 2));
+    // Group into dynamic rows
+    for (let i = 0; i < filteredStations.length; i += numColumns) {
+      rows.push(filteredStations.slice(i, i + numColumns));
     }
 
     // Insert ad every 3 rows
@@ -104,7 +105,7 @@ function ExploreScreenContent() {
     });
 
     return data;
-  }, [filteredStations]);
+  }, [filteredStations, numColumns]);
 
   const handleToggleFavorite = useCallback((id: string) => {
     toggleFavorite(id);
@@ -135,6 +136,7 @@ function ExploreScreenContent() {
             <StationCard
               key={station.id}
               item={station}
+              cardWidth={cardWidth}
               isFavorite={isFavorite}
               isStationPlaying={isStationPlaying}
               isLoading={isLoading}
@@ -144,22 +146,26 @@ function ExploreScreenContent() {
             />
           );
         })}
-        {item.items.length === 1 && <View style={{ width: CARD_WIDTH }} />}
+        {item.items.length < numColumns && 
+          Array.from({ length: numColumns - item.items.length }).map((_, idx) => (
+             <View key={`spacer-${idx}`} style={{ width: cardWidth }} />
+          ))
+        }
       </View>
     );
   }, [favorites, playerState, router, handleToggleFavorite, pause, playStation]);
 
   const getItemLayout = useCallback((_data: any, index: number) => {
     return {
-      length: CARD_WIDTH + CARD_GAP,
-      offset: (CARD_WIDTH + CARD_GAP) * index,
+      length: cardWidth + CARD_GAP,
+      offset: (cardWidth + CARD_GAP) * index,
       index,
     };
-  }, []);
+  }, [cardWidth]);
 
   if (dataLoading) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }, isLandscape ? { marginLeft: 160 } : {}]}>
         <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
       </View>
     );
@@ -169,6 +175,7 @@ function ExploreScreenContent() {
     <View style={styles.container}>
       <TopNavigation />
       <FlatList
+        style={isLandscape ? { marginLeft: 160 } : {}}
         ListHeaderComponent={(
           <View style={styles.searchBarContainer}>
             <TextInput
@@ -187,7 +194,7 @@ function ExploreScreenContent() {
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: insets.top + 60, paddingBottom: 100 }}
+        contentContainerStyle={{ paddingTop: isLandscape ? insets.top : insets.top + 60, paddingBottom: 100 }}
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />
@@ -219,14 +226,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cardContainer: {
-    width: CARD_WIDTH,
     backgroundColor: '#1c1c1e',
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
   },
   imageContainer: {
-    height: CARD_WIDTH * 0.85,
     width: '100%',
     backgroundColor: '#27272a',
     justifyContent: 'center',

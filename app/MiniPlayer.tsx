@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView, useWindowDimensions } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
@@ -20,6 +20,8 @@ export default function MiniPlayer() {
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
   const [isQualityMenuVisible, setQualityMenuVisible] = useState(false);
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   // Convenience alias for the stream probe result
   const streamInfo = playerState.streamInfo;
@@ -158,16 +160,17 @@ export default function MiniPlayer() {
     <Animated.View
       style={[
         styles.container, 
+        isLandscape ? styles.containerLandscape : {},
         { 
           transform: [{ translateY: slideAnim }],
           bottom: bottomOffset,
-          height: 64,
+          height: isLandscape ? 90 : 64, // Taller in landscape to wrap controls vertically
         },
       ]}
     >
-      <View style={styles.contentContainer}>
-        <View style={styles.mainRow}>
-          <View style={styles.infoSection}>
+      <View style={[styles.contentContainer, isLandscape ? styles.contentContainerLandscape : {}]}>
+        <View style={[styles.mainRow, isLandscape ? styles.mainRowLandscape : {}]}>
+          <View style={[styles.infoSection, isLandscape ? styles.infoSectionLandscape : {}]}>
             <View style={styles.scrollClip}>
               <Animated.View style={{ transform: [{ translateY }] }}>
                 <View style={styles.textTrack}>
@@ -208,7 +211,7 @@ export default function MiniPlayer() {
             )}
           </View>
 
-          <View style={styles.controls}>
+          <View style={[styles.controls, isLandscape ? styles.controlsLandscape : {}]}>
             {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 && (
               <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.qualityBtn} activeOpacity={0.7}>
                 <Text style={styles.qualityText}>
@@ -297,9 +300,21 @@ const styles = StyleSheet.create({
     height: 64,
     justifyContent: 'center',
   },
+  containerLandscape: {
+    right: 'auto',
+    width: 160,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+    borderRightWidth: 1,
+    borderRightColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#121212',
+  },
   contentContainer: {
     flex: 1,
     width: '100%',
+  },
+  contentContainerLandscape: {
+    paddingVertical: 10,
   },
   mainRow: {
     flexDirection: 'row',
@@ -307,11 +322,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     flex: 1,
   },
+  mainRowLandscape: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
   infoSection: {
     flex: 1,
     height: 24,
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  infoSectionLandscape: {
+    width: '100%',
+    flex: undefined,
   },
   scrollClip: {
     height: 24,
@@ -341,6 +368,11 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  controlsLandscape: {
+    width: '100%',
+    justifyContent: 'space-between',
+    gap: 4,
   },
   button: {
     padding: 8,

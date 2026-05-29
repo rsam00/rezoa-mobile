@@ -3,7 +3,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Image, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
@@ -11,8 +11,6 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const HERO_HEIGHT = SCREEN_HEIGHT * 0.5;
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any;[key: string]: any }>;
 function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
@@ -76,6 +74,9 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
 
 export default function StationDetailsScreen() {
   const insets = useSafeAreaInsets();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const isLandscape = screenWidth > screenHeight;
+  const heroHeight = isLandscape ? screenHeight * 0.7 : screenHeight * 0.5;
   const { id } = useLocalSearchParams();
   const { stations, getProgramsForStation, loading, recordClick, recordProgramClick } = useData();
   const station = stations.find(s => s.id === id);
@@ -127,8 +128,8 @@ export default function StationDetailsScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroSection}>
-          <Image source={logoSource} style={styles.heroBg} blurRadius={15} resizeMode="cover" />
+        <View style={[styles.heroSection, { height: heroHeight }]}>
+          <Image source={logoSource} style={[styles.heroBg, { height: heroHeight }]} blurRadius={15} resizeMode="cover" />
           <LinearGradient
             colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)', 'black']}
             style={StyleSheet.absoluteFill}
@@ -237,8 +238,8 @@ export default function StationDetailsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
   scrollContent: { paddingBottom: 150 },
-  heroSection: { height: HERO_HEIGHT, width: '100%' },
-  heroBg: { ...StyleSheet.absoluteFillObject, width: '100%', height: HERO_HEIGHT },
+  heroSection: { width: '100%' },
+  heroBg: { ...StyleSheet.absoluteFillObject, width: '100%' },
   heroContent: {
     flex: 1,
     paddingHorizontal: 20,

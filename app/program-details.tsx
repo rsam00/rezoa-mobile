@@ -3,13 +3,12 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
-import { ActivityIndicator, Animated, Dimensions, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HERO_HEIGHT = 420;
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any; [key: string]: any }>;
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
   },
   heroRoot: {
     height: HERO_HEIGHT,
-    width: SCREEN_WIDTH,
+    width: '100%',
     position: 'relative',
   },
   heroWrapper: {
@@ -235,7 +234,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   posterContainer: {
-    width: SCREEN_WIDTH * 0.75,
+    width: '75%',
     height: 180,
     borderRadius: 16,
     overflow: 'hidden',

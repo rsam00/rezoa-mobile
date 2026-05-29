@@ -11,7 +11,10 @@ import {
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
+    useWindowDimensions,
+    ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -21,14 +24,17 @@ import Animated, {
 import { useAuth } from '../contexts/AuthContext';
 import { useDrawer } from '../contexts/DrawerContext';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const SIDEBAR_WIDTH = SCREEN_WIDTH * 0.8;
 
 export default function Sidebar() {
   const { isOpen, closeDrawer } = useDrawer();
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const translateX = useSharedValue(-SIDEBAR_WIDTH);
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const isLandscape = screenWidth > screenHeight;
+  const insets = useSafeAreaInsets();
+  const sidebarWidth = Math.min(screenWidth * 0.8, 300);
+  
+  const translateX = useSharedValue(-sidebarWidth);
   const opacity = useSharedValue(0);
 
   useEffect(() => {
@@ -36,10 +42,10 @@ export default function Sidebar() {
       translateX.value = withSpring(0, { damping: 20, stiffness: 90 });
       opacity.value = withTiming(1, { duration: 300 });
     } else {
-      translateX.value = withTiming(-SIDEBAR_WIDTH, { duration: 300 });
+      translateX.value = withTiming(-sidebarWidth, { duration: 300 });
       opacity.value = withTiming(0, { duration: 300 });
     }
-  }, [isOpen]);
+  }, [isOpen, sidebarWidth]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
@@ -74,10 +80,10 @@ export default function Sidebar() {
         </Animated.View>
       )}
 
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View style={[styles.container, animatedStyle, { width: sidebarWidth }]}>
         <View style={[StyleSheet.absoluteFill, { backgroundColor: '#1e1b4b' }]} />
         
-        <View style={styles.content}>
+        <ScrollView style={[styles.content, { paddingTop: isLandscape ? insets.top + 20 : insets.top + 60 }]} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
           <View style={styles.header}>
             <Image 
               source={require('../assets/images/logo-sidebar.png')} 
@@ -85,7 +91,7 @@ export default function Sidebar() {
               resizeMode="contain"
             />
             {user && (
-              <View style={styles.userProfile}>
+              <View style={[styles.userProfile, isLandscape ? { flexDirection: 'row' } : {}]}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>{user.email?.[0].toUpperCase()}</Text>
                 </View>
@@ -117,7 +123,7 @@ export default function Sidebar() {
             </View>
             <Text style={styles.version}>v1.0.0 Alpha</Text>
           </View>
-        </View>
+        </ScrollView>
       </Animated.View>
     </View>
   );
@@ -135,7 +141,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     left: 0,
-    width: SIDEBAR_WIDTH,
     zIndex: 1001,
     shadowColor: '#000',
     shadowOffset: { width: 4, height: 0 },
@@ -145,7 +150,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 60,
     paddingHorizontal: 20,
   },
   header: {
@@ -161,7 +165,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    padding: 20,
+    padding: 15,
     borderRadius: 12,
     gap: 12,
   },
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   footer: {
-    paddingBottom: 80,
+    marginTop: 40,
     alignItems: 'center',
   },
   version: {

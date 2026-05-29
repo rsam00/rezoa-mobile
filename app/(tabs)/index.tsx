@@ -5,7 +5,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, InteractionManager, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
@@ -16,8 +16,6 @@ import { usePlayer } from '../../contexts/PlayerContext';
 import TopNavigation from '../../components/TopNavigation';
 import { getCurrentProgram, getHaitiTime } from '../../utils/timeUtils';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const HERO_HEIGHT = SCREEN_HEIGHT * 0.45;
 const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 100;
 const HERO_ROTATION_INTERVAL = 10000;
@@ -109,6 +107,9 @@ export default function HomeScreen() {
 // values actually change. Since it takes no props, React can freely bail out.
 const HomeScreenContent = React.memo(function HomeScreenContent() {
   console.log('--- RENDERING HOME SCREEN CONTENT ---');
+  const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+  const isLandscape = screenWidth > screenHeight;
+  const heroHeight = isLandscape ? screenHeight * 0.7 : screenHeight * 0.45;
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
   const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
@@ -343,13 +344,13 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
       <TopNavigation />
 
       <ScrollView
-        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 60 }]}
+        contentContainerStyle={{ paddingBottom: 150, paddingTop: isLandscape ? insets.top : insets.top + 60 }}
+        style={isLandscape ? { marginLeft: 160 } : {}}
       >
         {featuredItem?.station && (
           <TouchableOpacity
-            style={styles.heroContainer}
+            style={[styles.heroContainer, { height: heroHeight }]}
             onPress={navigateToDetails}
             activeOpacity={0.9}
           >
@@ -581,7 +582,6 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   heroContainer: {
-    height: HERO_HEIGHT,
     width: '100%',
     position: 'relative',
   },
