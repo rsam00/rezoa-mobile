@@ -13,6 +13,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useContributions } from '../contexts/ContributionsContext';
@@ -22,6 +23,8 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 
 export default function ContributeProgramScreen() {
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
   const { stationId } = useLocalSearchParams();
   const { stations } = useData();
   const station = stations.find((s) => s.id === stationId);
@@ -99,7 +102,7 @@ export default function ContributeProgramScreen() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={[styles.scrollContent, { maxWidth: 800, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.stationBanner}>
              <Text style={styles.contributingTo}>CONTRIBUTING TO</Text>
              <Text style={styles.stationName}>{station.name}</Text>

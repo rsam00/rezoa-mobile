@@ -13,6 +13,8 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    ScrollView,
+    useWindowDimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
@@ -26,6 +28,8 @@ export default function LoginScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   async function handleAuth() {
     if (!email || !password || (isSignUp && !confirmPassword)) {
@@ -76,9 +80,10 @@ export default function LoginScreen() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.content}
+        style={{ flex: 1 }}
       >
-        <View style={styles.header}>
+        <ScrollView contentContainerStyle={[styles.content, { flexGrow: 1, maxWidth: 400, alignSelf: 'center', width: '100%' }]} showsVerticalScrollIndicator={false}>
+          <View style={styles.header}>
           <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
           <Text style={styles.subtitle}>
             {isSignUp ? 'Join the Rezoa community' : 'Sign in to sync your favorites'}
@@ -168,6 +173,7 @@ export default function LoginScreen() {
         >
           <Text style={styles.skipButtonText}>Skip for now</Text>
         </TouchableOpacity>
+        </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
@@ -196,9 +202,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: {
-    flex: 1,
     padding: 24,
     justifyContent: 'center',
+    paddingTop: 80,
   },
   header: {
     marginBottom: 40,

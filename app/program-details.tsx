@@ -3,13 +3,13 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import React, { useMemo, useRef } from 'react';
-import { ActivityIndicator, Animated, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Image, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 
-const HERO_HEIGHT = 420;
+// HERO_HEIGHT is now dynamically calculated
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any; [key: string]: any }>;
 function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
@@ -34,6 +34,9 @@ export default function ProgramDetailsScreen() {
   const { id } = useLocalSearchParams();
   const { programs, stations, loading, recordProgramClick } = useData();
   const program = programs.find(p => p.id === id);
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const heroHeight = isLandscape ? height * 0.8 : 420;
 
   React.useEffect(() => {
     if (program) {
@@ -71,7 +74,7 @@ export default function ProgramDetailsScreen() {
       </View>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Header Hero Section */}
-        <View style={styles.heroRoot}>
+        <View style={[styles.heroRoot, { height: heroHeight }]}>
           <View style={styles.heroWrapper}>
             {/* Immersive Background */}
             <View style={styles.heroBackgroundContainer}>
@@ -115,7 +118,7 @@ export default function ProgramDetailsScreen() {
         </View>
 
         {/* Content Section */}
-        <View style={styles.infoContent}>
+        <View style={[styles.infoContent, { maxWidth: 800, alignSelf: 'center', width: '100%' }]}>
           <Text style={styles.programTitle}>{program.name}</Text>
           
           {program.host && (
@@ -191,7 +194,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   heroRoot: {
-    height: HERO_HEIGHT,
     width: '100%',
     position: 'relative',
   },

@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, storage } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
 interface FavoritesContextType {
@@ -36,7 +35,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (error) throw error;
 
       const cloudIds = cloudFavs.map(f => f.station_id);
-      const localData = await AsyncStorage.getItem('favoriteStations');
+      const localData = storage.getString('favoriteStations');
       const localIds: string[] = localData ? JSON.parse(localData) : [];
       
       const combinedIds = Array.from(new Set([...cloudIds, ...localIds]));
@@ -49,7 +48,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       setFavorites(combinedIds);
-      await AsyncStorage.removeItem('favoriteStations');
+      storage.delete('favoriteStations');
     } catch (e) {
       console.error('Error syncing favorites:', e);
     } finally {

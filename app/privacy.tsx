@@ -2,12 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, Stack } from 'expo-router';
 import React from 'react';
-import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function PrivacyPolicyScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
 
   return (
     <View style={styles.container}>
@@ -25,7 +26,7 @@ export default function PrivacyPolicyScreen() {
         <Text style={styles.headerTitle}>Privacy Policy</Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 70 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 70, maxWidth: 800, alignSelf: 'center', width: '100%' }]} showsVerticalScrollIndicator={false}>
         <Text style={styles.lastUpdated}>Last Updated: January 17, 2026</Text>
 
         <Section title="1. Information We Collect">

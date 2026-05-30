@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, storage } from '../lib/supabase';
 
 // Types matched to Supabase schema
 export interface Station {
@@ -108,7 +107,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       const fetchAll = async (table: string, fields: string) => {
         let allData: any[] = [];
         let from = 0;
-        const limit = 1000;
+        const limit = 200;
         let hasMore = true;
 
         while (hasMore) {
@@ -175,16 +174,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         // ONE dispatch = ONE render (was 3 separate setState calls before)
         dispatch({ type: 'LOAD_NETWORK', stations: mappedS, programs: mappedP });
 
-        // Defer cache writes — these are fire-and-forget and don't affect UI
-        setTimeout(() => {
-          AsyncStorage.setItem(CACHE_KEYS.STATIONS, JSON.stringify(mappedS))
-            .catch(e => console.log('--- STATIONS SAVE ERROR ---', e));
-        }, 2000);
-
-        setTimeout(() => {
-          AsyncStorage.setItem(CACHE_KEYS.PROGRAMS, JSON.stringify(mappedP))
-            .catch(e => console.log('--- PROGRAMS SAVE ERROR ---', e));
-        }, 4000);
+        // Cache writes with MMKV are instantaneous
+        try {
+          storage.set(CACHE_KEYS.STATIONS, JSON.stringify(mappedS));
+          storage.set(CACHE_KEYS.PROGRAMS, JSON.stringify(mappedP));
+        } catch (e) {
+          console.log('--- MMKV SAVE ERROR ---', e);
+        }
       }
     } catch (e) {
       console.error('--- NETWORK CRASHED ---');
@@ -196,10 +192,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const startup = async () => {
       console.log('--- DATA STARTUP BEGINS ---');
       try {
-        const [cachedS, cachedP] = await Promise.all([
-          AsyncStorage.getItem(CACHE_KEYS.STATIONS),
-          AsyncStorage.getItem(CACHE_KEYS.PROGRAMS),
-        ]);
+        const cachedS = storage.getString(CACHE_KEYS.STATIONS);
+        const cachedP = storage.getString(CACHE_KEYS.PROGRAMS);
 
         if (cachedS && cachedP) {
           try {

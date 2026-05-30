@@ -28,15 +28,26 @@ export default function TopNavigation({ rightComponent }: Props) {
   const isLandscape = width > height;
 
   return (
-    <View style={[
-      styles.headerWrapper, 
-      isLandscape ? styles.headerWrapperLandscape : {},
-      { paddingTop: isLandscape ? insets.top + 20 : insets.top, height: isLandscape ? '100%' : insets.top + 60 }
-    ]}>
-      <View style={[styles.headerRow, isLandscape ? styles.headerRowLandscape : {}]}>
-        <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
-        <Text style={styles.profileButtonText}>☰</Text>
-      </TouchableOpacity>
+    <>
+      {isLandscape && (
+        <TouchableOpacity 
+          style={[styles.floatingHamburger, { top: Math.max(10, insets.top - 10), left: 170 }]} 
+          onPress={openDrawer}
+        >
+          <Text style={styles.profileButtonText}>☰</Text>
+        </TouchableOpacity>
+      )}
+      <View style={[
+        styles.headerWrapper, 
+        isLandscape ? styles.headerWrapperLandscape : {},
+        { paddingTop: isLandscape ? insets.top + 20 : insets.top, height: isLandscape ? '100%' : insets.top + 60 }
+      ]}>
+        <View style={[styles.headerRow, isLandscape ? styles.headerRowLandscape : {}]}>
+          {!isLandscape && (
+            <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
+              <Text style={styles.profileButtonText}>☰</Text>
+            </TouchableOpacity>
+          )}
       
       <View style={[styles.navContainer, isLandscape ? styles.navContainerLandscape : {}]}>
         {tabs.map((tab) => {
@@ -62,7 +73,8 @@ export default function TopNavigation({ rightComponent }: Props) {
         </View>
       )}
       </View>
-    </View>
+      </View>
+    </>
   );
 }
 
@@ -118,17 +130,17 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   navTab: {
-    paddingHorizontal: 15, 
+    paddingHorizontal: 5, 
     paddingVertical: 6, 
-    borderRadius: 20, 
-    backgroundColor: '#1c1c1e'
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
   activeNavTab: {
-    backgroundColor: '#a78bfa'
+    borderBottomColor: '#a78bfa'
   },
   navTabText: {
-    color: '#a1a1aa',
-    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: 15,
     fontWeight: '600',
   },
   activeNavTabText: {
@@ -139,5 +151,15 @@ const styles = StyleSheet.create({
     minWidth: 44,
     alignItems: 'flex-end',
     justifyContent: 'center',
+  },
+  floatingHamburger: {
+    position: 'absolute',
+    zIndex: 200,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    width: 48,
+    height: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
   }
 });

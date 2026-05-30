@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useSegments } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView, useWindowDimensions, Image } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
@@ -149,6 +149,10 @@ export default function MiniPlayer() {
     return stream ? `${stream.bitrate}k` : 'AUTO';
   };
 
+  const logoSource = playerState.currentStation?.logo 
+    ? { uri: playerState.currentStation.logo.startsWith('http') ? playerState.currentStation.logo : `https:${playerState.currentStation.logo}` } 
+    : require('../assets/images/app-icon-primary.png');
+
   const translateY = scrollAnim.interpolate({
     inputRange: [-1, 0],
     outputRange: [-24, 0], // Heights for the vertical shift
@@ -164,13 +168,15 @@ export default function MiniPlayer() {
         { 
           transform: [{ translateY: slideAnim }],
           bottom: bottomOffset,
-          height: isLandscape ? 90 : 64, // Taller in landscape to wrap controls vertically
+          height: isLandscape ? 170 : 64, // Taller in landscape to fit logo and controls
         },
       ]}
     >
       <View style={[styles.contentContainer, isLandscape ? styles.contentContainerLandscape : {}]}>
         <View style={[styles.mainRow, isLandscape ? styles.mainRowLandscape : {}]}>
-          <View style={[styles.infoSection, isLandscape ? styles.infoSectionLandscape : {}]}>
+          <View style={[styles.leftGroup, isLandscape ? styles.leftGroupLandscape : {}]}>
+            <Image source={logoSource} style={[styles.stationLogo, isLandscape ? styles.stationLogoLandscape : {}]} resizeMode="contain" />
+            <View style={[styles.infoSection, isLandscape ? styles.infoSectionLandscape : {}]}>
             <View style={styles.scrollClip}>
               <Animated.View style={{ transform: [{ translateY }] }}>
                 <View style={styles.textTrack}>
@@ -209,6 +215,7 @@ export default function MiniPlayer() {
                 {playerState.error}
               </Text>
             )}
+          </View>
           </View>
 
           <View style={[styles.controls, isLandscape ? styles.controlsLandscape : {}]}>
@@ -319,16 +326,30 @@ const styles = StyleSheet.create({
   mainRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     flex: 1,
+    width: '100%',
   },
   mainRowLandscape: {
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 4,
+    gap: 10,
+    paddingVertical: 0,
     paddingHorizontal: 12,
+  },
+  leftGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  leftGroupLandscape: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 10,
   },
   infoSection: {
     flex: 1,
@@ -339,6 +360,19 @@ const styles = StyleSheet.create({
   infoSectionLandscape: {
     width: '100%',
     flex: undefined,
+  },
+  stationLogo: {
+    width: 70,
+    height: 44,
+    borderRadius: 6,
+    marginRight: 12,
+  },
+  stationLogoLandscape: {
+    width: 120,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 0,
+    alignSelf: 'center',
   },
   scrollClip: {
     height: 24,
@@ -368,10 +402,11 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
   },
   controlsLandscape: {
     width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     gap: 4,
   },
   button: {

@@ -8,6 +8,12 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import mobileAds from 'react-native-google-mobile-ads';
 import { StatusBar } from 'expo-status-bar';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  '`setBackgroundColorAsync` is not supported with edge-to-edge enabled.',
+  '`setPositionAsync` is not supported with edge-to-edge enabled.'
+]);
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -56,9 +62,15 @@ export default function RootLayout() {
     }, 3000);
 
     if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync('rgba(0,0,0,0.7)');
-      NavigationBar.setButtonStyleAsync('light');
-      NavigationBar.setPositionAsync('absolute');
+      (async () => {
+        try {
+          await NavigationBar.setBackgroundColorAsync('rgba(0,0,0,0.7)');
+          await NavigationBar.setButtonStyleAsync('light');
+          await NavigationBar.setPositionAsync('absolute');
+        } catch (error) {
+          // Ignore errors gracefully when edge-to-edge is enforced
+        }
+      })();
     }
   }, []);
   

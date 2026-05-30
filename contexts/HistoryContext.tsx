@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, storage } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
 interface HistoryContextType {
@@ -28,8 +27,8 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user]);
 
-  const loadLocal = async () => {
-    const data = await AsyncStorage.getItem('playbackHistory');
+  const loadLocal = () => {
+    const data = storage.getString('playbackHistory');
     if (data) setHistory(JSON.parse(data));
     else setHistory([]);
   };
@@ -48,7 +47,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (error) throw error;
 
       const cloudIds = cloudHistory.map(h => h.station_id);
-      const localData = await AsyncStorage.getItem('playbackHistory');
+      const localData = storage.getString('playbackHistory');
       const localIds: string[] = localData ? JSON.parse(localData) : [];
       
       const combinedIds = Array.from(new Set([...localIds, ...cloudIds])).slice(0, 15);
@@ -56,7 +55,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setHistory(combinedIds);
       
       // 4. IMPORTANT: Clear local history after migration
-      await AsyncStorage.removeItem('playbackHistory');
+      storage.delete('playbackHistory');
     } catch (e) {
       console.error('Error syncing history:', e);
     } finally {
@@ -71,8 +70,8 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setHistory(newHistory);
     
     if (!user) {
-      // Only save to AsyncStorage if guest
-      await AsyncStorage.setItem('playbackHistory', JSON.stringify(newHistory));
+      // Only save to MMKV if guest
+      storage.set('playbackHistory', JSON.stringify(newHistory));
     }
 
     if (user) {
@@ -88,7 +87,7 @@ export const HistoryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const clearHistory = async () => {
     setHistory([]);
-    await AsyncStorage.removeItem('playbackHistory');
+    storage.delete('playbackHistory');
     
     if (user) {
       try {
