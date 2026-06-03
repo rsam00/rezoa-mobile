@@ -179,10 +179,11 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           ? (station.logo.startsWith('//') ? `https:${station.logo}` : station.logo)
           : 'https://via.placeholder.com/150',
         // Tell ICY/SHOUTcast servers to send inline metadata,
-        // and present as a known media player so stream hosts don't block us
+        // and present as a standard browser so strict networks (like iHeart/Audacy) don't block us.
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         headers: {
           'Icy-MetaData': '1',
-          'User-Agent'  : 'VLC/3.0 LibVLC/3.0',
+          'User-Agent'  : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         },
       };
 

@@ -30,8 +30,8 @@ export async function resolveStreamUrl(url: string): Promise<string> {
     console.log(`[PlaylistParser] Fetching playlist: ${url}`);
     const response = await fetch(url, {
       headers: {
-        // Disguise as VLC to avoid blocks from strict Icecast/Shoutcast servers
-        'User-Agent': 'VLC/3.0 LibVLC/3.0',
+        // Disguise as a standard browser to avoid blocks from strict servers
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
     });
 
