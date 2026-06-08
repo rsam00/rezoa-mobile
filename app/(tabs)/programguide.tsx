@@ -558,7 +558,7 @@ function ProgramGuideContent() {
     <View style={styles.container}>
       <TopNavigation />
       
-      <View style={[{ flex: 1 }, isLandscape ? { marginLeft: 160 } : {}]}>
+      <View style={[{ flex: 1 }, isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), paddingRight: Math.max(0, insets.right) } : {}]}>
         <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15, paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }]}>
         <TouchableOpacity style={styles.filtersButton} onPress={() => setShowFiltersMenu(true)}>
            <Ionicons name="filter" size={16} color="#d4d4d8" />

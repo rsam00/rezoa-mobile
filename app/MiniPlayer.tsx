@@ -164,11 +164,11 @@ export default function MiniPlayer() {
     <Animated.View
       style={[
         styles.container, 
-        isLandscape ? styles.containerLandscape : {},
+        isLandscape ? [styles.containerLandscape, { width: 200 + Math.max(0, insets.left), paddingLeft: Math.max(0, insets.left) }] : {},
         { 
           transform: [{ translateY: slideAnim }],
           bottom: bottomOffset,
-          height: isLandscape ? 170 : 64, // Taller in landscape to fit logo and controls
+          height: isLandscape ? 120 : 64, // Taller in landscape to fit logo and controls
         },
       ]}
     >
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
   containerLandscape: {
     right: 'auto',
-    width: 160,
+    width: 200,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.1)',
     borderRightWidth: 1,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   contentContainerLandscape: {
-    paddingVertical: 10,
+    paddingVertical: 2,
   },
   mainRow: {
     flexDirection: 'row',
@@ -347,9 +347,10 @@ const styles = StyleSheet.create({
   },
   leftGroupLandscape: {
     width: '100%',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: 10,
+    flex: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   infoSection: {
     flex: 1,
@@ -358,8 +359,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   infoSectionLandscape: {
-    width: '100%',
-    flex: undefined,
+    flex: 1,
+    width: 'auto',
   },
   stationLogo: {
     width: 70,
@@ -368,9 +369,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   stationLogoLandscape: {
-    width: 120,
-    height: 60,
-    borderRadius: 8,
+    width: '30%',
+    height: 44,
+    borderRadius: 6,
     marginRight: 0,
     alignSelf: 'center',
   },

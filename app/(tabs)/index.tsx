@@ -345,8 +345,8 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 150, paddingTop: isLandscape ? insets.top : insets.top + 60 }}
-        style={isLandscape ? { marginLeft: 160 } : {}}
+        contentContainerStyle={{ paddingBottom: 150, paddingTop: isLandscape ? insets.top : insets.top + 60, paddingRight: isLandscape ? Math.max(0, insets.right) : 0 }}
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
       >
         {featuredItem?.station && (
           <TouchableOpacity

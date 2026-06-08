@@ -83,17 +83,24 @@ export default function Sidebar() {
       <Animated.View style={[styles.container, animatedStyle, { width: sidebarWidth }]}>
         <View style={[StyleSheet.absoluteFill, { backgroundColor: '#1e1b4b' }]} />
         
-        <ScrollView style={[styles.content, { paddingTop: isLandscape ? insets.top + 20 : insets.top + 60 }]} contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}>
-          <View style={styles.header}>
+        <ScrollView 
+          style={[styles.content, { 
+            paddingTop: isLandscape ? Math.max(20, insets.top + 20) : insets.top + 60,
+            paddingLeft: isLandscape ? Math.max(20, insets.left + 20) : 20
+          }]} 
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 20 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={[styles.header, isLandscape && { marginBottom: 20 }]}>
             <Image 
               source={require('../assets/images/logo-sidebar.png')} 
-              style={styles.logoImage} 
+              style={[styles.logoImage, isLandscape && { width: 110, height: 40, marginBottom: 10 }]} 
               resizeMode="contain"
             />
             {user && (
-              <View style={[styles.userProfile, isLandscape ? { flexDirection: 'row' } : {}]}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{user.email?.[0].toUpperCase()}</Text>
+              <View style={[styles.userProfile, isLandscape ? { flexDirection: 'row', padding: 10, gap: 10 } : {}]}>
+                <View style={[styles.avatar, isLandscape && { width: 32, height: 32, borderRadius: 16 }]}>
+                  <Text style={[styles.avatarText, isLandscape && { fontSize: 14 }]}>{user.email?.[0].toUpperCase()}</Text>
                 </View>
                 <Text style={styles.userEmail} numberOfLines={1}>{user.email}</Text>
               </View>
@@ -101,27 +108,30 @@ export default function Sidebar() {
           </View>
 
           <View style={styles.menuItems}>
-            <View style={[styles.divider, { marginVertical: 20 }]} />
-            
-            <TouchableOpacity style={styles.authButton} onPress={handleAuth}>
-              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.1)' }]} />
-              <Text style={styles.authButtonText}>
-                {user ? 'Sign Out' : 'Sign in'}
+            <TouchableOpacity style={styles.authButton} onPress={handleAuth} activeOpacity={0.8}>
+              <LinearGradient
+                colors={user ? ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.03)'] : ['#a78bfa', '#7c3aed']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
+              <Text style={[styles.authButtonText, user ? { color: '#ef4444' } : { color: '#fff' }]}>
+                {user ? 'Sign Out' : 'Sign In'}
               </Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
-            <View style={styles.legalLinks}>
-              <TouchableOpacity onPress={() => handleNav('/terms')} style={styles.legalItem}>
-                <Text style={styles.legalText}>Terms of Use</Text>
+            <View style={styles.legalLinksRow}>
+              <TouchableOpacity onPress={() => handleNav('/terms')}>
+                <Text style={styles.legalFooterText}>Terms</Text>
               </TouchableOpacity>
-              <View style={styles.legalSeparator} />
-              <TouchableOpacity onPress={() => handleNav('/privacy')} style={styles.legalItem}>
-                <Text style={styles.legalText}>Privacy Policy</Text>
+              <Text style={styles.legalFooterDot}>•</Text>
+              <TouchableOpacity onPress={() => handleNav('/privacy')}>
+                <Text style={styles.legalFooterText}>Privacy</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.version}>v1.0.0 Alpha</Text>
+            <Text style={styles.version}>Rezoa v1.0.0 Alpha</Text>
           </View>
         </ScrollView>
       </Animated.View>
@@ -150,10 +160,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingRight: 20, // left padding is handled dynamically
   },
   header: {
-    marginBottom: 30,
+    marginBottom: 40,
     alignItems: 'center',
   },
   logoImage: {
@@ -168,6 +178,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     gap: 12,
+    width: '100%',
   },
   avatar: {
     width: 40,
@@ -188,55 +199,48 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    width: '100%',
-  },
   menuItems: {
-    marginTop: 20,
     flex: 1,
   },
   authButton: {
     height: 50,
-    borderRadius: 8,
+    borderRadius: 12,
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    shadowColor: '#a78bfa',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   authButtonText: {
-    color: '#a78bfa',
     fontWeight: '900',
-    fontSize: 14,
+    fontSize: 15,
     letterSpacing: 1,
   },
   footer: {
     marginTop: 40,
     alignItems: 'center',
   },
+  legalLinksRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  legalFooterText: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  legalFooterDot: {
+    color: 'rgba(255,255,255,0.2)',
+    fontSize: 11,
+  },
   version: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: 12,
-  },
-  legalLinks: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  legalItem: {
-    paddingVertical: 10,
-    width: '100%',
-    alignItems: 'center',
-  },
-  legalText: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  legalSeparator: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    width: '80%',
+    color: 'rgba(255,255,255,0.2)',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });

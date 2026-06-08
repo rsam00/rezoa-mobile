@@ -10,6 +10,7 @@ import { useData } from '../contexts/DataContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
+import TopNavigation from '../components/TopNavigation';
 
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any;[key: string]: any }>;
@@ -121,13 +122,19 @@ export default function StationDetailsScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
+      {isLandscape && <TopNavigation />}
+
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }, isLandscape && { left: 200 + Math.max(0, insets.left) }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
+      >
         <View style={[styles.heroSection, { height: heroHeight }]}>
           <Image source={logoSource} style={[styles.heroBg, { height: heroHeight }]} blurRadius={15} resizeMode="cover" />
           <LinearGradient
@@ -147,9 +154,9 @@ export default function StationDetailsScreen() {
               </View>
             </View>
 
-            <View style={styles.heroActions}>
+            <View style={[styles.heroActions, isLandscape && { justifyContent: 'flex-start' }]}>
               <TouchableOpacity
-                style={[styles.mainPlayButton, isStationPlaying && styles.playingButton]}
+                style={[styles.mainPlayButton, isStationPlaying && styles.playingButton, isLandscape && { flex: 0, width: 250 }]}
                 onPress={async () => {
                   if (isStationPlaying) await pause();
                   else await playStation(station as any);
@@ -242,10 +249,13 @@ const styles = StyleSheet.create({
   heroBg: { ...StyleSheet.absoluteFillObject, width: '100%' },
   heroContent: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 30,
     paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 10 : 50,
-    paddingBottom: 30,
-    justifyContent: 'flex-end'
+    paddingBottom: 40,
+    justifyContent: 'flex-end',
+    maxWidth: 900,
+    alignSelf: 'flex-start',
+    width: '100%'
   },
   stickyHeader: {
     position: 'absolute',

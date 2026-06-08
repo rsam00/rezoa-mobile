@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
+import TopNavigation from '../components/TopNavigation';
 
 // HERO_HEIGHT is now dynamically calculated
 
@@ -67,12 +68,17 @@ export default function ProgramDetailsScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
-      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
+      {isLandscape && <TopNavigation />}
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }, isLandscape && { left: 200 + Math.max(0, insets.left) }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={{ paddingBottom: 120 }}
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
+      >
         {/* Header Hero Section */}
         <View style={[styles.heroRoot, { height: heroHeight }]}>
           <View style={styles.heroWrapper}>
@@ -135,7 +141,7 @@ export default function ProgramDetailsScreen() {
           {/* Listen Live Button - Premium Action */}
           {isProgramLive && station && (
             <TouchableOpacity
-              style={styles.listenLiveButton}
+              style={[styles.listenLiveButton, isLandscape && { alignSelf: 'center', width: 300 }]}
               onPress={() => playStation(station)}
               activeOpacity={0.8}
             >

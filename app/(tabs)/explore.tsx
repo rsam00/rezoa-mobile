@@ -69,7 +69,8 @@ function ExploreScreenContent() {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
   const numColumns = isLandscape ? 4 : 2;
-  const cardWidth = (screenWidth - (30 + (numColumns - 1) * CARD_GAP)) / numColumns;
+  const availableWidth = isLandscape ? screenWidth - (200 + Math.max(0, insets.left)) : screenWidth;
+  const cardWidth = (availableWidth - (30 + (numColumns - 1) * CARD_GAP)) / numColumns;
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
@@ -165,7 +166,7 @@ function ExploreScreenContent() {
 
   if (dataLoading) {
     return (
-      <View style={[styles.container, { paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }, isLandscape ? { marginLeft: 160 } : {}]}>
+      <View style={[styles.container, { paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }, isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}]}>
         <ActivityIndicator size="large" color="#a78bfa" style={{ marginTop: 40 }} />
       </View>
     );
@@ -175,7 +176,7 @@ function ExploreScreenContent() {
     <View style={styles.container}>
       <TopNavigation />
       <FlatList
-        style={isLandscape ? { marginLeft: 160 } : {}}
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
         ListHeaderComponent={(
           <View style={styles.searchBarContainer}>
             <TextInput
@@ -194,7 +195,7 @@ function ExploreScreenContent() {
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: isLandscape ? insets.top : insets.top + 60, paddingBottom: 100 }}
+        contentContainerStyle={{ paddingTop: isLandscape ? insets.top : insets.top + 60, paddingBottom: 100, paddingRight: isLandscape ? Math.max(0, insets.right) : 0 }}
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />

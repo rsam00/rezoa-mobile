@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDrawer } from '../contexts/DrawerContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Props {
   rightComponent?: React.ReactNode;
@@ -13,6 +14,7 @@ export default function TopNavigation({ rightComponent }: Props) {
   const router = useRouter();
   const segments = useSegments();
   const { openDrawer } = useDrawer();
+  const { user } = useAuth();
 
   // Determine current active tab based on route segments safely
   const currentRoute = Array.isArray(segments) && segments.length > 0 ? segments[segments.length - 1] : 'index';
@@ -29,25 +31,21 @@ export default function TopNavigation({ rightComponent }: Props) {
 
   return (
     <>
-      {isLandscape && (
-        <TouchableOpacity 
-          style={[styles.floatingHamburger, { top: Math.max(10, insets.top - 10), left: 170 }]} 
-          onPress={openDrawer}
-        >
-          <Text style={styles.profileButtonText}>☰</Text>
-        </TouchableOpacity>
-      )}
       <View style={[
         styles.headerWrapper, 
-        isLandscape ? styles.headerWrapperLandscape : {},
-        { paddingTop: isLandscape ? insets.top + 20 : insets.top, height: isLandscape ? '100%' : insets.top + 60 }
+        isLandscape ? [styles.headerWrapperLandscape, { width: 200 + Math.max(0, insets.left), paddingLeft: Math.max(0, insets.left) }] : {},
+        { paddingTop: isLandscape ? insets.top + 10 : insets.top, height: isLandscape ? '100%' : insets.top + 60 }
       ]}>
         <View style={[styles.headerRow, isLandscape ? styles.headerRowLandscape : {}]}>
-          {!isLandscape && (
-            <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
-              <Text style={styles.profileButtonText}>☰</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity style={styles.profileButton} onPress={openDrawer}>
+            {user?.email ? (
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{user.email[0].toUpperCase()}</Text>
+              </View>
+            ) : (
+              <Ionicons name="person-circle-outline" size={32} color="#a78bfa" />
+            )}
+          </TouchableOpacity>
       
       <View style={[styles.navContainer, isLandscape ? styles.navContainerLandscape : {}]}>
         {tabs.map((tab) => {
@@ -90,7 +88,7 @@ const styles = StyleSheet.create({
   headerWrapperLandscape: {
     bottom: 0,
     right: 'auto',
-    width: 160,
+    width: 200,
     borderRightWidth: 1,
     borderRightColor: 'rgba(255,255,255,0.1)',
     backgroundColor: '#121212',
@@ -107,16 +105,24 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    gap: 40,
+    gap: 20,
     paddingHorizontal: 20,
   },
   profileButton: { 
     padding: 4 
   },
-  profileButtonText: { 
-    color: '#a78bfa', 
-    fontSize: 28, 
-    fontWeight: '700' 
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#a78bfa',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   navContainer: {
     flexDirection: 'row',
@@ -152,14 +158,4 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
-  floatingHamburger: {
-    position: 'absolute',
-    zIndex: 200,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 4,
-  }
 });
