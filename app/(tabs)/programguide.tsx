@@ -778,7 +778,7 @@ const styles = StyleSheet.create({
   timeCell: { justifyContent: 'center', paddingLeft: 5 },
   timeText: { color: '#a1a1aa', fontSize: 12, fontWeight: '600' },
   programRow: { height: STATION_ROW_HEIGHT, width: 24 * CELL_WIDTH, borderBottomWidth: 1, borderBottomColor: '#27272a' },
-  programBlock: { position: 'absolute', top: 5, bottom: 5, borderRadius: 8, padding: 8, justifyContent: 'center' },
+  programBlock: { position: 'absolute', top: 5, bottom: 5, borderRadius: 8, padding: 8, justifyContent: 'center', borderWidth: 1, borderColor: '#27272a' },
   currentProgramBlock: { borderColor: '#a78bfa', borderWidth: 1 },
   programName: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
   programTime: { color: '#a1a1aa', fontSize: 10, marginTop: 2 },

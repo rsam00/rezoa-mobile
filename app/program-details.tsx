@@ -46,7 +46,9 @@ export default function ProgramDetailsScreen() {
   }, [program]);
   const station = program ? stations.find(s => s.id === program.stationId) : null;
   const router = useRouter();
-  const { playStation } = usePlayer();
+  const { playStation, playerState, pause } = usePlayer();
+  const isStationPlaying = playerState.isPlaying && playerState.currentStation?.id === station?.id;
+  const isStationLoading = playerState.isLoading && playerState.currentStation?.id === station?.id;
 
   const isProgramLive = useMemo(() => {
     if (!program) return false;
@@ -69,9 +71,14 @@ export default function ProgramDetailsScreen() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       {isLandscape && <TopNavigation />}
-      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }, isLandscape && { left: 200 + Math.max(0, insets.left) }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
+      <View style={[
+        styles.floatingHeader, 
+        { top: Math.max(insets.top, 15) }, 
+        isLandscape ? { left: 200 + Math.max(insets.left, 15) } : { left: Math.max(insets.left, 15) }
+      ]}>
+        <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
       <ScrollView 
@@ -141,17 +148,40 @@ export default function ProgramDetailsScreen() {
           {/* Listen Live Button - Premium Action */}
           {isProgramLive && station && (
             <TouchableOpacity
-              style={[styles.listenLiveButton, isLandscape && { alignSelf: 'center', width: 300 }]}
-              onPress={() => playStation(station)}
+              style={[
+                styles.listenLiveButton, 
+                isStationPlaying && { backgroundColor: '#7c3aed' },
+                isLandscape && { alignSelf: 'center', width: 300 }
+              ]}
+              onPress={async () => {
+                if (isStationPlaying) await pause();
+                else await playStation(station as any);
+              }}
               activeOpacity={0.8}
             >
-              <LinearGradient
-                colors={['#a78bfa', '#7c3aed']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={StyleSheet.absoluteFill}
-              />
-              <Text style={styles.listenLiveText}>▶   LISTEN LIVE</Text>
+              {!isStationPlaying && (
+                <LinearGradient
+                  colors={['#a78bfa', '#7c3aed']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={StyleSheet.absoluteFill}
+                />
+              )}
+              {isStationLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Ionicons
+                    name={isStationPlaying ? "pause" : "play"}
+                    size={20}
+                    color="#fff"
+                    style={{ marginRight: 8, marginLeft: isStationPlaying ? 0 : 4 }}
+                  />
+                  <Text style={styles.listenLiveText}>
+                    {isStationPlaying ? 'PAUSE' : 'LISTEN LIVE'}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           )}
 
@@ -214,26 +244,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  stickyHeader: {
+  floatingHeader: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
     zIndex: 100,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
   },
-  backButton: {
+  floatingBackButton: {
     width: 44,
     height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   posterWrapper: {
     ...StyleSheet.absoluteFillObject,

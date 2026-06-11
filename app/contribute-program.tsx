@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import TopNavigation from '../components/TopNavigation';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
 
@@ -95,13 +96,23 @@ export default function ContributeProgramScreen() {
       <Stack.Screen options={{ headerShown: false }} />
       <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
       
-      <View style={[styles.stickyHeader, { paddingTop: insets.top, height: 60 + insets.top }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
+      <View style={[
+        styles.floatingHeader, 
+        { top: Math.max(insets.top, 15) }, 
+        isLandscape ? { left: 200 + Math.max(insets.left, 15) } : { left: Math.max(insets.left, 15) }
+      ]}>
+        <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      {isLandscape && <TopNavigation />}
+
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+        style={[{ flex: 1 }, isLandscape && { marginLeft: 200 + Math.max(0, insets.left) }]}
+      >
         <ScrollView contentContainerStyle={[styles.scrollContent, { maxWidth: 800, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.stationBanner}>
              <Text style={styles.contributingTo}>CONTRIBUTING TO</Text>
@@ -168,21 +179,20 @@ export default function ContributeProgramScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
-  stickyHeader: {
+  floatingHeader: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
     zIndex: 100,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
   },
-  backButton: {
+  floatingBackButton: {
     width: 44,
     height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   scrollContent: { padding: 20, paddingTop: 100, paddingBottom: 140 },
   stationBanner: { marginBottom: 30, alignItems: 'center' },
