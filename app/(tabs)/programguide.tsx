@@ -391,6 +391,15 @@ function ProgramGuideContent() {
 
 
 
+  const programsByStation = useMemo(() => {
+    const grouped: Record<string, Program[]> = {};
+    programs.forEach(p => {
+      if (!grouped[p.stationId]) grouped[p.stationId] = [];
+      grouped[p.stationId].push(p);
+    });
+    return grouped;
+  }, [programs]);
+
   const filteredStations = useMemo(() => {
     let active = stations.filter(s => s.name && s.streamUrl);
     if (selectedCountry !== 'All') {
@@ -414,17 +423,25 @@ function ProgramGuideContent() {
         return false;
       });
     }
-    return active;
-  }, [stations, selectedCountry, selectedDepartment, selectedCity, selectedGenre]);
+    // Sort logic: 1. Has Programs, 2. Popularity, 3. Alphabetical
+    active.sort((a, b) => {
+      const aHasPrograms = programsByStation[a.id] && programsByStation[a.id].length > 0;
+      const bHasPrograms = programsByStation[b.id] && programsByStation[b.id].length > 0;
 
-  const programsByStation = useMemo(() => {
-    const grouped: Record<string, Program[]> = {};
-    programs.forEach(p => {
-      if (!grouped[p.stationId]) grouped[p.stationId] = [];
-      grouped[p.stationId].push(p);
+      if (aHasPrograms && !bHasPrograms) return -1;
+      if (!aHasPrograms && bHasPrograms) return 1;
+
+      const aClicks = a.clickCount || 0;
+      const bClicks = b.clickCount || 0;
+      if (bClicks !== aClicks) {
+        return bClicks - aClicks;
+      }
+
+      return a.name.localeCompare(b.name);
     });
-    return grouped;
-  }, [programs]);
+
+    return active;
+  }, [stations, selectedCountry, selectedDepartment, selectedCity, selectedGenre, programsByStation]);
 
   const guideData = useMemo(() => {
     const result: any[] = [];
