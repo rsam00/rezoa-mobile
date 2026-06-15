@@ -35,6 +35,7 @@ export default function ContributeProgramScreen() {
   const [name, setName] = useState('');
   const [host, setHost] = useState('');
   const [description, setDescription] = useState('');
+  const [poster, setPoster] = useState('');
   const [schedules, setSchedules] = useState([{ startTime: '09:00', endTime: '10:00', days: [] as string[] }]);
 
   const toggleDay = (index: number, day: string) => {
@@ -79,6 +80,7 @@ export default function ContributeProgramScreen() {
         name,
         host,
         description,
+        poster,
         schedules,
       });
       Alert.alert('Success', 'Thank you for your contribution!', [
@@ -129,6 +131,10 @@ export default function ContributeProgramScreen() {
           <View style={styles.section}>
             <Text style={styles.label}>DESCRIPTION (OPTIONAL)</Text>
             <TextInput style={[styles.input, styles.textArea]} placeholder="What is this program about?" placeholderTextColor="#52525b" multiline numberOfLines={4} value={description} onChangeText={setDescription} />
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.label}>POSTER IMAGE URL (OPTIONAL)</Text>
+            <TextInput style={styles.input} placeholder="https://example.com/poster.jpg" placeholderTextColor="#52525b" value={poster} onChangeText={setPoster} autoCapitalize="none" keyboardType="url" />
           </View>
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>

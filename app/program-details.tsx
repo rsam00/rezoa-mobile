@@ -37,7 +37,7 @@ export default function ProgramDetailsScreen() {
   const program = programs.find(p => p.id === id);
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
-  const heroHeight = isLandscape ? height * 0.8 : 420;
+  const heroHeight = isLandscape ? height * 0.8 : 380;
 
   React.useEffect(() => {
     if (program) {
@@ -70,6 +70,7 @@ export default function ProgramDetailsScreen() {
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
+      <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
       {isLandscape && <TopNavigation />}
       <View style={[
         styles.floatingHeader, 
@@ -91,21 +92,17 @@ export default function ProgramDetailsScreen() {
           <View style={styles.heroWrapper}>
             {/* Immersive Background */}
             <View style={styles.heroBackgroundContainer}>
-              {program.poster ? (
-                <Image source={{ uri: program.poster }} style={styles.heroBlurBg} resizeMode="cover" />
-              ) : (
-                <View style={[styles.heroBlurBg, { backgroundColor: '#1c1c1e' }]}>
-                   <LinearGradient
-                    colors={['#a78bfa', '#5b21b6', '#1e1b4b']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                </View>
-              )}
-              <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
+              <View style={[styles.heroBlurBg, { backgroundColor: '#1e1b4b' }]}>
+                 <LinearGradient
+                  colors={['#3b0764', '#1e1b4b']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
+              </View>
               <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)', 'black']}
+                colors={['transparent', 'rgba(30,27,75,0.8)', '#1e1b4b']}
+                locations={[0.5, 0.8, 1]}
                 style={StyleSheet.absoluteFill}
               />
             </View>
@@ -114,9 +111,17 @@ export default function ProgramDetailsScreen() {
           {/* Centered Poster or Fallback */}
           <View style={styles.posterWrapper}>
             {program.poster ? (
-              <AnimatedCard style={styles.posterContainer} onPress={() => {}}>
+              <View style={styles.posterContainer}>
+                <Image source={logoSource} style={StyleSheet.absoluteFill} blurRadius={30} resizeMode="cover" />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(30,27,75,0.5)' }]} />
                 <Image source={{ uri: program.poster }} style={styles.mainPoster} resizeMode="contain" />
-              </AnimatedCard>
+                <LinearGradient
+                  colors={['transparent', 'rgba(30,27,75,0.6)', '#1e1b4b']}
+                  locations={[0.7, 0.9, 1]}
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
+                />
+              </View>
             ) : (
               <View style={styles.fallbackContainer}>
                  <LinearGradient
@@ -227,7 +232,7 @@ export default function ProgramDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#000',
   },
   heroRoot: {
     width: '100%',
@@ -263,14 +268,21 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 100,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   posterContainer: {
-    width: '75%',
-    height: 180,
+    width: '100%',
+    height: '100%',
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 10,
   },
   mainPoster: {
     width: '100%',

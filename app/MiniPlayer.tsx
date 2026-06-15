@@ -4,8 +4,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, TouchableOpacity, View, Modal, TouchableWithoutFeedback, ScrollView, useWindowDimensions, Image } from 'react-native';
 import TextTicker from 'react-native-text-ticker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
+import AdBanner from '../components/AdBanner';
 import { refreshZenoNowPlaying } from '../lib/streamProbe';
 
 import { calculateProgramProgress, getCurrentProgram, Program } from '../utils/timeUtils';
@@ -20,6 +23,7 @@ export default function MiniPlayer() {
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
   const [isQualityMenuVisible, setQualityMenuVisible] = useState(false);
+  const [isFullPlayerVisible, setFullPlayerVisible] = useState(false);
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
 
@@ -174,7 +178,11 @@ export default function MiniPlayer() {
     >
       <View style={[styles.contentContainer, isLandscape ? styles.contentContainerLandscape : {}]}>
         <View style={[styles.mainRow, isLandscape ? styles.mainRowLandscape : {}]}>
-          <View style={[styles.leftGroup, isLandscape ? styles.leftGroupLandscape : {}]}>
+          <TouchableOpacity 
+            style={[styles.leftGroup, isLandscape ? styles.leftGroupLandscape : {}]}
+            activeOpacity={0.8}
+            onPress={() => setFullPlayerVisible(true)}
+          >
             <Image source={logoSource} style={[styles.stationLogo, isLandscape ? styles.stationLogoLandscape : {}]} resizeMode="contain" />
             <View style={[styles.infoSection, isLandscape ? styles.infoSectionLandscape : {}]}>
             <View style={styles.scrollClip}>
@@ -210,22 +218,22 @@ export default function MiniPlayer() {
               </Animated.View>
             </View>
             
-            {playerState.error && (
+            {playerState.error ? (
               <Text style={styles.error} numberOfLines={1}>
                 {playerState.error}
               </Text>
-            )}
+            ) : null}
           </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={[styles.controls, isLandscape ? styles.controlsLandscape : {}]}>
-            {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 && (
+            {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 ? (
               <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.qualityBtn} activeOpacity={0.7}>
                 <Text style={styles.qualityText}>
                   {getQualityBtnLabel()}
                 </Text>
               </TouchableOpacity>
-            )}
+            ) : null}
             {playerState.isLoading ? (
               <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
             ) : (
@@ -244,12 +252,104 @@ export default function MiniPlayer() {
         </View>
 
         {/* Show Progress Bar */}
-        {liveInfo.program && (
+        {liveInfo.program ? (
           <View style={styles.progressContainer}>
             <View style={[styles.progressBar, { width: `${liveInfo.progress * 100}%` }]} />
           </View>
-        )}
+        ) : null}
       </View>
+
+        {/* Full Player Modal */}
+        <Modal visible={isFullPlayerVisible} animationType="slide" transparent={false} onRequestClose={() => setFullPlayerVisible(false)}>
+          <LinearGradient colors={['#2e1065', '#000000']} style={[styles.fullPlayerBackground, { paddingTop: Platform.OS === 'ios' ? insets.top : 0, paddingBottom: insets.bottom }]}>
+            <View style={styles.fullPlayerHeader}>
+              <TouchableOpacity onPress={() => setFullPlayerVisible(false)} style={styles.fullPlayerCloseBtn}>
+                <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+                <Ionicons name="chevron-back" size={24} color="#fff" style={{ marginLeft: -2 }} />
+              </TouchableOpacity>
+              <Text style={styles.fullPlayerHeaderText}>Now Playing</Text>
+              <View style={{ width: 44 }} />
+            </View>
+
+            <ScrollView contentContainerStyle={[styles.fullPlayerScroll, isLandscape && styles.fullPlayerScrollLandscape]}>
+              <View style={isLandscape ? styles.fullPlayerRowLandscape : {}}>
+                <View style={isLandscape ? styles.fullPlayerLeftColLandscape : {}}>
+                  <View style={[styles.fullPlayerArtworkContainer, isLandscape ? styles.fullPlayerArtworkLandscape : {}]}>
+                    <Image 
+                      source={
+                        liveInfo.program?.poster 
+                          ? { uri: liveInfo.program.poster.startsWith('http') ? liveInfo.program.poster : `https:${liveInfo.program.poster}` }
+                          : logoSource
+                      } 
+                      style={[styles.fullPlayerArtwork, isLandscape ? styles.fullPlayerArtworkImageLandscape : {}]} 
+                      resizeMode="contain" 
+                    />
+                  </View>
+                  {isLandscape && (
+                    <View style={styles.landscapeAdContainer}>
+                      <AdBanner type="banner" />
+                    </View>
+                  )}
+                </View>
+
+                <View style={isLandscape ? styles.fullPlayerRightColLandscape : {}}>
+                  <View style={styles.fullPlayerInfo}>
+                    <TextTicker style={styles.fullPlayerStationTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
+                      {playerState.currentStation.name}
+                    </TextTicker>
+                    <TextTicker style={styles.fullPlayerProgramTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
+                      {streamInfo?.nowPlaying
+                        ? streamInfo.nowPlaying
+                        : liveInfo.program
+                          ? liveInfo.program.name
+                          : 'Live Stream'}
+                    </TextTicker>
+                    {playerState.error ? (
+                      <Text style={styles.fullPlayerError} numberOfLines={2}>{playerState.error}</Text>
+                    ) : null}
+                  </View>
+
+                  {liveInfo.program ? (
+                    <View style={styles.fullPlayerProgressWrapper}>
+                      <View style={styles.fullPlayerProgressBarContainer}>
+                        <View style={[styles.fullPlayerProgressBar, { width: `${liveInfo.progress * 100}%` }]} />
+                      </View>
+                    </View>
+                  ) : null}
+
+                  <View style={styles.fullPlayerControls}>
+                    {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 ? (
+                      <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
+                        <Ionicons name="options" size={32} color="#d1d5db" />
+                        <Text style={styles.fullPlayerQualityText}>{getQualityBtnLabel()}</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={styles.fullPlayerControlBtn} />
+                    )}
+
+                    {playerState.isLoading ? (
+                      <ActivityIndicator size="large" color="#a78bfa" style={styles.fullPlayerPlayPauseBtn} />
+                    ) : (
+                      <TouchableOpacity onPress={handlePlayPause} style={styles.fullPlayerPlayPauseBtn} activeOpacity={0.7}>
+                        <Ionicons name={playerState.isPlaying ? "pause-circle" : "play-circle"} size={80} color="#fff" />
+                      </TouchableOpacity>
+                    )}
+
+                    <TouchableOpacity onPress={() => stop()} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
+                      <Ionicons name="square" size={32} color="#d1d5db" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+            
+            {!isLandscape && (
+              <View style={styles.portraitAdContainer}>
+                <AdBanner type="banner" />
+              </View>
+            )}
+          </LinearGradient>
+        </Modal>
 
         {/* Quality Selection Modal */}
         <Modal visible={isQualityMenuVisible} transparent animationType="fade">
@@ -493,5 +593,158 @@ const styles = StyleSheet.create({
   modalOptionTextActive: {
     color: '#a78bfa',
     fontWeight: 'bold',
+  },
+  fullPlayerBackground: {
+    flex: 1,
+  },
+  fullPlayerHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  fullPlayerCloseBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  fullPlayerHeaderText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  fullPlayerScroll: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    paddingBottom: 40,
+  },
+  fullPlayerScrollLandscape: {
+    paddingHorizontal: 0,
+    justifyContent: 'center',
+  },
+  fullPlayerRowLandscape: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 24,
+  },
+  fullPlayerLeftColLandscape: {
+    flex: 1,
+    paddingRight: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fullPlayerRightColLandscape: {
+    flex: 1,
+    paddingLeft: 16,
+    justifyContent: 'center',
+  },
+  landscapeAdContainer: {
+    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  portraitAdContainer: {
+    width: '100%',
+    alignItems: 'center',
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  fullPlayerArtworkContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  fullPlayerArtworkLandscape: {
+    marginBottom: 0,
+  },
+  fullPlayerArtwork: {
+    width: '100%',
+    aspectRatio: 1,
+    maxWidth: 400,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  fullPlayerArtworkImageLandscape: {
+    width: 'auto',
+    height: 200,
+    aspectRatio: 1,
+  },
+  fullPlayerInfo: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  fullPlayerStationTitle: {
+    color: '#a78bfa',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  fullPlayerProgramTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '500',
+    opacity: 0.8,
+    textAlign: 'center',
+  },
+  fullPlayerError: {
+    color: '#ef4444',
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  fullPlayerProgressWrapper: {
+    marginBottom: 40,
+    width: '100%',
+  },
+  fullPlayerProgressBarContainer: {
+    height: 6,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  fullPlayerProgressBar: {
+    height: '100%',
+    backgroundColor: '#a78bfa',
+    borderRadius: 3,
+  },
+  fullPlayerControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+  },
+  fullPlayerControlBtn: {
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullPlayerPlayPauseBtn: {
+    width: 100,
+    height: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullPlayerQualityText: {
+    color: '#d1d5db',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 4,
   }
 });

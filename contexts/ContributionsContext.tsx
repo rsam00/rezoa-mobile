@@ -13,6 +13,7 @@ export interface Contribution {
   name: string;
   host?: string;
   description?: string;
+  poster?: string;
   schedules: ScheduleSlot[];
   status: 'pending' | 'approved';
   createdAt: number;
@@ -52,6 +53,7 @@ export function ContributionsProvider({ children }: { children: React.ReactNode 
           name: item.name,
           host: item.host,
           description: item.description,
+          poster: item.poster,
           schedules: item.schedules,
           status: item.status,
           createdAt: new Date(item.created_at).getTime(),
@@ -75,6 +77,7 @@ export function ContributionsProvider({ children }: { children: React.ReactNode 
             name: data.name,
             host: data.host,
             description: data.description,
+            poster: data.poster,
             schedules: data.schedules,
           },
         ])
@@ -90,6 +93,7 @@ export function ContributionsProvider({ children }: { children: React.ReactNode 
           name: inserted.name,
           host: inserted.host,
           description: inserted.description,
+          poster: inserted.poster,
           schedules: inserted.schedules,
           status: inserted.status,
           createdAt: new Date(inserted.created_at).getTime(),
