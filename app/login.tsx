@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -72,9 +73,10 @@ export default function LoginScreen() {
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
       
-      <View style={[styles.headerNav, { paddingTop: insets.top, height: 60 + insets.top }]}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#a78bfa" />
+      <View style={[styles.floatingHeader, { top: insets.top > 0 ? insets.top : 20, left: Math.max(20, insets.left) }]}>
+        <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -183,23 +185,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerNav: {
+  floatingHeader: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    zIndex: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    zIndex: 100,
   },
-  backButton: {
+  floatingBackButton: {
     width: 44,
     height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   content: {
     padding: 24,

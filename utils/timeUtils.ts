@@ -3,6 +3,8 @@ export interface Program {
   stationId: string;
   name: string;
   schedules: { startTime: string; endTime: string; days: string[] }[];
+  poster?: string;
+  host?: string;
 }
 
 // ---------------------------------------------------------------------------

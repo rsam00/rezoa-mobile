@@ -18,8 +18,8 @@ export default function MiniPlayer() {
   const { playerState, playStation, pause, stop, refreshNowPlayingTitle, setPreferredQuality } = usePlayer();
   const { programs } = useData();
   const segments = useSegments();
-  
-  const slideAnim = useRef(new Animated.Value(200)).current; 
+
+  const slideAnim = useRef(new Animated.Value(200)).current;
   const scrollAnim = useRef(new Animated.Value(0)).current;
   const [liveInfo, setLiveInfo] = useState<{ program: Program | null, progress: number }>({ program: null, progress: 0 });
   const [isQualityMenuVisible, setQualityMenuVisible] = useState(false);
@@ -105,7 +105,7 @@ export default function MiniPlayer() {
       Animated.sequence([
         Animated.delay(4000),
         Animated.timing(scrollAnim, {
-          toValue: -1, 
+          toValue: -1,
           duration: 600,
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
@@ -153,8 +153,8 @@ export default function MiniPlayer() {
     return stream ? `${stream.bitrate}k` : 'AUTO';
   };
 
-  const logoSource = playerState.currentStation?.logo 
-    ? { uri: playerState.currentStation.logo.startsWith('http') ? playerState.currentStation.logo : `https:${playerState.currentStation.logo}` } 
+  const logoSource = playerState.currentStation?.logo
+    ? { uri: playerState.currentStation.logo.startsWith('http') ? playerState.currentStation.logo : `https:${playerState.currentStation.logo}` }
     : require('../assets/images/app-icon-primary.png');
 
   const translateY = scrollAnim.interpolate({
@@ -167,9 +167,9 @@ export default function MiniPlayer() {
   return (
     <Animated.View
       style={[
-        styles.container, 
+        styles.container,
         isLandscape ? [styles.containerLandscape, { width: 200 + Math.max(0, insets.left), paddingLeft: Math.max(0, insets.left) }] : {},
-        { 
+        {
           transform: [{ translateY: slideAnim }],
           bottom: bottomOffset,
           height: isLandscape ? 120 : 64, // Taller in landscape to fit logo and controls
@@ -178,52 +178,52 @@ export default function MiniPlayer() {
     >
       <View style={[styles.contentContainer, isLandscape ? styles.contentContainerLandscape : {}]}>
         <View style={[styles.mainRow, isLandscape ? styles.mainRowLandscape : {}]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.leftGroup, isLandscape ? styles.leftGroupLandscape : {}]}
             activeOpacity={0.8}
             onPress={() => setFullPlayerVisible(true)}
           >
             <Image source={logoSource} style={[styles.stationLogo, isLandscape ? styles.stationLogoLandscape : {}]} resizeMode="contain" />
             <View style={[styles.infoSection, isLandscape ? styles.infoSectionLandscape : {}]}>
-            <View style={styles.scrollClip}>
-              <Animated.View style={{ transform: [{ translateY }] }}>
-                <View style={styles.textTrack}>
-                  <TextTicker
-                    style={styles.stationTitle}
-                    scrollSpeed={40}
-                    loop
-                    bounce={false}
-                    repeatSpacer={50}
-                    marqueeDelay={2000}
-                  >
-                    {playerState.currentStation.name}
-                  </TextTicker>
-                </View>
-                <View style={styles.textTrack}>
-                  <TextTicker
-                    style={styles.programTitle}
-                    scrollSpeed={40}
-                    loop
-                    bounce={false}
-                    repeatSpacer={50}
-                    marqueeDelay={2000}
-                  >
-                    {streamInfo?.nowPlaying
-                      ? streamInfo.nowPlaying
-                      : liveInfo.program
-                        ? liveInfo.program.name
-                        : 'Live Stream'}
-                  </TextTicker>
-                </View>
-              </Animated.View>
+              <View style={styles.scrollClip}>
+                <Animated.View style={{ transform: [{ translateY }] }}>
+                  <View style={styles.textTrack}>
+                    <TextTicker
+                      style={styles.stationTitle}
+                      scrollSpeed={40}
+                      loop
+                      bounce={false}
+                      repeatSpacer={50}
+                      marqueeDelay={2000}
+                    >
+                      {playerState.currentStation.name}
+                    </TextTicker>
+                  </View>
+                  <View style={styles.textTrack}>
+                    <TextTicker
+                      style={styles.programTitle}
+                      scrollSpeed={40}
+                      loop
+                      bounce={false}
+                      repeatSpacer={50}
+                      marqueeDelay={2000}
+                    >
+                      {streamInfo?.nowPlaying
+                        ? streamInfo.nowPlaying
+                        : liveInfo.program
+                          ? liveInfo.program.name
+                          : 'Live Stream'}
+                    </TextTicker>
+                  </View>
+                </Animated.View>
+              </View>
+
+              {playerState.error ? (
+                <Text style={styles.error} numberOfLines={1}>
+                  {playerState.error}
+                </Text>
+              ) : null}
             </View>
-            
-            {playerState.error ? (
-              <Text style={styles.error} numberOfLines={1}>
-                {playerState.error}
-              </Text>
-            ) : null}
-          </View>
           </TouchableOpacity>
 
           <View style={[styles.controls, isLandscape ? styles.controlsLandscape : {}]}>
@@ -238,10 +238,10 @@ export default function MiniPlayer() {
               <ActivityIndicator size="small" color="#a78bfa" style={styles.loadingIndicator} />
             ) : (
               <TouchableOpacity onPress={handlePlayPause} style={styles.button} activeOpacity={0.7}>
-                <Ionicons 
-                  name={playerState.isPlaying ? "pause" : "play"} 
-                  size={24} 
-                  color="#fff" 
+                <Ionicons
+                  name={playerState.isPlaying ? "pause" : "play"}
+                  size={24}
+                  color="#fff"
                 />
               </TouchableOpacity>
             )}
@@ -259,135 +259,135 @@ export default function MiniPlayer() {
         ) : null}
       </View>
 
-        {/* Full Player Modal */}
-        <Modal visible={isFullPlayerVisible} animationType="slide" transparent={false} onRequestClose={() => setFullPlayerVisible(false)}>
-          <LinearGradient colors={['#2e1065', '#000000']} style={[styles.fullPlayerBackground, { paddingTop: Platform.OS === 'ios' ? insets.top : 0, paddingBottom: insets.bottom }]}>
-            <View style={styles.fullPlayerHeader}>
-              <TouchableOpacity onPress={() => setFullPlayerVisible(false)} style={styles.fullPlayerCloseBtn}>
-                <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-                <Ionicons name="chevron-back" size={24} color="#fff" style={{ marginLeft: -2 }} />
-              </TouchableOpacity>
-              <Text style={styles.fullPlayerHeaderText}>Now Playing</Text>
-              <View style={{ width: 44 }} />
-            </View>
+      {/* Full Player Modal */}
+      <Modal visible={isFullPlayerVisible} animationType="slide" transparent={false} onRequestClose={() => setFullPlayerVisible(false)}>
+        <LinearGradient colors={['#2e1065', '#000000']} style={[styles.fullPlayerBackground, { paddingTop: Platform.OS === 'ios' ? insets.top : 0, paddingBottom: insets.bottom }]}>
+          <View style={styles.fullPlayerHeader}>
+            <TouchableOpacity onPress={() => setFullPlayerVisible(false)} style={styles.fullPlayerCloseBtn}>
+              <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+              <Ionicons name="chevron-back" size={24} color="#fff" style={{ marginLeft: -2 }} />
+            </TouchableOpacity>
+            <Text style={styles.fullPlayerHeaderText}>Now Playing</Text>
+            <View style={{ width: 44 }} />
+          </View>
 
-            <ScrollView contentContainerStyle={[styles.fullPlayerScroll, isLandscape && styles.fullPlayerScrollLandscape]}>
-              <View style={isLandscape ? styles.fullPlayerRowLandscape : {}}>
-                <View style={isLandscape ? styles.fullPlayerLeftColLandscape : {}}>
-                  <View style={[styles.fullPlayerArtworkContainer, isLandscape ? styles.fullPlayerArtworkLandscape : {}]}>
-                    <Image 
-                      source={
-                        liveInfo.program?.poster 
-                          ? { uri: liveInfo.program.poster.startsWith('http') ? liveInfo.program.poster : `https:${liveInfo.program.poster}` }
-                          : logoSource
-                      } 
-                      style={[styles.fullPlayerArtwork, isLandscape ? styles.fullPlayerArtworkImageLandscape : {}]} 
-                      resizeMode="contain" 
-                    />
-                  </View>
-                  {isLandscape && (
-                    <View style={styles.landscapeAdContainer}>
-                      <AdBanner type="banner" />
-                    </View>
-                  )}
+          <ScrollView contentContainerStyle={[styles.fullPlayerScroll, isLandscape && styles.fullPlayerScrollLandscape]}>
+            <View style={isLandscape ? styles.fullPlayerRowLandscape : {}}>
+              <View style={isLandscape ? styles.fullPlayerLeftColLandscape : {}}>
+                <View style={[styles.fullPlayerArtworkContainer, isLandscape ? styles.fullPlayerArtworkLandscape : {}]}>
+                  <Image
+                    source={
+                      liveInfo.program?.poster
+                        ? { uri: liveInfo.program.poster.startsWith('http') ? liveInfo.program.poster : `https:${liveInfo.program.poster}` }
+                        : logoSource
+                    }
+                    style={[styles.fullPlayerArtwork, isLandscape ? styles.fullPlayerArtworkImageLandscape : {}]}
+                    resizeMode="contain"
+                  />
                 </View>
-
-                <View style={isLandscape ? styles.fullPlayerRightColLandscape : {}}>
-                  <View style={styles.fullPlayerInfo}>
-                    <TextTicker style={styles.fullPlayerStationTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
-                      {playerState.currentStation.name}
-                    </TextTicker>
-                    <TextTicker style={styles.fullPlayerProgramTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
-                      {streamInfo?.nowPlaying
-                        ? streamInfo.nowPlaying
-                        : liveInfo.program
-                          ? liveInfo.program.name
-                          : 'Live Stream'}
-                    </TextTicker>
-                    {playerState.error ? (
-                      <Text style={styles.fullPlayerError} numberOfLines={2}>{playerState.error}</Text>
-                    ) : null}
+                {isLandscape && (
+                  <View style={styles.landscapeAdContainer}>
+                    <AdBanner type="banner" />
                   </View>
+                )}
+              </View>
 
-                  {liveInfo.program ? (
-                    <View style={styles.fullPlayerProgressWrapper}>
-                      <View style={styles.fullPlayerProgressBarContainer}>
-                        <View style={[styles.fullPlayerProgressBar, { width: `${liveInfo.progress * 100}%` }]} />
-                      </View>
-                    </View>
+              <View style={isLandscape ? styles.fullPlayerRightColLandscape : {}}>
+                <View style={styles.fullPlayerInfo}>
+                  <TextTicker style={styles.fullPlayerStationTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
+                    {playerState.currentStation.name}
+                  </TextTicker>
+                  <TextTicker style={styles.fullPlayerProgramTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
+                    {streamInfo?.nowPlaying
+                      ? streamInfo.nowPlaying
+                      : liveInfo.program
+                        ? liveInfo.program.name
+                        : 'Live Stream'}
+                  </TextTicker>
+                  {playerState.error ? (
+                    <Text style={styles.fullPlayerError} numberOfLines={2}>{playerState.error}</Text>
                   ) : null}
+                </View>
 
-                  <View style={styles.fullPlayerControls}>
-                    {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 ? (
-                      <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
-                        <Ionicons name="options" size={32} color="#d1d5db" />
-                        <Text style={styles.fullPlayerQualityText}>{getQualityBtnLabel()}</Text>
-                      </TouchableOpacity>
-                    ) : (
-                      <View style={styles.fullPlayerControlBtn} />
-                    )}
-
-                    {playerState.isLoading ? (
-                      <ActivityIndicator size="large" color="#a78bfa" style={styles.fullPlayerPlayPauseBtn} />
-                    ) : (
-                      <TouchableOpacity onPress={handlePlayPause} style={styles.fullPlayerPlayPauseBtn} activeOpacity={0.7}>
-                        <Ionicons name={playerState.isPlaying ? "pause-circle" : "play-circle"} size={80} color="#fff" />
-                      </TouchableOpacity>
-                    )}
-
-                    <TouchableOpacity onPress={() => stop()} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
-                      <Ionicons name="square" size={32} color="#d1d5db" />
-                    </TouchableOpacity>
+                {liveInfo.program ? (
+                  <View style={styles.fullPlayerProgressWrapper}>
+                    <View style={styles.fullPlayerProgressBarContainer}>
+                      <View style={[styles.fullPlayerProgressBar, { width: `${liveInfo.progress * 100}%` }]} />
+                    </View>
                   </View>
-                </View>
-              </View>
-            </ScrollView>
-            
-            {!isLandscape && (
-              <View style={styles.portraitAdContainer}>
-                <AdBanner type="banner" />
-              </View>
-            )}
-          </LinearGradient>
-        </Modal>
+                ) : null}
 
-        {/* Quality Selection Modal */}
-        <Modal visible={isQualityMenuVisible} transparent animationType="fade">
-          <TouchableWithoutFeedback onPress={() => setQualityMenuVisible(false)}>
-            <View style={styles.modalOverlay}>
-              <TouchableWithoutFeedback>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalTitle}>Stream Quality</Text>
-                  <ScrollView style={styles.modalScroll}>
-                    <TouchableOpacity 
-                      style={[styles.modalOption, playerState.preferredQuality === 'auto' && styles.modalOptionActive]} 
-                      onPress={() => handleSelectQuality('auto')}
-                    >
-                      <Text style={[styles.modalOptionText, playerState.preferredQuality === 'auto' && styles.modalOptionTextActive]}>
-                        Auto (Smart Selection)
-                      </Text>
+                <View style={styles.fullPlayerControls}>
+                  {playerState.currentStation?.streams && playerState.currentStation.streams.length > 0 ? (
+                    <TouchableOpacity onPress={() => setQualityMenuVisible(true)} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
+                      <Ionicons name="options" size={32} color="#d1d5db" />
+                      <Text style={styles.fullPlayerQualityText}>{getQualityBtnLabel()}</Text>
                     </TouchableOpacity>
-                    
-                    {playerState.currentStation?.streams && [...playerState.currentStation.streams].sort((a, b) => b.bitrate - a.bitrate).map((stream, idx) => {
-                      const isActive = playerState.preferredQuality === stream.url;
-                      return (
-                        <TouchableOpacity 
-                          key={idx}
-                          style={[styles.modalOption, isActive && styles.modalOptionActive]} 
-                          onPress={() => handleSelectQuality(stream.url)}
-                        >
-                          <Text style={[styles.modalOptionText, isActive && styles.modalOptionTextActive]}>
-                            {stream.label} ({stream.bitrate}k {stream.format.toUpperCase()})
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
+                  ) : (
+                    <View style={styles.fullPlayerControlBtn} />
+                  )}
+
+                  {playerState.isLoading ? (
+                    <ActivityIndicator size="large" color="#a78bfa" style={styles.fullPlayerPlayPauseBtn} />
+                  ) : (
+                    <TouchableOpacity onPress={handlePlayPause} style={styles.fullPlayerPlayPauseBtn} activeOpacity={0.7}>
+                      <Ionicons name={playerState.isPlaying ? "pause-circle" : "play-circle"} size={80} color="#fff" />
+                    </TouchableOpacity>
+                  )}
+
+                  <TouchableOpacity onPress={() => stop()} style={styles.fullPlayerControlBtn} activeOpacity={0.7}>
+                    <Ionicons name="square" size={32} color="#d1d5db" />
+                  </TouchableOpacity>
                 </View>
-              </TouchableWithoutFeedback>
+              </View>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
+          </ScrollView>
+
+          {!isLandscape && (
+            <View style={styles.portraitAdContainer}>
+              <AdBanner type="banner" />
+            </View>
+          )}
+        </LinearGradient>
+      </Modal>
+
+      {/* Quality Selection Modal */}
+      <Modal visible={isQualityMenuVisible} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setQualityMenuVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Stream Quality</Text>
+                <ScrollView style={styles.modalScroll}>
+                  <TouchableOpacity
+                    style={[styles.modalOption, playerState.preferredQuality === 'auto' && styles.modalOptionActive]}
+                    onPress={() => handleSelectQuality('auto')}
+                  >
+                    <Text style={[styles.modalOptionText, playerState.preferredQuality === 'auto' && styles.modalOptionTextActive]}>
+                      Auto (Smart Selection)
+                    </Text>
+                  </TouchableOpacity>
+
+                  {playerState.currentStation?.streams && [...playerState.currentStation.streams].sort((a, b) => b.bitrate - a.bitrate).map((stream, idx) => {
+                    const isActive = playerState.preferredQuality === stream.url;
+                    return (
+                      <TouchableOpacity
+                        key={idx}
+                        style={[styles.modalOption, isActive && styles.modalOptionActive]}
+                        onPress={() => handleSelectQuality(stream.url)}
+                      >
+                        <Text style={[styles.modalOptionText, isActive && styles.modalOptionTextActive]}>
+                          {stream.label} ({stream.bitrate}k {stream.format.toUpperCase()})
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
     </Animated.View>
   );

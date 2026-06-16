@@ -12,15 +12,15 @@ import TopNavigation from '../../components/TopNavigation';
 
 const CARD_GAP = 12;
 
-const StationCard = React.memo(function StationCard({ item, isFavorite, isStationPlaying, isLoading, onPress, onToggleFavorite, onPlayPause, cardWidth }: any) {
+const StationCard = React.memo(function StationCard({ item, isFavorite, isStationPlaying, isLoading, onPress, onToggleFavorite, onPlayPause }: any) {
   const [imgError, setImgError] = useState(false);
   return (
     <TouchableOpacity
-      style={[styles.cardContainer, { width: cardWidth }]}
+      style={[styles.cardContainer, { flex: 1 }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
-      <View style={[styles.imageContainer, { height: cardWidth * 0.85 }]}>
+      <View style={[styles.imageContainer, { aspectRatio: 1 / 0.85 }]}>
         <Image
           source={imgError ? require('../../assets/images/app-icon-primary.png') : (item.logo ? { uri: item.logo.startsWith('http') ? item.logo : `https:${item.logo}` } : require('../../assets/images/app-icon-primary.png'))}
           style={styles.stationLogo}
@@ -69,8 +69,8 @@ function ExploreScreenContent() {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
   const numColumns = isLandscape ? 4 : 2;
-  const availableWidth = isLandscape ? screenWidth - (200 + Math.max(0, insets.left)) : screenWidth;
-  const cardWidth = (availableWidth - (30 + (numColumns - 1) * CARD_GAP)) / numColumns;
+  const flatListWidth = isLandscape ? screenWidth - (200 + Math.max(0, insets.left)) : screenWidth;
+  const contentWidth = isLandscape ? flatListWidth - Math.max(0, insets.right) : screenWidth;
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
@@ -137,7 +137,6 @@ function ExploreScreenContent() {
             <StationCard
               key={station.id}
               item={station}
-              cardWidth={cardWidth}
               isFavorite={isFavorite}
               isStationPlaying={isStationPlaying}
               isLoading={isLoading}
@@ -149,20 +148,12 @@ function ExploreScreenContent() {
         })}
         {item.items.length < numColumns && 
           Array.from({ length: numColumns - item.items.length }).map((_, idx) => (
-             <View key={`spacer-${idx}`} style={{ width: cardWidth }} />
+             <View key={`spacer-${idx}`} style={{ flex: 1 }} />
           ))
         }
       </View>
     );
   }, [favorites, playerState, router, handleToggleFavorite, pause, playStation]);
-
-  const getItemLayout = useCallback((_data: any, index: number) => {
-    return {
-      length: cardWidth + CARD_GAP,
-      offset: (cardWidth + CARD_GAP) * index,
-      index,
-    };
-  }, [cardWidth]);
 
   if (dataLoading) {
     return (
@@ -176,7 +167,7 @@ function ExploreScreenContent() {
     <View style={styles.container}>
       <TopNavigation />
       <FlatList
-        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
+        style={isLandscape ? { alignSelf: 'flex-end', width: flatListWidth, flex: 1 } : { flex: 1, width: '100%' }}
         ListHeaderComponent={(
           <View style={styles.searchBarContainer}>
             <TextInput
@@ -195,7 +186,11 @@ function ExploreScreenContent() {
         data={exploreData}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: isLandscape ? insets.top : insets.top + 60, paddingBottom: 100, paddingRight: isLandscape ? Math.max(0, insets.right) : 0 }}
+        contentContainerStyle={{ 
+          paddingTop: isLandscape ? insets.top : insets.top + 60, 
+          paddingBottom: 100, 
+          paddingRight: isLandscape ? Math.max(0, insets.right) : 0
+        }}
         renderItem={renderExploreItem}
         initialNumToRender={6}
       />
