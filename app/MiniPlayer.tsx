@@ -210,9 +210,13 @@ export default function MiniPlayer() {
                     >
                       {streamInfo?.nowPlaying
                         ? streamInfo.nowPlaying
-                        : liveInfo.program
+                        : liveInfo.program && liveInfo.program.name.trim() !== '-'
                           ? liveInfo.program.name
-                          : 'Live Stream'}
+                          : liveInfo.program?.description
+                            ? liveInfo.program.description
+                            : liveInfo.program?.host
+                              ? liveInfo.program.host
+                              : 'Live Stream'}
                     </TextTicker>
                   </View>
                 </Animated.View>
@@ -300,9 +304,13 @@ export default function MiniPlayer() {
                   <TextTicker style={styles.fullPlayerProgramTitle} scrollSpeed={40} loop bounce={false} repeatSpacer={50} marqueeDelay={2000}>
                     {streamInfo?.nowPlaying
                       ? streamInfo.nowPlaying
-                      : liveInfo.program
+                      : liveInfo.program && liveInfo.program.name.trim() !== '-'
                         ? liveInfo.program.name
-                        : 'Live Stream'}
+                        : liveInfo.program?.description
+                          ? liveInfo.program.description
+                          : liveInfo.program?.host
+                            ? liveInfo.program.host
+                            : 'Live Stream'}
                   </TextTicker>
                   {playerState.error ? (
                     <Text style={styles.fullPlayerError} numberOfLines={2}>{playerState.error}</Text>

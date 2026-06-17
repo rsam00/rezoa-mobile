@@ -95,7 +95,7 @@ function getBlocksForDay(programs: Program[], dayName: string) {
           startMinute: start,
           endMinute: end,
           duration: end - start,
-          isCurrent: isTargetDayHaitiToday && currentTotalMinutes >= start && currentTotalMinutes < end
+          isCurrent: false
         });
       } else if (end < start) {
         blocks.push({
@@ -103,12 +103,32 @@ function getBlocksForDay(programs: Program[], dayName: string) {
           startMinute: start,
           endMinute: 1440,
           duration: 1440 - start,
-          isCurrent: isTargetDayHaitiToday && currentTotalMinutes >= start
+          isCurrent: false
         });
       }
     });
   });
-  return blocks;
+
+  // Sort blocks by start time to handle overlaps
+  blocks.sort((a, b) => a.startMinute - b.startMinute);
+
+  // Resolve overlaps by clipping the earlier block's end time
+  for (let i = 0; i < blocks.length - 1; i++) {
+    const current = blocks[i];
+    const next = blocks[i + 1];
+    
+    if (current.endMinute > next.startMinute) {
+      current.endMinute = next.startMinute;
+      current.duration = current.endMinute - current.startMinute;
+    }
+  }
+
+  // Calculate isCurrent and filter out 0-duration blocks
+  return blocks.filter(block => {
+    if (block.duration <= 0) return false;
+    block.isCurrent = isTargetDayHaitiToday && currentTotalMinutes >= block.startMinute && currentTotalMinutes < block.endMinute;
+    return true;
+  });
 }
 
 const GENRE_MAPPING: Record<string, string[]> = {
@@ -605,6 +625,7 @@ function ProgramGuideContent() {
           <ReanimatedFlatList
             ref={leftRef}
             data={guideData}
+            extraData={playerState.currentStation?.id}
             keyExtractor={(item: any) => item.id}
             renderItem={renderLogoColumnItem}
             contentContainerStyle={{ paddingBottom: 100 }}
@@ -639,6 +660,7 @@ function ProgramGuideContent() {
             <ReanimatedFlatList
               ref={rightRef}
               data={guideData}
+              extraData={playerState.currentStation?.id}
               keyExtractor={(item: any) => item.id}
               renderItem={({ item }: any) => item.isAd ? (
                 <View style={{ width: 24 * CELL_WIDTH, height: STATION_ROW_HEIGHT, backgroundColor: '#000', flexDirection: 'row', alignItems: 'center' }}>

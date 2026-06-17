@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
+import TopNavigation from '../components/TopNavigation';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -73,7 +74,13 @@ export default function LoginScreen() {
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
       
-      <View style={[styles.floatingHeader, { top: insets.top > 0 ? insets.top : 20, left: Math.max(20, insets.left) }]}>
+      {isLandscape && <TopNavigation />}
+
+      <View style={[
+        styles.floatingHeader, 
+        { top: insets.top > 0 ? insets.top : 20 },
+        isLandscape ? { left: 200 + Math.max(20, insets.left) } : { left: Math.max(20, insets.left) }
+      ]}>
         <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
           <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <Ionicons name="chevron-back" size={24} color="#fff" />
@@ -82,7 +89,7 @@ export default function LoginScreen() {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={isLandscape ? { flex: 1, marginLeft: 200 + Math.max(0, insets.left) } : { flex: 1 }}
       >
         <ScrollView contentContainerStyle={[styles.content, { flexGrow: 1, maxWidth: 400, alignSelf: 'center', width: '100%' }]} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>

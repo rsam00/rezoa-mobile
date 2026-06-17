@@ -4,6 +4,7 @@ import { useRouter, Stack } from 'expo-router';
 import React from 'react';
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import TopNavigation from '../components/TopNavigation';
 
 export default function TermsOfUseScreen() {
   const router = useRouter();
@@ -19,14 +20,24 @@ export default function TermsOfUseScreen() {
         style={StyleSheet.absoluteFill}
       />
       
-      <View style={[styles.header, { paddingTop: insets.top, height: 60 + insets.top }]}>
+      {isLandscape && <TopNavigation />}
+
+      <View style={[
+        styles.header, 
+        { paddingTop: insets.top, height: 60 + insets.top },
+        isLandscape && { left: 200 + Math.max(0, insets.left) }
+      ]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Terms of Use</Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + 70, maxWidth: 800, alignSelf: 'center', width: '100%' }]} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + 70, maxWidth: 800, alignSelf: 'center', width: '100%' }]} 
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.lastUpdated}>Last Updated: January 17, 2026</Text>
 
         <Section title="1. Agreement to Terms">

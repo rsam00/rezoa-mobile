@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AdBanner from '../../components/AdBanner';
@@ -76,17 +76,64 @@ function ExploreScreenContent() {
   const { playerState, playStation, pause } = usePlayer();
   const router = useRouter();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   const filteredStations = useMemo(() => {
-    if (!search.trim()) return stations;
-    const q = search.trim().toLowerCase();
-    return stations.filter((s: any) =>
-      s.name.toLowerCase().includes(q) ||
-      (s.city && s.city.toLowerCase().includes(q)) ||
-      (s.country && s.country.toLowerCase().includes(q)) ||
-      (s.tag && s.tag.some((t: string) => t.toLowerCase().includes(q)))
-    );
-  }, [search, stations]);
+    if (!debouncedSearch.trim()) return stations;
+    
+    const q = debouncedSearch.trim().toLowerCase();
+    const terms = q.split(/\s+/).filter(Boolean);
+    
+    const scoredStations = stations.map((s: any) => {
+      let score = 0;
+      
+      const sName = s.name?.toLowerCase() || '';
+      const sCity = s.city?.toLowerCase() || '';
+      const sCountry = s.country?.toLowerCase() || '';
+      const sDept = s.department?.toLowerCase() || '';
+      const sLang = s.language?.toLowerCase() || '';
+      const sFreq = s.frequency?.toLowerCase() || '';
+      const sDesc = s.description?.toLowerCase() || '';
+      const sTags = s.tag || [];
+      
+      // Exact or prefix matches are heavily weighted
+      if (sName === q) score += 1000;
+      else if (sName.startsWith(q)) score += 500;
+      
+      let allTermsMatched = true;
+
+      terms.forEach(term => {
+        let termMatched = false;
+        if (sName.includes(term)) { score += 100; termMatched = true; }
+        if (sCity === term || sCity.includes(term)) { score += 80; termMatched = true; }
+        if (sFreq && sFreq.includes(term)) { score += 80; termMatched = true; }
+        if (sDept === term || sDept.includes(term)) { score += 60; termMatched = true; }
+        if (sCountry === term || sCountry.includes(term)) { score += 40; termMatched = true; }
+        if (sLang === term || sLang.includes(term)) { score += 30; termMatched = true; }
+        if (sTags.some((t: string) => t.toLowerCase() === term || t.toLowerCase().includes(term))) { score += 50; termMatched = true; }
+        if (sDesc.includes(term)) { score += 10; termMatched = true; }
+        
+        // Multi-word searches act as an AND gate. Every word must match *somewhere*
+        if (!termMatched) allTermsMatched = false;
+      });
+      
+      if (!allTermsMatched) score = 0;
+
+      return { station: s, score };
+    });
+    
+    return scoredStations
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(item => item.station);
+  }, [debouncedSearch, stations]);
 
   const exploreData = useMemo(() => {
     const data: any[] = [];
