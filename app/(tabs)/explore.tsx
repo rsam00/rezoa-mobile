@@ -69,8 +69,6 @@ function ExploreScreenContent() {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
   const numColumns = isLandscape ? 4 : 2;
-  const flatListWidth = isLandscape ? screenWidth - (200 + Math.max(0, insets.left)) : screenWidth;
-  const contentWidth = isLandscape ? flatListWidth - Math.max(0, insets.right) : screenWidth;
   const { stations, loading: dataLoading } = useData();
   const { favorites, toggleFavorite } = useFavorites();
   const { playerState, playStation, pause } = usePlayer();
@@ -214,7 +212,7 @@ function ExploreScreenContent() {
     <View style={styles.container}>
       <TopNavigation />
       <FlatList
-        style={isLandscape ? { alignSelf: 'flex-end', width: flatListWidth, flex: 1 } : { flex: 1, width: '100%' }}
+        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), flex: 1 } : { flex: 1, width: '100%' }}
         ListHeaderComponent={(
           <View style={styles.searchBarContainer}>
             <TextInput
