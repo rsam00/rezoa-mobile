@@ -224,17 +224,20 @@ export default function StationDetailsScreen() {
             </View>
 
             {stationPrograms.length > 0 ? (
-              stationPrograms.map(prog => (
-                <ProgramCard
-                  key={prog.id}
-                  item={prog}
-                  fallbackLogo={logoSource}
-                  onPress={() => {
-                    recordProgramClick(prog.id);
-                    router.push({ pathname: '/program-details', params: { id: prog.id } });
-                  }}
-                />
-              ))
+              <View style={isLandscape ? { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' } : {}}>
+                {stationPrograms.map(prog => (
+                  <View key={prog.id} style={isLandscape ? { width: '48%' } : { width: '100%' }}>
+                    <ProgramCard
+                      item={prog}
+                      fallbackLogo={logoSource}
+                      onPress={() => {
+                        recordProgramClick(prog.id);
+                        router.push({ pathname: '/program-details', params: { id: prog.id } });
+                      }}
+                    />
+                  </View>
+                ))}
+              </View>
             ) : (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>No programs listed for this station yet.</Text>
