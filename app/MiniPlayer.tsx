@@ -264,12 +264,29 @@ export default function MiniPlayer() {
       </View>
 
       {/* Full Player Modal */}
-      <Modal visible={isFullPlayerVisible} animationType="slide" transparent={false} onRequestClose={() => setFullPlayerVisible(false)}>
-        <LinearGradient colors={['#2e1065', '#000000']} style={[styles.fullPlayerBackground, { paddingTop: Platform.OS === 'ios' ? insets.top : 0, paddingBottom: insets.bottom }]}>
+      <Modal 
+        visible={isFullPlayerVisible} 
+        animationType="slide" 
+        transparent={true} 
+        statusBarTranslucent={true}
+        onRequestClose={() => setFullPlayerVisible(false)}
+      >
+        <LinearGradient 
+          colors={['#2e1065', '#000000']} 
+          style={[
+            styles.fullPlayerBackground, 
+            { 
+              paddingTop: Platform.OS === 'ios' ? Math.max(insets.top, 20) : insets.top, 
+              paddingBottom: insets.bottom,
+              paddingLeft: insets.left,
+              paddingRight: insets.right
+            }
+          ]}
+        >
           <View style={styles.fullPlayerHeader}>
             <TouchableOpacity onPress={() => setFullPlayerVisible(false)} style={styles.fullPlayerCloseBtn}>
-              <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-              <Ionicons name="chevron-back" size={24} color="#fff" style={{ marginLeft: -2 }} />
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.3)' }]} />
+              <Ionicons name="chevron-down" size={24} color="#fff" style={{ marginTop: 2 }} />
             </TouchableOpacity>
             <Text style={styles.fullPlayerHeaderText}>Now Playing</Text>
             <View style={{ width: 44 }} />
