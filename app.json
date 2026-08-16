@@ -25,7 +25,7 @@
         "foregroundImage": "./assets/images/app-icon-primary.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": false,
+      "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
@@ -71,6 +71,8 @@
         "expo-build-properties",
         {
           "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
             "kotlinVersion": "2.1.0",
             "usesCleartextTraffic": true
           }

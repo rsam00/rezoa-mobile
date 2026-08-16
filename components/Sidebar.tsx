@@ -88,7 +88,7 @@ export default function Sidebar() {
             paddingTop: isLandscape ? Math.max(20, insets.top + 20) : insets.top + 60,
             paddingLeft: isLandscape ? Math.max(20, insets.left + 20) : 20
           }]} 
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 20 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: insets.bottom + 40 }}
           showsVerticalScrollIndicator={false}
         >
           <View style={[styles.header, isLandscape && { marginBottom: 20 }]}>

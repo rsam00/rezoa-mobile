@@ -162,7 +162,7 @@ export default function MiniPlayer() {
     outputRange: [-24, 0], // Heights for the vertical shift
   });
 
-  const bottomOffset = insets.bottom;
+  const bottomOffset = insets.bottom + 20;
 
   return (
     <Animated.View

@@ -61,17 +61,7 @@ export default function RootLayout() {
         });
     }, 3000);
 
-    if (Platform.OS === 'android') {
-      (async () => {
-        try {
-          await NavigationBar.setBackgroundColorAsync('rgba(0,0,0,0.7)');
-          await NavigationBar.setButtonStyleAsync('light');
-          await NavigationBar.setPositionAsync('absolute');
-        } catch (error) {
-          // Ignore errors gracefully when edge-to-edge is enforced
-        }
-      })();
-    }
+    // NavigationBar styling is handled natively by edgeToEdgeEnabled in app.json
   }, []);
   
   if (!loaded) {

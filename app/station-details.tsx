@@ -249,7 +249,7 @@ export default function StationDetailsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'black' },
-  scrollContent: { paddingBottom: 150 },
+  scrollContent: { paddingBottom: 80 },
   heroSection: { width: '100%' },
   heroBg: { ...StyleSheet.absoluteFillObject, width: '100%' },
   heroContent: {
