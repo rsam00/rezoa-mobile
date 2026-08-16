@@ -3,7 +3,7 @@
     "name": "Rezoa",
     "slug": "rezoa-mobile",
     "version": "1.0.0",
-    "orientation": "default",
+    "orientation": "portrait",
     "icon": "./assets/images/app-icon-primary.png",
     "scheme": "rezoa",
     "userInterfaceStyle": "automatic",
