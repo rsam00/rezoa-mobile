@@ -65,7 +65,7 @@ export default function ProgramDetailsScreen() {
     );
   }
 
-  const logoSource = station?.logo ? { uri: station.logo.startsWith('http') ? station.logo : `https:${station.logo}` } : require('../assets/images/app-icon-primary.png');
+  const logoSource = typeof station?.logo === 'string' ? { uri: station.logo.startsWith('http') ? station.logo : `https:${station.logo}` } : require('../assets/images/app-icon-primary.png');
 
   return (
     <View style={styles.container}>
@@ -78,7 +78,7 @@ export default function ProgramDetailsScreen() {
         isLandscape ? { left: 200 + Math.max(insets.left, 15) } : { left: Math.max(insets.left, 15) }
       ]}>
         <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
-          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -92,17 +92,9 @@ export default function ProgramDetailsScreen() {
           <View style={styles.heroWrapper}>
             {/* Immersive Background */}
             <View style={styles.heroBackgroundContainer}>
-              <View style={[styles.heroBlurBg, { backgroundColor: '#1e1b4b' }]}>
-                 <LinearGradient
-                  colors={['#3b0764', '#1e1b4b']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-              </View>
+              <Image source={typeof program.poster === 'string' && program.poster.trim() !== '' ? { uri: program.poster } : logoSource} style={[styles.heroBlurBg, { height: heroHeight }]} blurRadius={15} resizeMode="cover" />
               <LinearGradient
-                colors={['transparent', 'rgba(30,27,75,0.8)', '#1e1b4b']}
-                locations={[0.5, 0.8, 1]}
+                colors={['rgba(30,27,75,0.4)', 'rgba(30,27,75,0.8)', '#1e1b4b']}
                 style={StyleSheet.absoluteFill}
               />
             </View>
@@ -110,24 +102,12 @@ export default function ProgramDetailsScreen() {
           
           {/* Centered Poster or Fallback */}
           <View style={styles.posterWrapper}>
-            {program.poster ? (
+            {typeof program.poster === 'string' && program.poster.trim() !== '' ? (
               <View style={styles.posterContainer}>
-                <Image source={logoSource} style={StyleSheet.absoluteFill} blurRadius={30} resizeMode="cover" />
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(30,27,75,0.5)' }]} />
                 <Image source={{ uri: program.poster }} style={styles.mainPoster} resizeMode="contain" />
-                <LinearGradient
-                  colors={['transparent', 'rgba(30,27,75,0.6)', '#1e1b4b']}
-                  locations={[0.7, 0.9, 1]}
-                  style={StyleSheet.absoluteFill}
-                  pointerEvents="none"
-                />
               </View>
             ) : (
               <View style={styles.fallbackContainer}>
-                 <LinearGradient
-                    colors={['#a78bfa33', 'transparent']}
-                    style={StyleSheet.absoluteFill}
-                  />
                 <Image source={logoSource} style={styles.fallbackLogo} resizeMode="contain" />
               </View>
             )}
@@ -137,18 +117,18 @@ export default function ProgramDetailsScreen() {
 
         {/* Content Section */}
         <View style={[styles.infoContent, { maxWidth: 800, alignSelf: 'center', width: '100%' }]}>
-          <Text style={styles.programTitle}>{program.name}</Text>
+          <Text style={styles.programTitle}>{String(program.name)}</Text>
           
-          {program.host && (
+          {program.host ? (
             <View style={styles.hostRow}>
               <Text style={styles.hostLabel}>HOSTED BY</Text>
-              <Text style={styles.hostName}>{program.host.toUpperCase()}</Text>
+              <Text style={styles.hostName}>{String(program.host).toUpperCase()}</Text>
             </View>
-          )}
+          ) : null}
 
-          {program.description && (
-            <Text style={styles.programDescription}>{program.description}</Text>
-          )}
+          {program.description ? (
+            <Text style={styles.programDescription}>{String(program.description)}</Text>
+          ) : null}
 
           {/* Listen Live Button - Premium Action */}
           {isProgramLive && station && (
@@ -164,14 +144,7 @@ export default function ProgramDetailsScreen() {
               }}
               activeOpacity={0.8}
             >
-              {!isStationPlaying && (
-                <LinearGradient
-                  colors={['#a78bfa', '#7c3aed']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={StyleSheet.absoluteFill}
-                />
-              )}
+              <View style={[StyleSheet.absoluteFill, { backgroundColor: isStationPlaying ? '#7c3aed' : '#a78bfa' }]} />
               {isStationLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
@@ -192,12 +165,12 @@ export default function ProgramDetailsScreen() {
 
           {/* Schedule Section */}
           <Text style={styles.sectionHeader}>SCHEDULE</Text>
-          {program.schedules && program.schedules.length > 0 ? (
+          {Array.isArray(program.schedules) && program.schedules.length > 0 ? (
             <View style={styles.scheduleGrid}>
               {program.schedules.map((sch, idx) => (
                 <View key={idx} style={styles.scheduleBadge}>
-                  <Text style={styles.scheduleDaysBadge}>{sch.days.join(' • ').toUpperCase()}</Text>
-                  <Text style={styles.scheduleTimeBadge}>{sch.startTime} - {sch.endTime}</Text>
+                  <Text style={styles.scheduleDaysBadge}>{(Array.isArray(sch?.days) ? sch.days : []).join(' • ').toUpperCase()}</Text>
+                  <Text style={styles.scheduleTimeBadge}>{String(sch?.startTime)} - {String(sch?.endTime)}</Text>
                 </View>
               ))}
             </View>
@@ -206,23 +179,23 @@ export default function ProgramDetailsScreen() {
           )}
 
           {/* Station Glassmorphism Card */}
-          {station && (
+          {station ? (
             <>
               <Text style={styles.sectionHeader}>AIRING ON</Text>
               <AnimatedCard
                 style={styles.stationGlassCard}
                 onPress={() => router.push({ pathname: '/station-details', params: { id: station.id } })}
               >
-                <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.05)' }]} />
                 <Image source={logoSource} style={styles.miniStationLogo} resizeMode="contain"/>
                 <View style={styles.miniStationDetail}>
-                  <Text style={styles.miniStationName}>{station.name}</Text>
-                  <Text style={styles.miniStationFreq}>{station.frequency || station.city}</Text>
+                  <Text style={styles.miniStationName}>{String(station.name)}</Text>
+                  <Text style={styles.miniStationFreq}>{String(station.frequency || station.city)}</Text>
                 </View>
                 <Text style={styles.miniStationChevron}>›</Text>
               </AnimatedCard>
             </>
-          )}
+          ) : null}
         </View>
       </ScrollView>
     </View>
@@ -240,7 +213,6 @@ const styles = StyleSheet.create({
   },
   heroWrapper: {
     ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
   },
   heroBackgroundContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -277,12 +249,7 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: 'transparent',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 10,
+    backgroundColor: 'rgba(30,27,75,0.8)',
   },
   mainPoster: {
     width: '100%',
@@ -382,11 +349,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 40,
-    shadowColor: '#a78bfa',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 10,
   },
   listenLiveText: {
     color: '#fff',

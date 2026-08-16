@@ -93,14 +93,15 @@ export function getCurrentProgram(programs: Program[], stationId: string, precom
 
   const program = programs.find((p: Program) => 
     String(p.stationId) === String(stationId) && 
-    p.schedules && 
+    Array.isArray(p.schedules) && 
     p.schedules.some(sch => {
       // Robust day matching: check if normalizedDay is in sch.days
-      const dayMatch = sch.days.some(d => d.trim().toLowerCase() === normalizedDay.toLowerCase());
+      const safeDays = Array.isArray(sch.days) ? sch.days : [];
+      const dayMatch = safeDays.some(d => d.trim().toLowerCase() === normalizedDay.toLowerCase());
       if (!dayMatch) return false;
       
-      const [startH, startM = '0'] = sch.startTime.split(':');
-      const [endH, endM = '0'] = sch.endTime.split(':');
+      const [startH, startM = '0'] = (sch.startTime || '0:0').split(':');
+      const [endH, endM = '0'] = (sch.endTime || '0:0').split(':');
       const start = parseInt(startH, 10) * 60 + parseInt(startM, 10);
       let end = parseInt(endH, 10) * 60 + parseInt(endM, 10);
       
@@ -125,11 +126,14 @@ export function getCurrentProgram(programs: Program[], stationId: string, precom
 export function calculateProgramProgress(program: Program) {
   const { day, totalSeconds: nowSeconds } = getHaitiTime();
   
-  const activeSch = program.schedules.find(sch => sch.days.includes(day));
+  const activeSch = Array.isArray(program.schedules) ? program.schedules.find(sch => {
+    const safeDays = Array.isArray(sch.days) ? sch.days : [];
+    return safeDays.includes(day);
+  }) : undefined;
   if (!activeSch) return 0;
 
-  const [startH, startM = '0'] = activeSch.startTime.split(':');
-  const [endH, endM = '0'] = activeSch.endTime.split(':');
+  const [startH, startM = '0'] = (activeSch.startTime || '0:0').split(':');
+  const [endH, endM = '0'] = (activeSch.endTime || '0:0').split(':');
   
   let startSeconds = parseInt(startH, 10) * 3600 + parseInt(startM, 10) * 60;
   let endSeconds = parseInt(endH, 10) * 3600 + parseInt(endM, 10) * 60;

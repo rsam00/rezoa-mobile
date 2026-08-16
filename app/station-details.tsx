@@ -61,11 +61,11 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
           </Text>
         )}
 
-        {item.host && (
+        {item.host ? (
           <Text style={styles.programHost} numberOfLines={1}>
             Host: {item.host}
           </Text>
-        )}
+        ) : null}
       </View>
 
       <Ionicons name="chevron-forward" size={20} color="#52525b" />
