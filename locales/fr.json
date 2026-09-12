@@ -14,7 +14,16 @@
       "jumpBackIn": "Reprendre l'écoute",
       "popularRadios": "Radios Populaires",
       "topMix": "Votre Top Mix",
-      "liveRadio": "RADIO EN DIRECT"
+      "liveRadio": "RADIO EN DIRECT",
+      "trendingShows": "Émissions de Radio Tendances",
+      "morningBoost": "Boost Matinal",
+      "midDayMix": "Mix de Mi-Journée",
+      "eveningVibes": "Ambiance du Soir",
+      "lateNightRadio": "Radio de Fin de Soirée",
+      "newsTalk": "Infos & Discussions",
+      "inspirationalFaith": "Inspiration & Foi",
+      "globalMusicMix": "Mix Musical Global",
+      "justAdded": "Récemment Ajoutés"
     },
     "sidebar": {
       "home": "Accueil",

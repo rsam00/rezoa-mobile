@@ -245,17 +245,17 @@ export default function HomeScreenContent() {
 
   const temporalCategory = useMemo(() => {
     const hours = new Date().getHours();
-    let title = "Morning Boost";
+    let title = t('home.morningBoost');
     let filtered = stations.filter(s => typeof s.description === 'string' && s.description.toLowerCase().includes('news')).slice(0, 10);
 
     if (hours >= 11 && hours < 17) {
-      title = "Mid-Day Mix";
+      title = t('home.midDayMix');
       filtered = stations.filter(s => Array.isArray(s.tag) && s.tag.some(t => typeof t === 'string' && t.toLowerCase().includes('pop'))).slice(0, 10);
     } else if (hours >= 17 && hours < 23) {
-      title = "Evening Vibes";
+      title = t('home.eveningVibes');
       filtered = stations.filter(s => typeof s.description === 'string' && s.description.toLowerCase().includes('entertainment')).slice(0, 10);
     } else if (hours >= 23 || hours < 6) {
-      title = "Late Night Radio";
+      title = t('home.lateNightRadio');
       filtered = stations.filter(s =>
         (typeof s.description === 'string' && s.description.toLowerCase().includes('smooth')) ||
         (Array.isArray(s.tag) && s.tag.some(t => typeof t === 'string' && t.toLowerCase().includes('chill')))
@@ -479,7 +479,7 @@ export default function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
 
-        <Text style={styles.sectionTitle}>Trending Radio Shows</Text>
+        <Text style={styles.sectionTitle}>{t('home.trendingShows')}</Text>
         <FlatList
           data={trendingShows}
           keyExtractor={item => `trending-${item.id}`}
@@ -507,7 +507,7 @@ export default function HomeScreenContent() {
           <AdBanner />
         </View>
 
-        <Text style={styles.sectionTitle}>News & Talk</Text>
+        <Text style={styles.sectionTitle}>{t('home.newsTalk')}</Text>
         <FlatList
           data={newsStations}
           keyExtractor={item => `news-${item.id}`}
@@ -519,7 +519,7 @@ export default function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
 
-        <Text style={styles.sectionTitle}>Inspirational & Faith</Text>
+        <Text style={styles.sectionTitle}>{t('home.inspirationalFaith')}</Text>
         <FlatList
           data={faithStations}
           keyExtractor={item => `faith-${item.id}`}
@@ -531,7 +531,7 @@ export default function HomeScreenContent() {
           nestedScrollEnabled={true}
         />
 
-        <Text style={styles.sectionTitle}>Global Music Mix</Text>
+        <Text style={styles.sectionTitle}>{t('home.globalMusicMix')}</Text>
         <FlatList
           data={musicStations}
           keyExtractor={item => `music-${item.id}`}
@@ -547,7 +547,7 @@ export default function HomeScreenContent() {
           <AdBanner />
         </View>
 
-        <Text style={styles.sectionTitle}>Just Added</Text>
+        <Text style={styles.sectionTitle}>{t('home.justAdded')}</Text>
         <FlatList
           data={justAdded}
           keyExtractor={item => `new-${item.id}`}

@@ -9,6 +9,7 @@ import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 import TopNavigation from '../components/TopNavigation';
+import LanguageDropdown from '../components/LanguageDropdown';
 import { useTranslation } from 'react-i18next';
 
 // HERO_HEIGHT is now dynamically calculated
@@ -80,10 +81,19 @@ export default function ProgramDetailsScreen() {
         isLandscape ? { left: 200 + Math.max(insets.left, 15) } : { left: Math.max(insets.left, 15) }
       ]}>
         <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)' }]} />
+          <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
+
+      {!isLandscape && (
+        <View style={[
+          styles.floatingHeader, 
+          { top: Math.max(insets.top, 15), left: undefined, right: Math.max(insets.right, 15) }
+        ]}>
+          <LanguageDropdown />
+        </View>
+      )}
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={{ paddingBottom: 120 }}

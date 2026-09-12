@@ -37,6 +37,7 @@ import { usePlayer } from '../../contexts/PlayerContext';
 import { getHaitiTime } from '../../utils/timeUtils';
 import { LinearGradient } from 'expo-linear-gradient';
 import TopNavigation from '../../components/TopNavigation';
+import LanguageDropdown from '../../components/LanguageDropdown';
 import { useTranslation } from 'react-i18next';
 
 const ReanimatedFlatList = Animated.createAnimatedComponent(FlatList);
@@ -593,7 +594,7 @@ export default function ProgramGuideScreen() {
 
   return (
     <View style={styles.container}>
-      <TopNavigation />
+      <TopNavigation rightComponent={<LanguageDropdown />} />
       
       <View style={[{ flex: 1 }, isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), paddingRight: Math.max(0, insets.right) } : {}]}>
         <View style={[styles.headerContainer, { paddingTop: isLandscape ? Math.max(20, insets.top) : insets.top + 60, paddingHorizontal: isLandscape ? 40 : 20 }]}>

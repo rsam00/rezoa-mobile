@@ -10,6 +10,7 @@ import { useDrawer } from '../../contexts/DrawerContext';
 import { useFavorites } from '../../contexts/FavoritesContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import TopNavigation from '../../components/TopNavigation';
+import LanguageDropdown from '../../components/LanguageDropdown';
 
 const CARD_GAP = 12;
 
@@ -212,11 +213,10 @@ function ExploreScreenContent() {
 
   return (
     <View style={styles.container}>
-      <TopNavigation />
-      <FlatList
-        style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), flex: 1 } : { flex: 1, width: '100%' }}
-        ListHeaderComponent={(
-          <View style={styles.searchBarContainer}>
+      <TopNavigation rightComponent={<LanguageDropdown />} />
+      <View style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), flex: 1, paddingTop: insets.top } : { flex: 1, width: '100%', paddingTop: insets.top + 60 }}>
+        <View style={{ backgroundColor: 'black', paddingBottom: 16, zIndex: 10 }}>
+          <View style={[styles.searchBarContainer, { marginBottom: 0 }]}>
             <TextInput
               style={styles.searchBar}
               placeholder={t('explore.searchPlaceholder')}
@@ -229,18 +229,19 @@ function ExploreScreenContent() {
             />
             <Ionicons name="search" size={20} color="#a78bfa" style={styles.searchIcon} />
           </View>
-        )}
-        data={exploreData}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ 
-          paddingTop: isLandscape ? insets.top : insets.top + 60, 
-          paddingBottom: 100, 
-          paddingRight: isLandscape ? Math.max(0, insets.right) : 0
-        }}
-        renderItem={renderExploreItem}
-        initialNumToRender={6}
-      />
+        </View>
+        <FlatList
+          data={exploreData}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ 
+            paddingBottom: 100, 
+            paddingRight: isLandscape ? Math.max(0, insets.right) : 0
+          }}
+          renderItem={renderExploreItem}
+          initialNumToRender={6}
+        />
+      </View>
     </View>
   );
 }

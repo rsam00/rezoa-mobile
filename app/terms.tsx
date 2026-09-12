@@ -5,6 +5,7 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopNavigation from '../components/TopNavigation';
+import LanguageDropdown from '../components/LanguageDropdown';
 import { useTranslation } from 'react-i18next';
 
 export default function TermsOfUseScreen() {
@@ -23,7 +24,7 @@ export default function TermsOfUseScreen() {
         style={StyleSheet.absoluteFill}
       />
       
-      {isLandscape && <TopNavigation />}
+      {isLandscape && <TopNavigation rightComponent={<LanguageDropdown />} />}
 
       <View style={[
         styles.header, 
@@ -34,6 +35,11 @@ export default function TermsOfUseScreen() {
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('terms.title')}</Text>
+        {!isLandscape && (
+          <View style={{ position: 'absolute', right: Math.max(insets.right, 20), bottom: 10 }}>
+            <LanguageDropdown />
+          </View>
+        )}
       </View>
 
       <ScrollView 

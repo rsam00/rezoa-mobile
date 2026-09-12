@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopNavigation from '../components/TopNavigation';
+import LanguageDropdown from '../components/LanguageDropdown';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
 import { useTranslation } from 'react-i18next';
@@ -117,7 +118,16 @@ export default function ContributeProgramScreen() {
         </TouchableOpacity>
       </View>
 
-      {isLandscape && <TopNavigation />}
+      {!isLandscape && (
+        <View style={[
+          styles.floatingHeader, 
+          { top: Math.max(insets.top, 15), left: undefined, right: Math.max(insets.right, 15) }
+        ]}>
+          <LanguageDropdown />
+        </View>
+      )}
+
+      {isLandscape && <TopNavigation rightComponent={<LanguageDropdown />} />}
 
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
@@ -140,6 +150,7 @@ export default function ContributeProgramScreen() {
             <Text style={styles.label}>{t('contribute.description')}</Text>
             <TextInput style={[styles.input, styles.textArea]} placeholder={t('contribute.descriptionPlaceholder')} placeholderTextColor="#52525b" multiline numberOfLines={4} value={description} onChangeText={setDescription} />
           </View>
+
           <View style={styles.section}>
             <Text style={styles.label}>{t('contribute.poster')}</Text>
             <TextInput style={styles.input} placeholder={t('contribute.posterPlaceholder')} placeholderTextColor="#52525b" value={poster} onChangeText={setPoster} autoCapitalize="none" keyboardType="url" />

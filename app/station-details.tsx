@@ -11,6 +11,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 import TopNavigation from '../components/TopNavigation';
+import LanguageDropdown from '../components/LanguageDropdown';
 import { useTranslation } from 'react-i18next';
 
 
@@ -136,6 +137,15 @@ export default function StationDetailsScreen() {
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
+
+      {!isLandscape && (
+        <View style={[
+          styles.floatingHeader, 
+          { top: Math.max(insets.top, 15), left: undefined, right: Math.max(insets.right, 15) }
+        ]}>
+          <LanguageDropdown />
+        </View>
+      )}
 
       <ScrollView 
         contentContainerStyle={styles.scrollContent} 

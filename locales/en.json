@@ -14,7 +14,16 @@
       "jumpBackIn": "Jump Back In",
       "popularRadios": "Popular Radios",
       "topMix": "Your Top Mix",
-      "liveRadio": "LIVE RADIO"
+      "liveRadio": "LIVE RADIO",
+      "trendingShows": "Trending Radio Shows",
+      "morningBoost": "Morning Boost",
+      "midDayMix": "Mid-Day Mix",
+      "eveningVibes": "Evening Vibes",
+      "lateNightRadio": "Late Night Radio",
+      "newsTalk": "News & Talk",
+      "inspirationalFaith": "Inspirational & Faith",
+      "globalMusicMix": "Global Music Mix",
+      "justAdded": "Just Added"
     },
     "sidebar": {
       "home": "Home",

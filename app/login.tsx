@@ -20,6 +20,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import TopNavigation from '../components/TopNavigation';
+import LanguageDropdown from '../components/LanguageDropdown';
 import { useTranslation } from 'react-i18next';
 
 export default function LoginScreen() {
@@ -76,17 +77,22 @@ export default function LoginScreen() {
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <LinearGradient colors={['#1e1b4b', '#000']} style={StyleSheet.absoluteFill} />
       
-      {isLandscape && <TopNavigation />}
+      {isLandscape && <TopNavigation rightComponent={<LanguageDropdown />} />}
 
       <View style={[
         styles.floatingHeader, 
         { top: insets.top > 0 ? insets.top : 20 },
-        isLandscape ? { left: 200 + Math.max(20, insets.left) } : { left: Math.max(20, insets.left) }
+        isLandscape ? { left: 200 + Math.max(20, insets.left) } : { left: Math.max(20, insets.left), right: Math.max(20, insets.right) }
       ]}>
         <TouchableOpacity style={styles.floatingBackButton} onPress={() => router.back()}>
           <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
+        {!isLandscape && (
+          <View style={{ position: 'absolute', right: Math.max(insets.right, 20), bottom: 10 }}>
+            <LanguageDropdown />
+          </View>
+        )}
       </View>
 
       <KeyboardAvoidingView
