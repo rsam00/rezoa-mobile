@@ -1,4 +1,4 @@
-package com.richardsam76.rezoamobile
+package com.inovelabs.rezoa
 
 import android.app.Application
 import android.content.res.Configuration

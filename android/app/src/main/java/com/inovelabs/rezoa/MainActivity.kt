@@ -1,4 +1,4 @@
-package com.richardsam76.rezoamobile
+package com.inovelabs.rezoa
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
