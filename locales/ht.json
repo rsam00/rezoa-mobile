@@ -1,0 +1,139 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Akèy",
+      "guide": "Gid",
+      "explore": "Eksplore"
+    },
+    "home": {
+      "liveNow": "AN DIRÈK",
+      "on": "sou",
+      "listenLive": "KOUTE KOUNYEA",
+      "pause": "POZ",
+      "moreInfo": "PLIS ENFO",
+      "jumpBackIn": "Tounen Koute",
+      "popularRadios": "Radyo Popilè",
+      "topMix": "Top Miks Ou",
+      "liveRadio": "RADYO AN DIRÈK"
+    },
+    "sidebar": {
+      "home": "Akèy",
+      "myFavorites": "Favori Mwen",
+      "makeAContribution": "Fè yon Kontribisyon",
+      "contactUs": "Kontakte Nou",
+      "signOut": "Dekonekte",
+      "signIn": "Konekte"
+    },
+    "player": {
+      "nowPlaying": "Ap Jwe Kounyea",
+      "nextProgram": "Pwochen Pwogram",
+      "noProgramScheduled": "Pa gen pwogram ki pwograme"
+    },
+    "explore": {
+      "title": "Eksplore",
+      "searchPlaceholder": "Chèche radyo, estil..."
+    },
+    "guide": {
+      "title": "Gid Radyo",
+      "filters": "Filtre",
+      "live": "AN DIRÈK",
+      "country": "Peyi",
+      "department": "Depatman",
+      "state": "Eta",
+      "city": "Vil",
+      "genre": "Jan",
+      "select": "Chwazi",
+      "all": "Tout"
+    },
+    "program": {
+      "notFound": "Pa jwenn pwogram nan",
+      "hostedBy": "ANIME PA",
+      "schedule": "ORÈ",
+      "scheduleComingSoon": "Orè konplè ap vini byento.",
+      "airingOn": "AP PASE SOU"
+    },
+    "station": {
+      "listen": "KOUTE",
+      "pause": "POZ",
+      "schedule": "Orè Radyo a",
+      "addProgram": "+ Ajoute Pwogram",
+      "noPrograms": "Pa gen okenn pwogram pou radyo sa a."
+    },
+    "contribute": {
+      "contributingTo": "KONTRIBISYON POU",
+      "programName": "NON PWOGRAM NAN",
+      "programNamePlaceholder": "ekz. Matinée Musicale",
+      "hostName": "NON ANIMATÈ (OPSYONÈL)",
+      "hostNamePlaceholder": "ekz. Jean Pierre",
+      "description": "DESKRIPSYON (OPSYONÈL)",
+      "descriptionPlaceholder": "Ki sa pwogram sa a ye?",
+      "poster": "URL IMAJ (OPSYONÈL)",
+      "posterPlaceholder": "https://example.com/poster.jpg",
+      "schedule": "ORÈ",
+      "addSlot": "+ AJOUTE YON LÈ",
+      "slot": "Lè",
+      "start": "KÒMANSE",
+      "end": "FINI",
+      "submit": "VOYE KONTRIBISYON AN",
+      "submitting": "Ap voye...",
+      "success": "Kontribisyon an voye!"
+    },
+    "days": {
+      "mon": "LÈN", "tue": "MAD", "wed": "MÈK", "thu": "JED", "fri": "VAN", "sat": "SAM", "sun": "DIM",
+      "monday": "LENDI", "tuesday": "MADI", "wednesday": "MÈKREDI", "thursday": "JEDI", "friday": "VANDREDI", "saturday": "SAMDI", "sunday": "DIMANCH"
+    },
+    "login": {
+      "createAccount": "Kreye Kont",
+      "welcomeBack": "Byenvini Ankò",
+      "joinCommunity": "Rejwenn kominote Rezoa",
+      "signInSync": "Konekte pou senkronize favori ou yo",
+      "email": "ADRÈS IMÈL",
+      "password": "MODPAS",
+      "confirmPassword": "KONFIME MODPAS",
+      "signIn": "KONEKTE",
+      "signUp": "ENSKRI",
+      "dontHaveAccount": "Ou pa gen kont? Enskri",
+      "alreadyHaveAccount": "Ou deja gen kont? Konekte",
+      "skipForNow": "Sote pou kounyea",
+      "errorFillAll": "Tanpri ranpli tout chan yo",
+      "errorMismatch": "Modpas yo pa menm",
+      "error": "Erè"
+    },
+    "privacy": {
+      "title": "Règleman sou Konfidansyalite",
+      "lastUpdated": "Dènye Mizajou: 17 Janvye 2026",
+      "sec1Title": "1. Enfòmasyon Nou Kolekte",
+      "sec1P1": "Nou kolekte enfòmasyon ou bay nou dirèkteman, tankou lè ou kreye yon kont (Imèl), sigjere pwogram radyo, oswa renmen yon estasyon.",
+      "sec1P2": "Nou kolekte tou otomatiman kèk done entèraksyon, ki gen ladan ki estasyon ou jwe oswa ki emisyon ou wè, pou nou ka alimante analiz kominote nou an (Lis Tandans ak Popilarite).",
+      "sec2Title": "2. Kijan Nou Itilize Enfòmasyon Ou",
+      "sec2P1": "- Pou founi, kenbe, ak amelyore sèvis nou yo.\n- Pou rasanble metrik kominote anonim (pa egzanp, swiv \"klik\" pou chak emisyon).\n- Pou senkronize favori ou yo sou tout aparèy ou yo (pou itilizatè ki konekte yo).\n- Pou kominike avèk ou sou mizajou nan platfòm lan.",
+      "sec3Title": "3. Pataje Done ak Twazyèm Pati",
+      "sec3P1": "Nou pa vann done pèsonèl ou. Nou itilize Supabase pou jesyon baz done an sekirite ak otantifikasyon.",
+      "sec3P2": "Tanpri sonje Rezoa ap difize kontni ki soti nan estasyon radyo ekstèn. Entèraksyon ak difizyon sa yo ka enplike kominikasyon entènèt estanda avèk sèvè twazyèm pati yo.",
+      "sec4Title": "4. Dwa Ou",
+      "sec4P1": "Ou gen dwa pou jwenn aksè, mete ajou, oswa efase enfòmasyon pèsonèl ou a nenpòt ki lè atravè paramèt pwofil ou oswa si w kontakte sipò nou an.",
+      "sec5Title": "5. Sekirite",
+      "sec5P1": "Nou pran mezi rezonab pou ede pwoteje enfòmasyon sou ou kont pèt, vòl, move itilizasyon, ak aksè san otorizasyon.",
+      "footer": "© 2026 Rezoa. Tout dwa rezève."
+    },
+    "terms": {
+      "title": "Kondisyon Itilizasyon",
+      "lastUpdated": "Dènye Mizajou: 17 Janvye 2026",
+      "sec1Title": "1. Akò Ak Kondisyon Yo",
+      "sec1P1": "Lè ou jwenn aksè oswa itilize Rezoa, ou dakò pou w respekte Kondisyon Itilizasyon sa yo. Si w pa dakò, tanpri pa itilize aplikasyon an.",
+      "sec2Title": "2. Kontribisyon Kominote",
+      "sec2P1": "Rezoa pèmèt itilizatè yo sigjere pwogram radyo ak estasyon. Ou dakò pou w pa soumèt okenn kontni ki ilegal, ofansif, difamatwa, oswa ki vyole dwa pwopriyete entelektyèl lòt moun.",
+      "sec2P2": "Rezoa rezève dwa pou revize, modifye, oswa retire nenpòt kontribisyon kominote nan diskresyon nou.",
+      "sec3Title": "3. Pwopriyete Kontni",
+      "sec3P1": "Difizyon radyo ki aksesib atravè Rezoa se pwopriyete difizè respektif yo. Rezoa aji sèlman kòm yon anyè ak jwè pou difizyon piblik sa yo.",
+      "sec3P2": "Mak Rezoa, lojisyèl, ak done kominote se pwopriyete Rezoa.",
+      "sec4Title": "4. Limitasyon Responsablite",
+      "sec4P1": "Rezoa bay sèvis la \"jan li ye\" epi \"jan li disponib\". Nou pa garanti difizyon yo ap san entèripsyon, san erè, oswa toujou disponib. Disponibilite emisyon radyo depann sou estasyon k'ap bay difizyon an.",
+      "sec5Title": "5. Limit Responsablite",
+      "sec5P1": "Nan okenn ka Rezoa pap responsab pou okenn domaj endirèk, akseswa, espesyal, oswa ki rive akòz itilizasyon aplikasyon an.",
+      "sec6Title": "6. Chanjman nan Kondisyon Yo",
+      "sec6P1": "Nou ka modifye kondisyon sa yo a nenpòt ki lè. Itilizasyon kontinyèl aplikasyon an apre chanjman yo pibliye konstitye akseptasyon nouvo kondisyon yo.",
+      "footer": "© 2026 Rezoa. Tout dwa rezève."
+    }
+  }
+}

@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDrawer } from '../contexts/DrawerContext';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function TopNavigation({ rightComponent }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   const segments = useSegments();
   const { openDrawer } = useDrawer();
@@ -21,9 +23,9 @@ export default function TopNavigation({ rightComponent }: Props) {
   const insets = useSafeAreaInsets();
 
   const tabs = [
-    { name: 'Home', route: 'index' },
-    { name: 'Guide', route: 'programguide' },
-    { name: 'Explore', route: 'explore' },
+    { name: t('nav.home'), route: 'index' },
+    { name: t('nav.guide'), route: 'programguide' },
+    { name: t('nav.explore'), route: 'explore' },
   ];
 
   const { width, height } = useWindowDimensions();

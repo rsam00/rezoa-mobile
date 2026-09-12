@@ -5,11 +5,14 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopNavigation from '../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 export default function PrivacyPolicyScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   return (
     <View style={styles.container}>
@@ -30,7 +33,7 @@ export default function PrivacyPolicyScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Privacy Policy</Text>
+        <Text style={styles.headerTitle}>{t('privacy.title')}</Text>
       </View>
 
       <ScrollView 
@@ -38,49 +41,32 @@ export default function PrivacyPolicyScreen() {
         style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.lastUpdated}>Last Updated: January 17, 2026</Text>
+        <Text style={styles.lastUpdated}>{t('privacy.lastUpdated')}</Text>
 
-        <Section title="1. Information We Collect">
-          <Text style={styles.text}>
-            We collect information you provide directly to us, such as when you create an account (Email), suggest radio programs, or heart a station.
-          </Text>
-          <Text style={styles.text}>
-            We also automatically collect certain interaction data, including which stations you play or which shows you view, to power our community analytics (Trending and Popularity lists).
-          </Text>
+        <Section title={t('privacy.sec1Title')}>
+          <Text style={styles.text}>{t('privacy.sec1P1')}</Text>
+          <Text style={styles.text}>{t('privacy.sec1P2')}</Text>
         </Section>
 
-        <Section title="2. How We Use Your Information">
-          <Text style={styles.text}>
-            - To provide, maintain, and improve our services.{"\n"}
-            - To aggregate anonymous community metrics (e.g., tracking "clicks" per show).{"\n"}
-            - To synchronize your favorites across your devices (for logged-in users).{"\n"}
-            - To communicate with you about updates to the platform.
-          </Text>
+        <Section title={t('privacy.sec2Title')}>
+          <Text style={styles.text}>{t('privacy.sec2P1')}</Text>
         </Section>
 
-        <Section title="3. Data Sharing and Third Parties">
-          <Text style={styles.text}>
-            We do not sell your personal data. We use Supabase for secure database management and authentication.
-          </Text>
-          <Text style={styles.text}>
-            Please note that Rezoa streams content from external radio stations. Interacting with these streams may involve standard internet communication with third-party servers.
-          </Text>
+        <Section title={t('privacy.sec3Title')}>
+          <Text style={styles.text}>{t('privacy.sec3P1')}</Text>
+          <Text style={styles.text}>{t('privacy.sec3P2')}</Text>
         </Section>
 
-        <Section title="4. Your Rights">
-          <Text style={styles.text}>
-            You have the right to access, update, or delete your personal information at any time via your profile settings or by contacting our support.
-          </Text>
+        <Section title={t('privacy.sec4Title')}>
+          <Text style={styles.text}>{t('privacy.sec4P1')}</Text>
         </Section>
 
-        <Section title="5. Security">
-          <Text style={styles.text}>
-            We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access.
-          </Text>
+        <Section title={t('privacy.sec5Title')}>
+          <Text style={styles.text}>{t('privacy.sec5P1')}</Text>
         </Section>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2026 Rezoa. All rights reserved.</Text>
+          <Text style={styles.footerText}>{t('privacy.footer')}</Text>
         </View>
       </ScrollView>
     </View>

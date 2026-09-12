@@ -16,6 +16,7 @@ LogBox.ignoreLogs([
 ]);
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import '../utils/i18n';
 import { AuthProvider } from '../contexts/AuthContext';
 import { ContributionsProvider } from '../contexts/ContributionsContext';
 import { DataProvider } from '../contexts/DataContext';

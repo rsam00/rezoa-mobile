@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import AdBanner from '../../components/AdBanner';
 import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
@@ -65,6 +66,7 @@ export default function ExploreScreen() {
 }
 
 function ExploreScreenContent() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
@@ -217,7 +219,7 @@ function ExploreScreenContent() {
           <View style={styles.searchBarContainer}>
             <TextInput
               style={styles.searchBar}
-              placeholder="Find your sound..."
+              placeholder={t('explore.searchPlaceholder')}
               placeholderTextColor="#a1a1aa"
               value={search}
               onChangeText={setSearch}

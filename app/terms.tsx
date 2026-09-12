@@ -5,11 +5,14 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, Text, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopNavigation from '../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 export default function TermsOfUseScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   return (
     <View style={styles.container}>
@@ -30,7 +33,7 @@ export default function TermsOfUseScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#a78bfa" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Terms of Use</Text>
+        <Text style={styles.headerTitle}>{t('terms.title')}</Text>
       </View>
 
       <ScrollView 
@@ -38,52 +41,36 @@ export default function TermsOfUseScreen() {
         style={isLandscape ? { marginLeft: 200 + Math.max(0, insets.left) } : {}}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.lastUpdated}>Last Updated: January 17, 2026</Text>
+        <Text style={styles.lastUpdated}>{t('terms.lastUpdated')}</Text>
 
-        <Section title="1. Agreement to Terms">
-          <Text style={styles.text}>
-            By accessing or using Rezoa, you agree to be bound by these Terms of Use. If you do not agree, please do not use the application.
-          </Text>
+        <Section title={t('terms.sec1Title')}>
+          <Text style={styles.text}>{t('terms.sec1P1')}</Text>
         </Section>
 
-        <Section title="2. Community Contributions">
-          <Text style={styles.text}>
-            Rezoa allows users to suggest radio programs and stations. You agree not to submit any content that is illegal, offensive, defamatory, or infringes on the intellectual property rights of others.
-          </Text>
-          <Text style={styles.text}>
-            Rezoa reserves the right to review, modify, or remove any community contributions at our discretion.
-          </Text>
+        <Section title={t('terms.sec2Title')}>
+          <Text style={styles.text}>{t('terms.sec2P1')}</Text>
+          <Text style={styles.text}>{t('terms.sec2P2')}</Text>
         </Section>
 
-        <Section title="3. Content Ownership">
-          <Text style={styles.text}>
-            The radio streams accessible through Rezoa are the property of their respective broadcasters. Rezoa acts only as a directory and player for these publicly available streams.
-          </Text>
-          <Text style={styles.text}>
-            Rezoa branding, software, and community data are the property of Rezoa.
-          </Text>
+        <Section title={t('terms.sec3Title')}>
+          <Text style={styles.text}>{t('terms.sec3P1')}</Text>
+          <Text style={styles.text}>{t('terms.sec3P2')}</Text>
         </Section>
 
-        <Section title="4. Disclaimers">
-          <Text style={styles.text}>
-            Rezoa is provided "as is" and "as available". We do not warrant that streams will be uninterrupted, error-free, or always available. Radio broadcast availability depends on the source broadcaster.
-          </Text>
+        <Section title={t('terms.sec4Title')}>
+          <Text style={styles.text}>{t('terms.sec4P1')}</Text>
         </Section>
 
-        <Section title="5. Limitation of Liability">
-          <Text style={styles.text}>
-            In no event shall Rezoa be liable for any indirect, incidental, special, or consequential damages arising out of your use of the application.
-          </Text>
+        <Section title={t('terms.sec5Title')}>
+          <Text style={styles.text}>{t('terms.sec5P1')}</Text>
         </Section>
 
-        <Section title="6. Changes to Terms">
-          <Text style={styles.text}>
-            We may modify these terms at any time. Your continued use of the app after changes are posted constitutes acceptance of the new terms.
-          </Text>
+        <Section title={t('terms.sec6Title')}>
+          <Text style={styles.text}>{t('terms.sec6P1')}</Text>
         </Section>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>© 2026 Rezoa. All rights reserved.</Text>
+          <Text style={styles.footerText}>{t('terms.footer')}</Text>
         </View>
       </ScrollView>
     </View>

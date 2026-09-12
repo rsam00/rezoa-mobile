@@ -11,6 +11,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 import TopNavigation from '../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 
 type AnimatedCardProps = React.PropsWithChildren<{ onPress: () => void; style?: any;[key: string]: any }>;
@@ -74,6 +75,7 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, fallbackLog
 });
 
 export default function StationDetailsScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
@@ -184,7 +186,7 @@ export default function StationDetailsScreen() {
                       style={{ marginRight: 8 }}
                     />
                     <Text style={[styles.playButtonText, { color: isStationPlaying ? "#fff" : "#000" }]}>
-                      {isStationPlaying ? 'PAUSE' : 'LISTEN'}
+                      {isStationPlaying ? t('station.pause') : t('station.listen')}
                     </Text>
                   </View>
                 )}
@@ -217,9 +219,9 @@ export default function StationDetailsScreen() {
 
           <View style={styles.programSection}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Radio Schedule</Text>
+              <Text style={styles.sectionTitle}>{t('station.schedule')}</Text>
               <TouchableOpacity onPress={() => router.push({ pathname: '/contribute-program', params: { stationId: station.id } })}>
-                <Text style={styles.addLink}>+ Add Program</Text>
+                <Text style={styles.addLink}>{t('station.addProgram')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -240,7 +242,7 @@ export default function StationDetailsScreen() {
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>No programs listed for this station yet.</Text>
+                <Text style={styles.emptyText}>{t('station.noPrograms')}</Text>
               </View>
             )}
           </View>

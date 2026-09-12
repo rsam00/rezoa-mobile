@@ -9,6 +9,7 @@ import { useData } from '../contexts/DataContext';
 import { usePlayer } from '../contexts/PlayerContext';
 import { getCurrentProgram as isLive } from '../utils/timeUtils';
 import TopNavigation from '../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 // HERO_HEIGHT is now dynamically calculated
 
@@ -31,6 +32,7 @@ function AnimatedCard({ children, onPress, ...props }: AnimatedCardProps) {
 }
 
 export default function ProgramDetailsScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams();
   const { programs, stations, loading, recordProgramClick } = useData();
@@ -60,7 +62,7 @@ export default function ProgramDetailsScreen() {
   if (!program) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.programTitle}>Program not found</Text>
+        <Text style={styles.programTitle}>{t('program.notFound')}</Text>
       </SafeAreaView>
     );
   }
@@ -121,7 +123,7 @@ export default function ProgramDetailsScreen() {
           
           {program.host ? (
             <View style={styles.hostRow}>
-              <Text style={styles.hostLabel}>HOSTED BY</Text>
+              <Text style={styles.hostLabel}>{t('program.hostedBy')}</Text>
               <Text style={styles.hostName}>{String(program.host).toUpperCase()}</Text>
             </View>
           ) : null}
@@ -156,7 +158,7 @@ export default function ProgramDetailsScreen() {
                     style={{ marginRight: 8, marginLeft: isStationPlaying ? 0 : 4 }}
                   />
                   <Text style={styles.listenLiveText}>
-                    {isStationPlaying ? 'PAUSE' : 'LISTEN LIVE'}
+                    {isStationPlaying ? t('home.pause') : t('home.listenLive')}
                   </Text>
                 </View>
               )}
@@ -164,24 +166,24 @@ export default function ProgramDetailsScreen() {
           )}
 
           {/* Schedule Section */}
-          <Text style={styles.sectionHeader}>SCHEDULE</Text>
+          <Text style={styles.sectionHeader}>{t('program.schedule')}</Text>
           {Array.isArray(program.schedules) && program.schedules.length > 0 ? (
             <View style={styles.scheduleGrid}>
               {program.schedules.map((sch, idx) => (
                 <View key={idx} style={styles.scheduleBadge}>
-                  <Text style={styles.scheduleDaysBadge}>{(Array.isArray(sch?.days) ? sch.days : []).join(' • ').toUpperCase()}</Text>
+                  <Text style={styles.scheduleDaysBadge}>{(Array.isArray(sch?.days) ? sch.days : []).map((d: any) => t(`days.${String(d).toLowerCase()}`)).join(' • ').toUpperCase()}</Text>
                   <Text style={styles.scheduleTimeBadge}>{String(sch?.startTime)} - {String(sch?.endTime)}</Text>
                 </View>
               ))}
             </View>
           ) : (
-             <Text style={styles.emptyText}>Full schedule coming soon.</Text>
+             <Text style={styles.emptyText}>{t('program.scheduleComingSoon')}</Text>
           )}
 
           {/* Station Glassmorphism Card */}
           {station ? (
             <>
-              <Text style={styles.sectionHeader}>AIRING ON</Text>
+              <Text style={styles.sectionHeader}>{t('program.airingOn')}</Text>
               <AnimatedCard
                 style={styles.stationGlassCard}
                 onPress={() => router.push({ pathname: '/station-details', params: { id: station.id } })}

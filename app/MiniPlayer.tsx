@@ -56,7 +56,7 @@ export default function MiniPlayer() {
     if (!playerState.currentStation) return;
 
     const update = () => {
-      const program = getCurrentProgram(programs as any[], playerState.currentStation!.id);
+      const program = getCurrentProgram(programs, playerState.currentStation!.id);
       const progress = program ? calculateProgramProgress(program) : 0;
       setLiveInfo({ program: program || null, progress });
     };
@@ -64,7 +64,7 @@ export default function MiniPlayer() {
     update();
     const interval = setInterval(update, 10000); // 10s — plenty for a slow progress bar
     return () => clearInterval(interval);
-  }, [playerState.currentStation]);
+  }, [playerState.currentStation, programs]);
 
   // Handle entry/exit animation
   useEffect(() => {
@@ -380,7 +380,7 @@ export default function MiniPlayer() {
       <Modal visible={isQualityMenuVisible} transparent animationType="fade">
         <TouchableWithoutFeedback onPress={() => setQualityMenuVisible(false)}>
           <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => {}}>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>Stream Quality</Text>
                 <ScrollView style={styles.modalScroll}>

@@ -14,15 +14,18 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TopNavigation from '../components/TopNavigation';
 import { useContributions } from '../contexts/ContributionsContext';
 import { useData } from '../contexts/DataContext';
+import { useTranslation } from 'react-i18next';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function ContributeProgramScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
@@ -30,13 +33,14 @@ export default function ContributeProgramScreen() {
   const { stations } = useData();
   const station = stations.find((s) => s.id === stationId);
   const router = useRouter();
-  const { addContribution } = useContributions();
+  const { addContribution: submitProgram } = useContributions();
 
   const [name, setName] = useState('');
   const [host, setHost] = useState('');
   const [description, setDescription] = useState('');
   const [poster, setPoster] = useState('');
   const [schedules, setSchedules] = useState([{ startTime: '09:00', endTime: '10:00', days: [] as string[] }]);
+  const [submitting, setSubmitting] = useState(false);
 
   const toggleDay = (index: number, day: string) => {
     const newSchedules = [...schedules];
@@ -49,7 +53,7 @@ export default function ContributeProgramScreen() {
     setSchedules(newSchedules);
   };
 
-  const updateTime = (index: number, field: 'startTime' | 'endTime', value: string) => {
+  const updateSchedule = (index: number, field: 'startTime' | 'endTime', value: string) => {
     const newSchedules = [...schedules];
     newSchedules[index][field] = value;
     setSchedules(newSchedules);
@@ -75,19 +79,23 @@ export default function ContributeProgramScreen() {
       return;
     }
     try {
-      await addContribution({
+      setSubmitting(true);
+      const newProgram = {
         stationId: stationId as string,
         name,
         host,
         description,
         poster,
         schedules,
-      });
-      Alert.alert('Success', 'Thank you for your contribution!', [
+      };
+      await submitProgram(newProgram as any, stationId as string);
+      Alert.alert(t('contribute.success'), '', [
         { text: 'OK', onPress: () => router.back() },
       ]);
-    } catch (e) {
+    } catch (e: any) {
       Alert.alert('Error', 'Failed to save contribution.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -117,36 +125,36 @@ export default function ContributeProgramScreen() {
       >
         <ScrollView contentContainerStyle={[styles.scrollContent, { maxWidth: 800, alignSelf: 'center', width: '100%' }]}>
           <View style={styles.stationBanner}>
-             <Text style={styles.contributingTo}>CONTRIBUTING TO</Text>
+             <Text style={styles.contributingTo}>{t('contribute.contributingTo')}</Text>
              <Text style={styles.stationName}>{station.name}</Text>
           </View>
           <View style={styles.section}>
-            <Text style={styles.label}>PROGRAM NAME</Text>
-            <TextInput style={styles.input} placeholder="e.g. Matinée Musicale" placeholderTextColor="#52525b" value={name} onChangeText={setName} />
+            <Text style={styles.label}>{t('contribute.programName')}</Text>
+            <TextInput style={styles.input} placeholder={t('contribute.programNamePlaceholder')} placeholderTextColor="#52525b" value={name} onChangeText={setName} />
           </View>
           <View style={styles.section}>
-            <Text style={styles.label}>HOST NAME (OPTIONAL)</Text>
-            <TextInput style={styles.input} placeholder="e.g. Jean Pierre" placeholderTextColor="#52525b" value={host} onChangeText={setHost} />
+            <Text style={styles.label}>{t('contribute.hostName')}</Text>
+            <TextInput style={styles.input} placeholder={t('contribute.hostNamePlaceholder')} placeholderTextColor="#52525b" value={host} onChangeText={setHost} />
           </View>
           <View style={styles.section}>
-            <Text style={styles.label}>DESCRIPTION (OPTIONAL)</Text>
-            <TextInput style={[styles.input, styles.textArea]} placeholder="What is this program about?" placeholderTextColor="#52525b" multiline numberOfLines={4} value={description} onChangeText={setDescription} />
+            <Text style={styles.label}>{t('contribute.description')}</Text>
+            <TextInput style={[styles.input, styles.textArea]} placeholder={t('contribute.descriptionPlaceholder')} placeholderTextColor="#52525b" multiline numberOfLines={4} value={description} onChangeText={setDescription} />
           </View>
           <View style={styles.section}>
-            <Text style={styles.label}>POSTER IMAGE URL (OPTIONAL)</Text>
-            <TextInput style={styles.input} placeholder="https://example.com/poster.jpg" placeholderTextColor="#52525b" value={poster} onChangeText={setPoster} autoCapitalize="none" keyboardType="url" />
+            <Text style={styles.label}>{t('contribute.poster')}</Text>
+            <TextInput style={styles.input} placeholder={t('contribute.posterPlaceholder')} placeholderTextColor="#52525b" value={poster} onChangeText={setPoster} autoCapitalize="none" keyboardType="url" />
           </View>
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
-              <Text style={styles.label}>SCHEDULE</Text>
+              <Text style={styles.label}>{t('contribute.schedule')}</Text>
               <TouchableOpacity onPress={addScheduleSlot}>
-                <Text style={styles.addSlotButton}>+ ADD SLOT</Text>
+                <Text style={styles.addSlotButton}>{t('contribute.addSlot')}</Text>
               </TouchableOpacity>
             </View>
             {schedules.map((sch, idx) => (
               <View key={idx} style={styles.scheduleSlot}>
                 <View style={styles.slotHeader}>
-                   <Text style={styles.slotLabel}>Slot {idx + 1}</Text>
+                   <Text style={styles.slotLabel}>{t('contribute.slot')} {idx + 1}</Text>
                    {schedules.length > 1 && (
                      <TouchableOpacity onPress={() => removeScheduleSlot(idx)}>
                        <Text style={styles.removeSlotText}>Remove</Text>
@@ -155,12 +163,12 @@ export default function ContributeProgramScreen() {
                 </View>
                 <View style={styles.timeRow}>
                   <View style={styles.timeInputContainer}>
-                    <Text style={styles.timeLabel}>START</Text>
-                    <TextInput style={styles.timeInput} value={sch.startTime} onChangeText={(v) => updateTime(idx, 'startTime', v)} placeholder="00:00" placeholderTextColor="#52525b" />
+                    <Text style={styles.timeLabel}>{t('contribute.start')}</Text>
+                    <TextInput style={styles.timeInput} value={sch.startTime} onChangeText={(text) => updateSchedule(idx, 'startTime', text)} placeholder="09:00" placeholderTextColor="#52525b" />
                   </View>
                   <View style={styles.timeInputContainer}>
-                    <Text style={styles.timeLabel}>END</Text>
-                    <TextInput style={styles.timeInput} value={sch.endTime} onChangeText={(v) => updateTime(idx, 'endTime', v)} placeholder="00:00" placeholderTextColor="#52525b" />
+                    <Text style={styles.timeLabel}>{t('contribute.end')}</Text>
+                    <TextInput style={styles.timeInput} value={sch.endTime} onChangeText={(text) => updateSchedule(idx, 'endTime', text)} placeholder="11:00" placeholderTextColor="#52525b" />
                   </View>
                 </View>
                 <View style={styles.daysRow}>
@@ -173,9 +181,8 @@ export default function ContributeProgramScreen() {
               </View>
             ))}
           </View>
-          <TouchableOpacity style={styles.mainSubmitButton} onPress={handleSubmit}>
-             <LinearGradient colors={['#a78bfa', '#7c3aed']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
-            <Text style={styles.mainSubmitButtonText}>SUBMIT CONTRIBUTION</Text>
+          <TouchableOpacity style={[styles.mainSubmitButton, submitting && { opacity: 0.7 }]} onPress={handleSubmit} disabled={submitting}>
+            {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.mainSubmitButtonText}>{t('contribute.submit')}</Text>}
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

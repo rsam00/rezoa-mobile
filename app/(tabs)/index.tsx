@@ -14,7 +14,10 @@ import { useFavorites } from '../../contexts/FavoritesContext';
 import { useHistory } from '../../contexts/HistoryContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import TopNavigation from '../../components/TopNavigation';
+import HomeSkeleton from '../../components/HomeSkeleton';
 import { getCurrentProgram, getHaitiTime } from '../../utils/timeUtils';
+import { useTranslation } from 'react-i18next';
+import LanguageDropdown from '../../components/LanguageDropdown';
 
 const THUMB_WIDTH = 160;
 const THUMB_HEIGHT = 100;
@@ -83,40 +86,26 @@ const ProgramCard = React.memo(function ProgramCard({ item, onPress, station, ra
   );
 });
 
-export default function HomeScreen() {
-  const { isReady } = useData();
+export default function HomeScreenContent() {
+  const { t } = useTranslation();
+  const { isReady, stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
 
   useEffect(() => {
-    // Hide native splash screen once the JS Home Screen mounts/renders
+    // Hide the native splash screen IMMEDIATELY so the user sees the skeleton loader
+    // This prevents Android 12 from timing out and showing a black screen.
     SplashScreen.hideAsync().catch(() => { });
   }, []);
 
-  if (!isReady) {
-    return (
-      <View style={{ flex: 1, backgroundColor: '#2e1065', justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#fff" />
-        <Text style={{ color: '#fff', marginTop: 20, fontWeight: 'bold' }}>SYNCHRONIZING REZOA...</Text>
-      </View>
-    );
-  }
+  useEffect(() => {
+    console.log('--- HOME SCREEN CONTENT MOUNTED ---');
+  }, []);
 
-  return <HomeScreenContent />;
-}
-
-// React.memo prevents re-renders unless HomeScreenContent's own state/context
-// values actually change. Since it takes no props, React can freely bail out.
-const HomeScreenContent = React.memo(function HomeScreenContent() {
-  console.log('--- RENDERING HOME SCREEN CONTENT ---');
   const { height: screenHeight, width: screenWidth } = useWindowDimensions();
   const isLandscape = screenWidth > screenHeight;
   const heroHeight = isLandscape ? screenHeight * 0.7 : screenHeight * 0.45;
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
-  const { stations, programs, loading: dataLoading, recordClick, recordProgramClick } = useData();
 
-  useEffect(() => {
-    console.log('--- HOME SCREEN CONTENT MOUNTED ---');
-  }, []);
   const { favorites, toggleFavorite } = useFavorites();
   const { playStation, playerState, pause } = usePlayer();
   const { history } = useHistory();
@@ -337,11 +326,15 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
     index,
   }), []);
 
+  if (!isReady) {
+    return <HomeSkeleton />;
+  }
 
+  console.log('--- RENDERING HOME SCREEN CONTENT ---');
 
   return (
     <View style={styles.container}>
-      <TopNavigation />
+      <TopNavigation rightComponent={<LanguageDropdown />} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -390,11 +383,11 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
               <View style={styles.heroBadges}>
                 <View style={[styles.badge, !featuredItem.program && { backgroundColor: '#555' }]}>
                   <Text style={styles.badgeText}>
-                    {featuredItem.program ? 'LIVE NOW' : 'LIVE RADIO'}
+                    {featuredItem.program ? t('home.liveNow') : t('home.liveRadio')}
                   </Text>
                 </View>
                 <Text style={styles.heroMeta}>
-                  {featuredItem.program ? `on ${featuredItem.station?.name || 'Radio'}` : ([featuredItem.station?.city, featuredItem.station?.department, featuredItem.station?.country].filter(Boolean).join(', ') || 'Haiti')}
+                  {featuredItem.program ? `${t('home.on')} ${featuredItem.station?.name || 'Radio'}` : ([featuredItem.station?.city, featuredItem.station?.department, featuredItem.station?.country].filter(Boolean).join(', ') || 'Haiti')}
                 </Text>
               </View>
 
@@ -409,7 +402,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   }}
                 >
                   <Text style={styles.playButtonText}>
-                    {Boolean(playerState.isPlaying && playerState.currentStation && featuredItem.station && playerState.currentStation.id === featuredItem.station.id) ? '⏸ PAUSE' : '▶️ LISTEN LIVE'}
+                    {Boolean(playerState.isPlaying && playerState.currentStation && featuredItem.station && playerState.currentStation.id === featuredItem.station.id) ? `⏸ ${t('home.pause')}` : `▶️ ${t('home.listenLive')}`}
                   </Text>
                 </TouchableOpacity>
 
@@ -418,7 +411,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
                   onPress={navigateToDetails}
                 >
                   <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
-                  <Text style={styles.infoButtonText}>ⓘ MORE INFO</Text>
+                  <Text style={styles.infoButtonText}>ⓘ {t('home.moreInfo')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -444,7 +437,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
         {recentlyPlayed.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Jump Back In</Text>
+            <Text style={styles.sectionTitle}>{t('home.jumpBackIn')}</Text>
             <FlatList
               data={recentlyPlayed}
               keyExtractor={item => `history-${item.id}`}
@@ -460,7 +453,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
 
         {favoriteStations.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>Your Top Mix</Text>
+            <Text style={styles.sectionTitle}>{t('home.topMix')}</Text>
             <FlatList
               data={favoriteStations}
               keyExtractor={item => `fav-${item.id}`}
@@ -474,7 +467,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
           </>
         )}
 
-        <Text style={styles.sectionTitle}>Popular Radios</Text>
+        <Text style={styles.sectionTitle}>{t('home.popularRadios')}</Text>
         <FlatList
           data={popular}
           keyExtractor={item => `pop-${item.id}`}
@@ -568,7 +561,7 @@ const HomeScreenContent = React.memo(function HomeScreenContent() {
       </ScrollView>
     </View>
   );
-});
+}
 
 const styles = StyleSheet.create({
   container: {

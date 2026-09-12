@@ -35,7 +35,9 @@ import { useData } from '../../contexts/DataContext';
 import { useDrawer } from '../../contexts/DrawerContext';
 import { usePlayer } from '../../contexts/PlayerContext';
 import { getHaitiTime } from '../../utils/timeUtils';
+import { LinearGradient } from 'expo-linear-gradient';
 import TopNavigation from '../../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 const ReanimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -187,16 +189,14 @@ function AnimatedEqualizer() {
 }
 
 export default function ProgramGuideScreen() {
-  return <ProgramGuideContent />;
-}
-
-function ProgramGuideContent() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
   const router = useRouter();
   const { playStation, playerState, pause } = usePlayer();
-  const { stations, programs, loading: dataLoading } = useData();
+  const { stations, programs, loading, recordProgramClick } = useData();
+  const dataLoading = loading;
   
   const [selectedDay, setSelectedDay] = useState<number>(getHaitiTime().day ? ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(getHaitiTime().day) : new Date().getDay());
   const [haitiNow, setHaitiNow] = useState(getHaitiTime());
@@ -596,10 +596,13 @@ function ProgramGuideContent() {
       <TopNavigation />
       
       <View style={[{ flex: 1 }, isLandscape ? { marginLeft: 200 + Math.max(0, insets.left), paddingRight: Math.max(0, insets.right) } : {}]}>
-        <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15, paddingTop: isLandscape ? insets.top + 10 : insets.top + 70 }]}>
+        <View style={[styles.headerContainer, { paddingTop: isLandscape ? Math.max(20, insets.top) : insets.top + 60, paddingHorizontal: isLandscape ? 40 : 20 }]}>
+          <Text style={styles.headerTitle}>{t('guide.title')}</Text>
+        </View>
+        <View style={[styles.dayStripContainer, { flexDirection: 'row', alignItems: 'center', paddingRight: 15, paddingTop: 10 }]}>
         <TouchableOpacity style={styles.filtersButton} onPress={() => setShowFiltersMenu(true)}>
            <Ionicons name="filter" size={16} color="#d4d4d8" />
-           <Text style={styles.filtersButtonText}>Filters</Text>
+           <Text style={styles.filtersButtonText}>{t('guide.filters')}</Text>
         </TouchableOpacity>
         
         <ScrollView ref={dayScrollRef} horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={styles.dayStrip}>
@@ -609,13 +612,13 @@ function ProgramGuideContent() {
               onPress={() => setSelectedDay(i)}
               style={[styles.dayTab, selectedDay === i && styles.activeDayTab]}
             >
-              <Text style={[styles.dayText, selectedDay === i && styles.activeDayText]}>{day}</Text>
+              <Text style={[styles.dayText, selectedDay === i && styles.activeDayText]}>{t(`days.${day.toLowerCase()}`)}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
         <TouchableOpacity style={styles.liveNowButton} onPress={scrollToNow}>
           <Animated.View style={[styles.liveDot, liveDotStyle]} />
-          <Text style={styles.liveNowText}>LIVE</Text>
+          <Text style={styles.liveNowText}>{t('guide.live')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -702,22 +705,22 @@ function ProgramGuideContent() {
           </TouchableWithoutFeedback>
           <View style={[styles.modalContent, { maxHeight: 'auto' }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Filters</Text>
+              <Text style={styles.modalTitle}>{t('guide.filters')}</Text>
               <TouchableOpacity onPress={() => setShowFiltersMenu(false)}>
                 <Ionicons name="close" size={24} color="#fff" />
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Country'); }}>
-              <Text style={styles.modalOptionText}>Country: <Text style={{color:'#a78bfa'}}>{selectedCountry === 'United States' ? 'USA' : selectedCountry}</Text></Text>
+              <Text style={styles.modalOptionText}>{t('guide.country')}: <Text style={{color:'#a78bfa'}}>{selectedCountry === 'United States' ? 'USA' : selectedCountry === 'All' ? t('guide.all') : selectedCountry}</Text></Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Department'); }}>
-              <Text style={styles.modalOptionText}>{(selectedCountry === 'United States' || selectedCountry === 'USA') ? 'State' : 'Department'}: <Text style={{color:'#a78bfa'}}>{selectedDepartment}</Text></Text>
+              <Text style={styles.modalOptionText}>{(selectedCountry === 'United States' || selectedCountry === 'USA') ? t('guide.state') : t('guide.department')}: <Text style={{color:'#a78bfa'}}>{selectedDepartment === 'All' ? t('guide.all') : selectedDepartment}</Text></Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('City'); }}>
-              <Text style={styles.modalOptionText}>City: <Text style={{color:'#a78bfa'}}>{selectedCity}</Text></Text>
+              <Text style={styles.modalOptionText}>{t('guide.city')}: <Text style={{color:'#a78bfa'}}>{selectedCity === 'All' ? t('guide.all') : selectedCity}</Text></Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalOption} onPress={() => { setShowFiltersMenu(false); setActiveFilter('Genre'); }}>
-              <Text style={styles.modalOptionText}>Genre: <Text style={{color:'#a78bfa'}}>{selectedGenre}</Text></Text>
+              <Text style={styles.modalOptionText}>{t('guide.genre')}: <Text style={{color:'#a78bfa'}}>{selectedGenre === 'All' ? t('guide.all') : selectedGenre}</Text></Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -731,7 +734,7 @@ function ProgramGuideContent() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                Select {activeFilter === 'Department' && (selectedCountry === 'USA' || selectedCountry === 'United States') ? 'State' : activeFilter}
+                {t('guide.select')} {activeFilter === 'Department' && (selectedCountry === 'USA' || selectedCountry === 'United States') ? t('guide.state') : activeFilter ? t(`guide.${activeFilter.toLowerCase()}`) : ''}
               </Text>
               <TouchableOpacity onPress={() => setActiveFilter(null)}>
                 <Ionicons name="close" size={24} color="#fff" />
@@ -762,7 +765,7 @@ function ProgramGuideContent() {
                     (activeFilter === 'City' && selectedCity === item) ||
                     (activeFilter === 'Genre' && selectedGenre === item) ? { color: '#a78bfa', fontWeight: 'bold' } : {}
                   ]}>
-                    {item}
+                    {item === 'All' ? t('guide.all') : item === 'United States' ? 'USA' : item}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -775,6 +778,14 @@ function ProgramGuideContent() {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    paddingBottom: 15,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
   container: { flex: 1, backgroundColor: 'black' },
   liveNowButton: { 
     flexDirection: 'row', 

@@ -1,0 +1,139 @@
+{
+  "translation": {
+    "nav": {
+      "home": "Home",
+      "guide": "Guide",
+      "explore": "Explore"
+    },
+    "home": {
+      "liveNow": "LIVE NOW",
+      "on": "on",
+      "listenLive": "LISTEN LIVE",
+      "pause": "PAUSE",
+      "moreInfo": "MORE INFO",
+      "jumpBackIn": "Jump Back In",
+      "popularRadios": "Popular Radios",
+      "topMix": "Your Top Mix",
+      "liveRadio": "LIVE RADIO"
+    },
+    "sidebar": {
+      "home": "Home",
+      "myFavorites": "My Favorites",
+      "makeAContribution": "Make a Contribution",
+      "contactUs": "Contact Us",
+      "signOut": "Sign Out",
+      "signIn": "Sign In"
+    },
+    "player": {
+      "nowPlaying": "Now Playing",
+      "nextProgram": "Next Program",
+      "noProgramScheduled": "No program scheduled"
+    },
+    "explore": {
+      "title": "Explore",
+      "searchPlaceholder": "Search stations, genres..."
+    },
+    "guide": {
+      "title": "Radio Guide",
+      "filters": "Filters",
+      "live": "LIVE",
+      "country": "Country",
+      "department": "Department",
+      "state": "State",
+      "city": "City",
+      "genre": "Genre",
+      "select": "Select",
+      "all": "All"
+    },
+    "program": {
+      "notFound": "Program not found",
+      "hostedBy": "HOSTED BY",
+      "schedule": "SCHEDULE",
+      "scheduleComingSoon": "Full schedule coming soon.",
+      "airingOn": "AIRING ON"
+    },
+    "station": {
+      "listen": "LISTEN",
+      "pause": "PAUSE",
+      "schedule": "Radio Schedule",
+      "addProgram": "+ Add Program",
+      "noPrograms": "No programs listed for this station yet."
+    },
+    "contribute": {
+      "contributingTo": "CONTRIBUTING TO",
+      "programName": "PROGRAM NAME",
+      "programNamePlaceholder": "e.g. Matinée Musicale",
+      "hostName": "HOST NAME (OPTIONAL)",
+      "hostNamePlaceholder": "e.g. Jean Pierre",
+      "description": "DESCRIPTION (OPTIONAL)",
+      "descriptionPlaceholder": "What is this program about?",
+      "poster": "POSTER IMAGE URL (OPTIONAL)",
+      "posterPlaceholder": "https://example.com/poster.jpg",
+      "schedule": "SCHEDULE",
+      "addSlot": "+ ADD SLOT",
+      "slot": "Slot",
+      "start": "START",
+      "end": "END",
+      "submit": "SUBMIT CONTRIBUTION",
+      "submitting": "Submitting...",
+      "success": "Contribution submitted!"
+    },
+    "days": {
+      "mon": "MON", "tue": "TUE", "wed": "WED", "thu": "THU", "fri": "FRI", "sat": "SAT", "sun": "SUN",
+      "monday": "MONDAY", "tuesday": "TUESDAY", "wednesday": "WEDNESDAY", "thursday": "THURSDAY", "friday": "FRIDAY", "saturday": "SATURDAY", "sunday": "SUNDAY"
+    },
+    "login": {
+      "createAccount": "Create Account",
+      "welcomeBack": "Welcome Back",
+      "joinCommunity": "Join the Rezoa community",
+      "signInSync": "Sign in to sync your favorites",
+      "email": "EMAIL ADDRESS",
+      "password": "PASSWORD",
+      "confirmPassword": "CONFIRM PASSWORD",
+      "signIn": "SIGN IN",
+      "signUp": "SIGN UP",
+      "dontHaveAccount": "Don't have an account? Sign Up",
+      "alreadyHaveAccount": "Already have an account? Sign In",
+      "skipForNow": "Skip for now",
+      "errorFillAll": "Please fill in all fields",
+      "errorMismatch": "Passwords do not match",
+      "error": "Error"
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last Updated: January 17, 2026",
+      "sec1Title": "1. Information We Collect",
+      "sec1P1": "We collect information you provide directly to us, such as when you create an account (Email), suggest radio programs, or heart a station.",
+      "sec1P2": "We also automatically collect certain interaction data, including which stations you play or which shows you view, to power our community analytics (Trending and Popularity lists).",
+      "sec2Title": "2. How We Use Your Information",
+      "sec2P1": "- To provide, maintain, and improve our services.\n- To aggregate anonymous community metrics (e.g., tracking \"clicks\" per show).\n- To synchronize your favorites across your devices (for logged-in users).\n- To communicate with you about updates to the platform.",
+      "sec3Title": "3. Data Sharing and Third Parties",
+      "sec3P1": "We do not sell your personal data. We use Supabase for secure database management and authentication.",
+      "sec3P2": "Please note that Rezoa streams content from external radio stations. Interacting with these streams may involve standard internet communication with third-party servers.",
+      "sec4Title": "4. Your Rights",
+      "sec4P1": "You have the right to access, update, or delete your personal information at any time via your profile settings or by contacting our support.",
+      "sec5Title": "5. Security",
+      "sec5P1": "We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access.",
+      "footer": "© 2026 Rezoa. All rights reserved."
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "lastUpdated": "Last Updated: January 17, 2026",
+      "sec1Title": "1. Agreement to Terms",
+      "sec1P1": "By accessing or using Rezoa, you agree to be bound by these Terms of Use. If you do not agree, please do not use the application.",
+      "sec2Title": "2. Community Contributions",
+      "sec2P1": "Rezoa allows users to suggest radio programs and stations. You agree not to submit any content that is illegal, offensive, defamatory, or infringes on the intellectual property rights of others.",
+      "sec2P2": "Rezoa reserves the right to review, modify, or remove any community contributions at our discretion.",
+      "sec3Title": "3. Content Ownership",
+      "sec3P1": "The radio streams accessible through Rezoa are the property of their respective broadcasters. Rezoa acts only as a directory and player for these publicly available streams.",
+      "sec3P2": "Rezoa branding, software, and community data are the property of Rezoa.",
+      "sec4Title": "4. Disclaimers",
+      "sec4P1": "Rezoa is provided \"as is\" and \"as available\". We do not warrant that streams will be uninterrupted, error-free, or always available. Radio broadcast availability depends on the source broadcaster.",
+      "sec5Title": "5. Limitation of Liability",
+      "sec5P1": "In no event shall Rezoa be liable for any indirect, incidental, special, or consequential damages arising out of your use of the application.",
+      "sec6Title": "6. Changes to Terms",
+      "sec6P1": "We may modify these terms at any time. Your continued use of the app after changes are posted constitutes acceptance of the new terms.",
+      "footer": "© 2026 Rezoa. All rights reserved."
+    }
+  }
+}

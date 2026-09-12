@@ -20,8 +20,10 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import TopNavigation from '../components/TopNavigation';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,12 +37,12 @@ export default function LoginScreen() {
 
   async function handleAuth() {
     if (!email || !password || (isSignUp && !confirmPassword)) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('login.error'), t('login.errorFillAll'));
       return;
     }
 
     if (isSignUp && password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t('login.error'), t('login.errorMismatch'));
       return;
     }
 
@@ -93,15 +95,15 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={[styles.content, { flexGrow: 1, maxWidth: 400, alignSelf: 'center', width: '100%' }]} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-          <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
+          <Text style={styles.title}>{isSignUp ? t('login.createAccount') : t('login.welcomeBack')}</Text>
           <Text style={styles.subtitle}>
-            {isSignUp ? 'Join the Rezoa community' : 'Sign in to sync your favorites'}
+            {isSignUp ? t('login.joinCommunity') : t('login.signInSync')}
           </Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>EMAIL ADDRESS</Text>
+            <Text style={styles.label}>{t('login.email')}</Text>
             <TextInput
               style={styles.input}
               placeholder="email@example.com"
@@ -114,7 +116,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>PASSWORD</Text>
+            <Text style={styles.label}>{t('login.password')}</Text>
             <View style={styles.passwordWrapper}>
               <TextInput
                 style={[styles.input, styles.passwordInput]}
@@ -132,7 +134,7 @@ export default function LoginScreen() {
 
           {isSignUp && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>CONFIRM PASSWORD</Text>
+              <Text style={styles.label}>{t('login.confirmPassword')}</Text>
               <View style={styles.passwordWrapper}>
                 <TextInput
                   style={[styles.input, styles.passwordInput]}
@@ -161,7 +163,7 @@ export default function LoginScreen() {
               <ActivityIndicator color="#fff" />
             ) : (
               <Text style={styles.mainButtonText}>
-                {isSignUp ? 'SIGN UP' : 'SIGN IN'}
+                {isSignUp ? t('login.signUp') : t('login.signIn')}
               </Text>
             )}
           </TouchableOpacity>
@@ -171,7 +173,7 @@ export default function LoginScreen() {
             style={styles.switchButton}
           >
             <Text style={styles.switchButtonText}>
-              {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+              {isSignUp ? t('login.alreadyHaveAccount') : t('login.dontHaveAccount')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -180,7 +182,7 @@ export default function LoginScreen() {
           style={styles.skipButton}
           onPress={() => router.replace('/(tabs)')}
         >
-          <Text style={styles.skipButtonText}>Skip for now</Text>
+          <Text style={styles.skipButtonText}>{t('login.skipForNow')}</Text>
         </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

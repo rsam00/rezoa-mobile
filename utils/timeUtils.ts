@@ -5,6 +5,7 @@ export interface Program {
   schedules: { startTime: string; endTime: string; days: string[] }[];
   poster?: string;
   host?: string;
+  description?: string;
 }
 
 // ---------------------------------------------------------------------------

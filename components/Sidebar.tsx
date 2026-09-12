@@ -23,9 +23,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useAuth } from '../contexts/AuthContext';
 import { useDrawer } from '../contexts/DrawerContext';
+import { useTranslation } from 'react-i18next';
 
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   const { isOpen, closeDrawer } = useDrawer();
   const { user, signOut } = useAuth();
   const router = useRouter();
@@ -116,7 +118,7 @@ export default function Sidebar() {
                 style={StyleSheet.absoluteFill}
               />
               <Text style={[styles.authButtonText, user ? { color: '#ef4444' } : { color: '#fff' }]}>
-                {user ? 'Sign Out' : 'Sign In'}
+                {user ? t('sidebar.signOut') : t('sidebar.signIn')}
               </Text>
             </TouchableOpacity>
           </View>
