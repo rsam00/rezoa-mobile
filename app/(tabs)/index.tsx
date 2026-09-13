@@ -432,7 +432,7 @@ export default function HomeScreenContent() {
         )}
 
         <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
-          <AdBanner />
+          <AdBanner unitId="ca-app-pub-3065572808298366/5880178874" />
         </View>
 
         {recentlyPlayed.length > 0 && (
@@ -504,7 +504,7 @@ export default function HomeScreenContent() {
         />
 
         <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
-          <AdBanner />
+          <AdBanner unitId="ca-app-pub-3065572808298366/5880178874" />
         </View>
 
         <Text style={styles.sectionTitle}>{t('home.newsTalk')}</Text>
@@ -544,7 +544,7 @@ export default function HomeScreenContent() {
         />
 
         <View style={{ paddingHorizontal: 15, marginVertical: 15 }}>
-          <AdBanner />
+          <AdBanner unitId="ca-app-pub-3065572808298366/5880178874" />
         </View>
 
         <Text style={styles.sectionTitle}>{t('home.justAdded')}</Text>

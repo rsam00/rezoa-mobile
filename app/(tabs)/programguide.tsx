@@ -670,7 +670,7 @@ export default function ProgramGuideScreen() {
                 <View style={{ width: 24 * CELL_WIDTH, height: STATION_ROW_HEIGHT, backgroundColor: '#000', flexDirection: 'row', alignItems: 'center' }}>
                    {[0, 6, 12, 18].map((h) => (
                      <View key={h} style={{ width: 6 * CELL_WIDTH, height: STATION_ROW_HEIGHT, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10 }}>
-                        <AdBanner height={STATION_ROW_HEIGHT - 20} type="banner" />
+                        <AdBanner height={STATION_ROW_HEIGHT - 20} type="banner" unitId="ca-app-pub-3065572808298366/4531825225" />
                      </View>
                    ))}
                 </View>

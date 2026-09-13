@@ -308,7 +308,7 @@ export default function MiniPlayer() {
                 </View>
                 {isLandscape && (
                   <View style={styles.landscapeAdContainer}>
-                    <AdBanner type="banner" />
+                    <AdBanner type="banner" unitId="ca-app-pub-3065572808298366/4611716273" />
                   </View>
                 )}
               </View>
@@ -370,7 +370,7 @@ export default function MiniPlayer() {
 
           {!isLandscape && (
             <View style={styles.portraitAdContainer}>
-              <AdBanner type="banner" />
+              <AdBanner type="banner" unitId="ca-app-pub-3065572808298366/4611716273" />
             </View>
           )}
         </LinearGradient>

@@ -89,7 +89,7 @@ export default function ContributeProgramScreen() {
         poster,
         schedules,
       };
-      await submitProgram(newProgram as any, stationId as string);
+      await submitProgram(newProgram as any);
       Alert.alert(t('contribute.success'), '', [
         { text: 'OK', onPress: () => router.back() },
       ]);

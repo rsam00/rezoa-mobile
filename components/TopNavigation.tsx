@@ -57,7 +57,7 @@ export default function TopNavigation({ rightComponent }: Props) {
             <TouchableOpacity 
               key={tab.route} 
               style={[styles.navTab, isActive && styles.activeNavTab]}
-              onPress={() => router.navigate(`/(tabs)/${tab.route === 'index' ? '' : tab.route}`)}
+              onPress={() => router.navigate(`/(tabs)/${tab.route === 'index' ? '' : tab.route}` as any)}
             >
               <Text style={[styles.navTabText, isActive && styles.activeNavTabText]}>
                 {tab.name}

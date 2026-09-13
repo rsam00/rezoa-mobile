@@ -164,7 +164,7 @@ function ExploreScreenContent() {
     if (item.isAd) {
       return (
         <View style={{ paddingHorizontal: 15, marginVertical: 10, marginBottom: 16 }}>
-          <AdBanner />
+          <AdBanner unitId="ca-app-pub-3065572808298366/7436803122" />
         </View>
       );
     }
